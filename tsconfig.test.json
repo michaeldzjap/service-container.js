@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.base",
+    "compilerOptions": {
+        "paths": {
+            "@helpers/*": ["__tests__/helpers/*"],
+            "@src/*": ["src/*"],
+            "@typings/*": ["typings/*"]
+        }
+    },
+    "include": [
+        "__tests__/**/*",
+        "src/**/*",
+        "typings/**/*"
+    ]
+}

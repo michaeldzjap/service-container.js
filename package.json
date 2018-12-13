@@ -1,0 +1,73 @@
+{
+  "name": "koa-plus",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "development": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./bootstrap/app.ts",
+    "dev": "npm run development",
+    "production": "./node_modules/.bin/tsc ./bootstrap/app.ts",
+    "prod": "npm run production",
+    "test": "cross-env NODE_ENV=test jest",
+    "test:watch": "npm test -- --watch"
+  },
+  "keywords": [
+    "koa",
+    "javascript"
+  ],
+  "author": "Michael Dzjaparidze",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "@types/lodash.isstring": "^4.0.4",
+    "@types/node": "^10.12.12",
+    "eslint": "^5.10.0",
+    "eslint-plugin-jest": "^22.1.2",
+    "eslint-plugin-typescript": "^0.14.0",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.7.0",
+    "typescript": "^3.2.2",
+    "typescript-eslint-parser": "^21.0.2"
+  },
+  "dependencies": {
+    "cherow": "^1.6.8",
+    "reflect-metadata": "^0.1.12"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "moduleNameMapper": {
+      "^@helpers/(.*)$": "<rootDir>/__tests__/helpers/$1",
+      "^@src/(.*)$": "<rootDir>/src/$1",
+      "^@typings/(.*)$": "<rootDir>/typings/$1"
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "src",
+      "typings"
+    ],
+    "setupFiles": [
+      "<rootDir>/__tests__/setup.ts"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.+(ts|tsx|js)"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/__tests__/helpers/",
+      "<rootDir>/__tests__/setup.ts"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.test.json"
+      }
+    }
+  }
+}
