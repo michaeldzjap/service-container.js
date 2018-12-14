@@ -3,7 +3,7 @@ import IFunctionParser from '@src/Contracts/Parsing/IFunctionParser';
 import ParsingError from './ParsingError';
 import {ClassMethod} from '@typings/.';
 
-class ArrowFunctionExpression<T> extends AbstractFunctionParser<T> implements IFunctionParser {
+class ArrowFunctionExpression extends AbstractFunctionParser implements IFunctionParser {
 
     /**
      * Create a new arrow function parser instance.
@@ -11,7 +11,7 @@ class ArrowFunctionExpression<T> extends AbstractFunctionParser<T> implements IF
      * @param {Object} tree
      * @param {mixed} target
      */
-    public constructor(tree: any, target: ClassMethod<T>) {
+    public constructor(tree: any, target: Function) {
         if (tree.type !== 'ArrowFunctionExpression') {
             throw new ParsingError('Invalid ESTree structure provided.');
         }

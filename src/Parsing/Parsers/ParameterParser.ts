@@ -3,10 +3,11 @@ import 'reflect-metadata';
 import ExpressionCollector from '@src/Parsing/ExpressionCollector';
 import IParameterParser from '@src/Contracts/Parsing/IParameterParser';
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import {isNullOrUndefined} from '@src/Support/helpers';
 import {Interface} from '@typings/index';
 import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '@src/Constants/metadata';
 
-class ParameterParser<T> implements IParameterParser {
+class ParameterParser implements IParameterParser {
 
     /**
      * The ESTree structure representing an array of function parameters.
@@ -20,7 +21,14 @@ class ParameterParser<T> implements IParameterParser {
      *
      * @var {mixed}
      */
-    private _target: T;
+    private _target: Function;
+
+    /**
+     * The name of the function.
+     *
+     * @var {string}
+     */
+    private _name?: string;
 
     /**
      * The parameter types.
@@ -41,9 +49,10 @@ class ParameterParser<T> implements IParameterParser {
      *
      * @param {Array} tree
      * @param {mixed} target
+     * @param {string} name
      */
-    public constructor(tree: Array<any>, target: T) {
-        const types = this._fetchMetadata(DESIGN_PARAM_TYPES, target) || [];
+    public constructor(tree: any[], target: Function, name?: string) {
+        const types = this._fetchMetadata(DESIGN_PARAM_TYPES, target, name) || [];
 
         if (tree.length !== types.length) {
             throw new Error('The number of parameters and types must match.');
@@ -51,8 +60,9 @@ class ParameterParser<T> implements IParameterParser {
 
         this._tree = tree;
         this._target = target;
+        this._name = name;
         this._types = types;
-        this._keys = this._fetchMetadata(INTERFACE_SYMBOLS, target);
+        this._keys = this._fetchMetadata(INTERFACE_SYMBOLS, target, name);
     }
 
     /**
@@ -60,10 +70,10 @@ class ParameterParser<T> implements IParameterParser {
      *
      * @returns {Array}
      */
-    public all(): ParameterDescriptor<unknown>[] {
+    public all(): ParameterDescriptor[] {
         return this._tree
-            .map((param: any, i: number): ParameterDescriptor<unknown> => (
-                this._makeDescriptor<unknown>(param, this._types[i] as any, i)
+            .map((param: any, i: number): ParameterDescriptor => (
+                this._makeDescriptor(param, this._types[i], i)
             ));
     }
 
@@ -73,10 +83,9 @@ class ParameterParser<T> implements IParameterParser {
      * @param {number} index
      * @returns {ParameterDescriptor}
      */
-    public at(index: number): ParameterDescriptor<unknown> {
-        return this._makeDescriptor<unknown>(
-            this._tree[index],
-            this._types[index] as any, index
+    public at(index: number): ParameterDescriptor {
+        return this._makeDescriptor(
+            this._tree[index], this._types[index], index
         );
     }
 
@@ -88,16 +97,16 @@ class ParameterParser<T> implements IParameterParser {
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _makeDescriptor<U>(param: any, type: U, position: number): ParameterDescriptor<U> {
+    private _makeDescriptor(param: any, type: Function, position: number): ParameterDescriptor {
         // The parameter has a value assigned to it. Hence, we need to do
         // some parsing to fetch it. This can become quite complex in the
         // case of deeply nested parameter values
         if (param.type === 'AssignmentPattern') {
-            return this._parseAssignmentPattern<U>(param, type, position);
+            return this._parseAssignmentPattern(param, type, position);
         }
 
         // Simplest case: parameter does not have a value assigned
-        return new ParameterDescriptor<U>({
+        return new ParameterDescriptor({
             name: param.name,
             type: this._parseType(type, position),
             position
@@ -112,7 +121,7 @@ class ParameterParser<T> implements IParameterParser {
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _parseAssignmentPattern<U>(param: any, type: U, position: number): ParameterDescriptor<U> {
+    private _parseAssignmentPattern(param: any, type: Function, position: number): ParameterDescriptor {
         const props = {
             name: param.left.name,
             type: this._parseType(type, position),
@@ -156,7 +165,7 @@ class ParameterParser<T> implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseArrayExpression<U>(expr: any, props: any): ParameterDescriptor<U> {
+    private _parseArrayExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: ExpressionCollector.collectElements(expr)
@@ -170,7 +179,7 @@ class ParameterParser<T> implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseObjectExpression<U>(expr: any, props: any): ParameterDescriptor<U> {
+    private _parseObjectExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: ExpressionCollector.collectProperties(expr)
@@ -184,7 +193,7 @@ class ParameterParser<T> implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseMemberExpression<U>(expr: any, props: any): ParameterDescriptor<U> {
+    private _parseMemberExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: expr.object.name
@@ -198,7 +207,7 @@ class ParameterParser<T> implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseLiteral<U>(literal: any, props: any): ParameterDescriptor<U> {
+    private _parseLiteral(literal: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({...props, value: literal.value});
     }
 
@@ -207,15 +216,15 @@ class ParameterParser<T> implements IParameterParser {
      *
      * @param {string} key
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {string|undefined} name
      * @returns {Array|Map}
      */
-    private _fetchMetadata(key: string, target: any): any {
-        if (target.method) {
-            return Reflect.getMetadata(key, target.target, target.method as string);
+    private _fetchMetadata(key: string, target: any, name?: string): any[] | Map<number, Symbol | string> {
+        if (!isNullOrUndefined(name)) {
+            return Reflect.getMetadata(key, target, name);
         }
 
-        return Reflect.getMetadata(key, target.target);
+        return Reflect.getMetadata(key, target);
     }
 
 }

@@ -1,6 +1,6 @@
 import {AbstractReflectionFunction} from '.';
 
-class ReflectionFunction<T> extends AbstractReflectionFunction<T> {
+class ReflectionFunction extends AbstractReflectionFunction {
 
     //
 

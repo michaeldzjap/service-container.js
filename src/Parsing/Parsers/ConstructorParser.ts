@@ -2,9 +2,8 @@ import IConstructorParser from '@src/Contracts/Parsing/IConstructorParser';
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
 import ParsingError from './ParsingError';
-import {ClassMethod} from '@typings/.';
 
-class ConstructorParser<T> implements IConstructorParser {
+class ConstructorParser implements IConstructorParser {
 
     /**
      * The ESTree structure representing the class constructor.
@@ -18,22 +17,22 @@ class ConstructorParser<T> implements IConstructorParser {
      *
      * @var {mixed}
      */
-    private _target: T;
+    private _target: Function;
 
     /**
      * The parameter parser implementation.
      *
      * @var {ParameterParser}
      */
-    private _parameterParser: ParameterParser<T>;
+    private _parameterParser: ParameterParser;
 
     /**
      * Create a new method parser instance.
      *
      * @param {Object} tree
-     * @param {mixed} target
+     * @param {Function} target
      */
-    public constructor(tree: any, target: T) {
+    public constructor(tree: any, target: Function) {
         if (tree.kind !== 'constructor') {
             throw new ParsingError('Invalid ESTree structure provided.');
         }
@@ -50,7 +49,7 @@ class ConstructorParser<T> implements IConstructorParser {
      * @returns {string}
      */
     public getClass(): string {
-        return (this._target as any).name;
+        return this._target.name;
     }
 
     /**
@@ -67,7 +66,7 @@ class ConstructorParser<T> implements IConstructorParser {
      *
      * @returns {Array}
      */
-    public getParameters(): ParameterDescriptor<unknown>[] {
+    public getParameters(): ParameterDescriptor[] {
         if (!this._tree.value.params.length) return [];
 
         return this._parameterParser.all();
@@ -79,9 +78,9 @@ class ConstructorParser<T> implements IConstructorParser {
      * @returns {void}
      */
     private _initializeParameterParser(): void {
-        this._parameterParser = new ParameterParser<T>(
+        this._parameterParser = new ParameterParser(
             this._tree.value.params,
-            {target: this._target} as unknown as ClassMethod<T>
+            this._target
         );
     }
 

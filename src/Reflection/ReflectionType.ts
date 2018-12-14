@@ -1,18 +1,18 @@
-class ReflectionType<T> {
+class ReflectionType {
 
     /**
      * The reflected type.
      *
-     * @var {mixed}
+     * @var {Function}
      */
-    private _type: T;
+    private _type: Function;
 
     /**
      * Create a new reflection type instance.
      *
-     * @param {mixed} type
+     * @param {Function} type
      */
-    public constructor(type: T) {
+    public constructor(type: Function) {
         this._type = type;
     }
 
@@ -32,7 +32,7 @@ class ReflectionType<T> {
         const target = window || global;
 
         if (target) {
-            return !!target[(this._type as any).prototype.constructor.name];
+            return !!target[this._type.prototype.constructor.name];
         }
 
         return false;

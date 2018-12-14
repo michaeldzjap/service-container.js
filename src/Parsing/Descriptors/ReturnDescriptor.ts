@@ -1,11 +1,11 @@
-class ReturnDescriptor<T> {
+class ReturnDescriptor {
 
     /**
      * The return type.
      *
-     * @var {mixed}
+     * @var {Function}
      */
-    private _type: T;
+    private _type: Function;
 
     /**
      * The return value.
@@ -17,10 +17,10 @@ class ReturnDescriptor<T> {
     /**
      * Create a new parameter descriptor instance.
      *
-     * @param {mixed} type
+     * @param {Function} type
      * @param {mixed} value
      */
-    public constructor(type: T, value: unknown) {
+    public constructor(type: Function, value: unknown) {
         this._type = type;
         this._value = value;
     }
@@ -30,7 +30,7 @@ class ReturnDescriptor<T> {
      *
      * @returns {mixed}
      */
-    public get type(): T {
+    public get type(): Function {
         return this._type;
     }
 

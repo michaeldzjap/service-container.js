@@ -1,13 +1,13 @@
 import {ReflectionMethod} from '.';
 
-class ReflectionClass<T> {
+class ReflectionClass {
 
     /**
      * The class that should be reflected.
      *
-     * @var {mixed}
+     * @var {Function|Symbol}
      */
-    private _target: T | Symbol;
+    private _target: Function | Symbol;
 
     /**
      * Indicates if the reflected class is an interface.
@@ -21,7 +21,7 @@ class ReflectionClass<T> {
      *
      * @param {mixed} target
      */
-    public constructor(target: T | Symbol) {
+    public constructor(target: Function | Symbol) {
         this._target = target;
         this._isInterface = false;
     }
@@ -32,8 +32,8 @@ class ReflectionClass<T> {
      * @param {Symbol} key
      * @returns {ReflectionClass}
      */
-    public static createFromInterface<T>(key: Symbol): ReflectionClass<T> {
-        const instance = new ReflectionClass<T>(key);
+    public static createFromInterface(key: Symbol): ReflectionClass {
+        const instance = new ReflectionClass(key);
         instance._isInterface = true;
 
         return instance;
@@ -44,13 +44,13 @@ class ReflectionClass<T> {
      *
      * @returns {mixed|undefined}
      */
-    public getTarget(): T | Symbol | undefined {
+    public getTarget(): Function | Symbol | undefined {
         if (this.isInterface()) {
             return this._target as Symbol;
         }
 
         if (this.isInstantiable()) {
-            return this._target as T;
+            return this._target as Function;
         }
     }
 
@@ -64,7 +64,7 @@ class ReflectionClass<T> {
             return this._target.toString();
         }
 
-        return (this._target as any).name;
+        return (this._target as Function).name;
     }
 
     /**
@@ -96,8 +96,8 @@ class ReflectionClass<T> {
      *
      * @returns {ReflectionMethod}
      */
-    public getConstructor(): ReflectionMethod<T> {
-        return new ReflectionMethod(this._target as T, 'constructor');
+    public getConstructor(): ReflectionMethod {
+        return new ReflectionMethod(this._target as Function, 'constructor');
     }
 
     /**
@@ -106,8 +106,8 @@ class ReflectionClass<T> {
      * @param {Array} dependencies
      * @returns {mixed}
      */
-    public newInstanceArgs(dependencies: any[]): T {
-        return new (this._target as any)(...dependencies) as T;
+    public newInstanceArgs(dependencies: any[]): object {
+        return new (this._target as any)(...dependencies);
     }
 
 }

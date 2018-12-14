@@ -3,30 +3,30 @@ import {ReflectionClass, ReflectionType} from '.';
 import {isNullOrUndefined, isClass} from '@src/Support/helpers';
 import {Interface} from '@typings/.'
 
-class ReflectionParameter<U, V> {
+class ReflectionParameter {
 
     /**
      * The target the parameter belongs to.
      *
      * @var mixed
      */
-    private _target: U;
+    private _target: Function;
 
     /**
      * The type of the reflected parameter.
      *
      * @var {mixed}
      */
-    private _descriptor: ParameterDescriptor<V>;
+    private _descriptor: ParameterDescriptor;
 
     /**
      * Create a new reflection parameter instance.
      *
-     * @param {mixed} target
+     * @param {Function} target
      * @param {ParameterDescriptor} descriptor
      * @param {number} position
      */
-    public constructor(target: U, descriptor: ParameterDescriptor<V>) {
+    public constructor(target: Function, descriptor: ParameterDescriptor) {
         this._target = target;
         this._descriptor = descriptor;
     }
@@ -36,9 +36,9 @@ class ReflectionParameter<U, V> {
      *
      * @returns {ReflectionClass|undefined}
      */
-    public getDeclaringClass(): ReflectionClass<U> | undefined {
+    public getDeclaringClass(): ReflectionClass | undefined {
         if (isClass(this._target)) {
-            return new ReflectionClass<U>(this._target);
+            return new ReflectionClass(this._target);
         }
     }
 
@@ -47,7 +47,7 @@ class ReflectionParameter<U, V> {
      *
      * @returns {ReflectionClass|undefined}
      */
-    public getClass(): ReflectionClass<V> | undefined {
+    public getClass(): ReflectionClass | undefined {
         if (this.getType().isBuiltin()) return;
 
         if ((this._descriptor.type as any).name === 'Interface') {
@@ -56,7 +56,7 @@ class ReflectionParameter<U, V> {
             );
         }
 
-        return new ReflectionClass<V>(this._descriptor.type);
+        return new ReflectionClass(this._descriptor.type);
     }
 
     /**
@@ -73,8 +73,8 @@ class ReflectionParameter<U, V> {
      *
      * @returns {mixed}
      */
-    public getType(): ReflectionType<V> {
-        return new ReflectionType<V>(this._descriptor.type);
+    public getType(): ReflectionType {
+        return new ReflectionType(this._descriptor.type);
     }
 
     /**

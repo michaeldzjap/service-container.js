@@ -6,7 +6,7 @@ import {
 } from '.';
 import {PARAM_TYPES} from '@src/Constants/metadata';
 
-class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
+class ReflectionMethod extends AbstractReflectionFunction {
 
     /**
      * The method descriptor object.
@@ -18,13 +18,13 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
     /**
      * Create a new reflection method instance.
      *
-     * @param {mixed} target
+     * @param {Function} target
      * @param {string} name
      */
-    public constructor(target: T, name: string) {
+    public constructor(target: Function, name: string) {
         super(target, name);
 
-        const descriptor = ReflectionMethod._findDescriptor<T>(target, name);
+        const descriptor = ReflectionMethod._findDescriptor(target, name);
 
         this._descriptor = descriptor;
     }
@@ -38,21 +38,15 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
      *
      * @throws {ReferenceError}
      */
-    private static _findDescriptor<T>(target: T, name: string): PropertyDescriptor | undefined {
-        if (Reflect.has((target as unknown as Function).prototype as any, name)) {
+    private static _findDescriptor(target: Function, name: string): PropertyDescriptor | undefined {
+        if (Reflect.has(target.prototype, name)) {
             // Regular method
-            return Reflect.getOwnPropertyDescriptor(
-                (target as unknown as Function).prototype as any,
-                name
-            );
+            return Reflect.getOwnPropertyDescriptor(target.prototype, name);
         }
 
         if (Reflect.has(target as unknown as object, name)) {
             // Static method
-            return Reflect.getOwnPropertyDescriptor(
-                target as unknown as object,
-                name
-            );
+            return Reflect.getOwnPropertyDescriptor(target, name);
         }
 
         throw new ReferenceError(
@@ -65,8 +59,8 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
      *
      * @returns {ReflectionClass}
      */
-    public getDeclaringClass(): ReflectionClass<T> {
-        return new ReflectionClass<T>(this._target);
+    public getDeclaringClass(): ReflectionClass {
+        return new ReflectionClass(this._target);
     }
 
     /**
@@ -74,7 +68,7 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
      *
      * @returns {Array}
      */
-    public getParameters(): ReflectionParameter<T, unknown>[] {
+    public getParameters(): ReflectionParameter[] {
         return super.getParameters(this._getTypes());
     }
 
@@ -109,10 +103,7 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
     public isStatic(): boolean {
         if (!this._name || this._name === 'constructor') return false;
 
-        return !!Reflect.getOwnPropertyDescriptor(
-            this._target as unknown as object,
-            this._name
-        );
+        return !!Reflect.getOwnPropertyDescriptor(this._target, this._name);
     }
 
     /**
@@ -120,7 +111,7 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
      *
      * @returns {ParameterDescriptor|undefined}
      */
-    private _getTypes(): ParameterDescriptor<unknown>[] | undefined {
+    private _getTypes(): ParameterDescriptor[] | undefined {
         if (this.isConstructor()) {
             return Reflect.getMetadata(PARAM_TYPES, this._target);
         }
@@ -130,7 +121,7 @@ class ReflectionMethod<T> extends AbstractReflectionFunction<T> {
         }
 
         return Reflect.getMetadata(
-            PARAM_TYPES, (this._target as any).prototype, this._name as string
+            PARAM_TYPES, this._target.prototype, this._name as string
         );
     }
 
