@@ -95,7 +95,7 @@ export const isMap = (value: any): value is Map<unknown, unknown> => (
  * @param {Array} array
  * @returns {mixed}
  */
-export const last = (array: unknown[]): unknown => array[array.length - 1];
+export const last = (array: unknown[]): any => array[array.length - 1];
 
 /**
  * Check if an array has any elements or an object has any properties.

@@ -1,11 +1,13 @@
+import {Newable} from '@typings/.';
+
 class Callable<T> {
 
     /**
      * The class definition or instance to target.
      *
-     * @var {mixed}
+     * @var {Function|Newable}
      */
-    private _target: T;
+    private _target: Function | Newable<T>;
 
     /**
      * The name of the method that is to be called on the class / instance.
@@ -24,11 +26,11 @@ class Callable<T> {
     /**
      * Create a new callable instance.
      *
-     * @param {mixed} target
+     * @param {Function|Newable} target
      * @param {string|undefined} method
      * @param {boolean} isStatic
      */
-    public constructor(target: T, method?: string, isStatic: boolean = false) {
+    public constructor(target: Function | Newable<T>, method?: string, isStatic: boolean = false) {
         this._target = target;
         this._method = method;
         this._isStatic = isStatic;
@@ -37,9 +39,9 @@ class Callable<T> {
     /**
      * Get the class definition or instance.
      *
-     * @returns {mixed}
+     * @returns {Function|Newable}
      */
-    public get target(): T {
+    public get target(): Function | Newable<T> {
         return this._target;
     }
 
@@ -66,7 +68,7 @@ class Callable<T> {
      *
      * @returns {Array}
      */
-    public asArray(): [T, string | undefined, boolean] {
+    public asArray(): [Function | Newable<T>, string | undefined, boolean] {
         return [this._target, this._method, this._isStatic];
     }
 
@@ -82,12 +84,12 @@ class Callable<T> {
             throw new Error('Cannot call a non-existent function on a callable.');
         }
 
-        if ((this._target as any).prototype && !this._isStatic) {
+        if (this._target.prototype && !this._isStatic) {
             throw new Error('Cannot call an instance method on a class definition.');
         }
 
         if (this._isStatic) {
-            return (this._target as any).prototype
+            return this._target.prototype
                 ? this._target[this._method](...args)
                 : this._target.constructor[this._method](...args);
         }

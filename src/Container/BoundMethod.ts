@@ -135,7 +135,7 @@ class BoundMethod {
      * @returns {void}
      */
     protected static _addDependencyForCallParameter(container: Container,
-        parameter: ReflectionParameter<any, any>, parameters: object, dependencies: object): void {
+        parameter: ReflectionParameter, parameters: object, dependencies: object): void {
         if (parameters.hasOwnProperty(parameter.getName())) {
             dependencies[parameter.getName()] = parameters[parameter.getName()];
 
@@ -157,10 +157,9 @@ class BoundMethod {
      * @param {Callable} callback
      * @returns {ReflectionMethod}
      */
-    protected static _getCallReflector<T>(callback: Callable<T>): ReflectionMethod<T> {
+    protected static _getCallReflector<T>(callback: Callable<T>): ReflectionMethod {
         return new ReflectionMethod<T>(
-            callback.target.constructor as any,
-            callback.method as string
+            callback.target.constructor, callback.method as string
         );
     }
 
@@ -171,7 +170,7 @@ class BoundMethod {
      * @returns {boolean}
      */
     private static _isCallable<T>(callback: Callable<T>): boolean {
-        return !!(callback.target as any).prototype;
+        return !!callback.target.prototype;
     }
 
 }

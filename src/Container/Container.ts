@@ -67,70 +67,70 @@ class Container implements IContainer {
      *
      * @var {Map}
      */
-    protected _abstractAliases: Map<any, Array<any>> = new Map;
+    protected _abstractAliases: Map<any, any[]> = new Map;
 
     /**
      * The extension closures for services.
      *
      * @var {Map}
      */
-    protected _extenders: Map<any, Array<Function>> = new Map;
+    protected _extenders: Map<any, Function[]> = new Map;
 
     /**
      * All of the registered tags.
      *
      * @var {Map}
      */
-    protected _tags: Map<string, Array<any>> = new Map;
+    protected _tags: Map<string, any[]> = new Map;
 
     /**
      * The stack of concretions currently being built.
      *
      * @var {Array}
      */
-    protected _buildStack: Array<any> = [];
+    protected _buildStack: any[] = [];
 
     /**
      * The parameter override stack.
      *
      * @var {Array}
      */
-    protected _with: Array<Array<any> | object> = [];
+    protected _with: Array<any[] | object> = [];
 
     /**
      * All of the registered rebound callbacks.
      *
      * @var {Map}
      */
-    protected _reboundCallbacks: Map<any, Array<Function>> = new Map;
+    protected _reboundCallbacks: Map<any, Function[]> = new Map;
 
     /**
      * All of the global resolving callbacks.
      *
      * @var {Array}
      */
-    protected _globalResolvingCallbacks: Array<Function> = [];
+    protected _globalResolvingCallbacks: Function[] = [];
 
     /**
      * All of the global after resolving callbacks.
      *
      * @var {Array}
      */
-    protected _globalAfterResolvingCallbacks: Array<Function> = [];
+    protected _globalAfterResolvingCallbacks: Function[] = [];
 
     /**
      * All of the resolving callbacks by class type.
      *
      * @var {Map}
      */
-    protected _resolvingCallbacks: Map<any, Array<Function>> = new Map;
+    protected _resolvingCallbacks: Map<any, Function[]> = new Map;
 
     /**
      * All of the after resolving callbacks by class type.
      *
      * @var {Map}
      */
-    protected _afterResolvingCallbacks: Map<any, Array<Function>> = new Map;
+    protected _afterResolvingCallbacks: Map<any, Function[]> = new Map;
 
     /**
      * Set the globally available instance of the container.
@@ -591,8 +591,8 @@ class Container implements IContainer {
         }
 
         const reflector = typeof concrete === 'symbol'
-            ? ReflectionClass.createFromInterface<T>(concrete)
-            : new ReflectionClass(concrete as T);
+            ? ReflectionClass.createFromInterface(concrete)
+            : new ReflectionClass(concrete);
 
         // If the type is not instantiable, the developer is attempting to
         // resolve an abstract type such as an Interface of Abstract Class and
@@ -929,7 +929,7 @@ class Container implements IContainer {
             return;
         }
 
-        for (const alias of this._abstractAliases.get(abstract) as Array<any>) {
+        for (const alias of this._abstractAliases.get(abstract) as any[]) {
             const binding = this._findInContextualBindings<any>(alias);
             if (!isNullOrUndefined(binding)) {
                 return binding;
@@ -968,7 +968,7 @@ class Container implements IContainer {
      * @param {Array} dependencies
      * @returns {Array}
      */
-    protected _resolveDependencies<T>(dependencies: Array<ReflectionParameter<T, unknown>>): Array<any> {
+    protected _resolveDependencies<T>(dependencies: ReflectionParameter[]): any[] {
         const results = [];
 
         for (const dependency of dependencies) {
@@ -976,8 +976,8 @@ class Container implements IContainer {
             // will use that instead as the value. Otherwise, we will continue
             // with this run of resolutions and let reflection attempt to
             // determine the result.
-            if (this._hasParameterOverride<T, unknown>(dependency)) {
-                results.push(this._getParameterOverride<T, unknown>(dependency));
+            if (this._hasParameterOverride(dependency)) {
+                results.push(this._getParameterOverride(dependency));
 
                 continue;
             }
@@ -987,8 +987,8 @@ class Container implements IContainer {
             // no-where to go.
             results.push(
                 dependency.getType().isBuiltin()
-                    ? this._resolvePrimitive<T, unknown>(dependency)
-                    : this._resolveClass<T, unknown>(dependency)
+                    ? this._resolvePrimitive(dependency)
+                    : this._resolveClass<T>(dependency)
             );
         }
 
@@ -1001,7 +1001,7 @@ class Container implements IContainer {
      * @param {@src/Reflection/ReflectionParameter} dependency
      * @returns {boolean}
      */
-    protected _hasParameterOverride<U, V>(dependency: ReflectionParameter<U, V>): boolean {
+    protected _hasParameterOverride(dependency: ReflectionParameter): boolean {
         const override = this._getLastParameterOverride();
 
         return Array.isArray(override)
@@ -1012,10 +1012,10 @@ class Container implements IContainer {
     /**
      * Get a parameter override for a dependency.
      *
-     * @param {@src/Reflection/ReflectionParameter} dependency
+     * @param {ReflectionParameter} dependency
      * @returns {mixed}
      */
-    protected _getParameterOverride<U, V>(dependency: ReflectionParameter<U, V>): any {
+    protected _getParameterOverride(dependency: ReflectionParameter): any {
         return this._getLastParameterOverride()[dependency.getName()];
     }
 
@@ -1024,17 +1024,17 @@ class Container implements IContainer {
      *
      * @returns {Array|Object}
      */
-    protected _getLastParameterOverride(): Array<any> | object {
+    protected _getLastParameterOverride(): any[] | object {
         return this._with.length ? last(this._with) : [];
     }
 
     /**
      * Resolve a non-class hinted primitive dependency.
      *
-     * @param {@src/Reflection/ReflectionParameter} parameter
+     * @param {ReflectionParameter} parameter
      * @returns {mixed|undefined}
      */
-    protected _resolvePrimitive<U, V>(parameter: ReflectionParameter<U, V>): any | undefined {
+    protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
         const concrete = this._getContextualConcrete(parameter.getName());
         if (concrete) {
             return concrete instanceof Function
@@ -1046,20 +1046,20 @@ class Container implements IContainer {
             return parameter.getDefaultValue();
         }
 
-        this._unresolvablePrimitive<U, V>(parameter);
+        this._unresolvablePrimitive(parameter);
     }
 
     /**
      * Resolve a class based dependency from the container.
      *
-     * @param {@src/Reflection/ReflectionParameter} parameter
+     * @param {ReflectionParameter} parameter
      * @returns {mixed}
      *
-     * @throws {@sr/Container/BindingResolutionError}
+     * @throws {BindingResolutionError}
      */
-    protected _resolveClass<U, V>(parameter: ReflectionParameter<U, V>): V | unknown {
+    protected _resolveClass<T>(parameter: ReflectionParameter): T | unknown {
         try {
-            return this.make<V>(parameter.getClass()!.getTarget() as any);
+            return this.make<T>(parameter.getClass()!.getTarget() as any);
         } catch (e) {
             // If we can not resolve the class instance, we will check to see if
             // the value is optional, and if it is we will return the optional
@@ -1157,10 +1157,10 @@ class Container implements IContainer {
      * @returns {Array}
      */
     protected _getCallbacksForType<T>(abstract: Identifier<T>, object: object,
-        callbacksPerType: Map<string, Array<Function>>): Array<Function> {
-        const results: Array<Function> = [];
+        callbacksPerType: Map<string, Function[]>): Function[] {
+        const results: Function[] = [];
 
-        callbacksPerType.forEach((callbacks: Array<Function>, type: any): void => {
+        callbacksPerType.forEach((callbacks: Function[], type: any): void => {
             if (type === abstract || object instanceof type) {
                 results.push(...callbacks);
             }
@@ -1176,7 +1176,7 @@ class Container implements IContainer {
      * @param {Array} callbacks
      * @returns {void}
      */
-    protected _fireCallbackArray(object: object, callbacks: Array<Function>): void {
+    protected _fireCallbackArray(object: object, callbacks: Function[]): void {
         for (const callback of callbacks) {
             callback(object, this);
         }
@@ -1188,11 +1188,11 @@ class Container implements IContainer {
      * @param {mixed} abstract
      * @returns {Array}
      */
-    protected _getExtenders<T>(abstract: Identifier<T>): Array<Function> {
+    protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
         abstract = this.getAlias<T>(abstract);
 
         if (this._extenders.has(abstract)) {
-            return this._extenders.get(abstract) as Array<Function>;
+            return this._extenders.get(abstract) as Function[];
         }
 
         return [];
