@@ -50,10 +50,8 @@ class ReflectionParameter {
     public getClass(): ReflectionClass | undefined {
         if (this.getType().isBuiltin()) return;
 
-        if ((this._descriptor.type as any).name === 'Interface') {
-            return ReflectionClass.createFromInterface(
-                (this._descriptor.type as unknown as Interface).key
-            );
+        if (this._descriptor.type.name === 'Interface') {
+            return ReflectionClass.createFromInterface(this._descriptor.type);
         }
 
         return new ReflectionClass(this._descriptor.type);

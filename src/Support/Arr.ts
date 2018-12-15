@@ -175,7 +175,7 @@ class Arr {
      * @param {mixed|undefined} dflt
      * @returns {mixed}
      */
-    public static last(array: unknown[], callback?: Function, dflt?: unknown): unknown {
+    public static last(array: unknown[], callback?: Function, dflt?: unknown): any {
         if (isNullOrUndefined(callback)) {
             return array.length ? array[array.length - 1] : value(dflt);
         }
@@ -281,6 +281,18 @@ class Arr {
         }
 
         return obj;
+    }
+
+    /**
+     * Check if an array has any elements or an object has any properties.
+     *
+     * @param {Array|Object} array
+     * @returns {boolean}
+     */
+    public static empty(array: unknown[] | object): boolean {
+        return !(
+            Array.isArray(array) ? array.length : Object.keys(array).length
+        );
     }
 
     /**
@@ -445,8 +457,7 @@ class Arr {
      * @param {mixed} value
      * @returns {Object}
      */
-    public static set(obj: object | Map<unknown, unknown>, key: string | null,
-        value: unknown): object | unknown {
+    public static set(obj: object, key: string | null, value: unknown): object | unknown {
         if (key === null) return value;
 
         const keys = key.split('.');

@@ -54,11 +54,17 @@ describe('ReflectionMethod', (): void => {
         [
             {className: 'DependencyStub', name: 'stub'},
             {className: 'String', name: 'name', value: 'Riley Martin'},
-            {className: 'Symbol(IReflectionClassContractStub)', name: 'impl'},
+            {className: 'IReflectionClassContractStub', name: 'impl'},
         ].forEach(({className, name, value}, i: number): void => {
             expect(parameters[i]).toBeInstanceOf(ReflectionParameter);
             expect(parameters[i].getType()).toBeInstanceOf(ReflectionType);
-            expect(parameters[i].getClass().getName()).toBe(className);
+
+            if (parameters[i].getType().isBuiltin()) {
+                expect(parameters[i].getClass()).toBeUndefined();
+            } else {
+                expect(parameters[i].getClass()!.getName()).toBe(className);
+            }
+
             expect(parameters[i].getName()).toBe(name);
             expect(parameters[i].getDefaultValue()).toBe(value);
         });

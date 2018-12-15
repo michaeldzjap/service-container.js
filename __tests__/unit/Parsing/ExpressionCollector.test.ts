@@ -23,7 +23,7 @@ describe('ExpressionCollector', (): void => {
         const expr = tree.body[0].body.body[4].value.params[0].right;
 
         // eslint-disable-next-line require-jsdoc
-        const fn = (): Array<unknown> => ExpressionCollector.collectElements(expr);
+        const fn = (): unknown[] => ExpressionCollector.collectElements(expr);
 
         expect(fn).toThrow('ESTree expression cannot be resolved.');
     });

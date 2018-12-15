@@ -1,6 +1,7 @@
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
 import {ReflectionClass, ReflectionParameter, ReflectionType} from '@src/Reflection';
 import ReflectionClassStub, {DependencyStub} from '@helpers/Stubs/ReflectionClassStub';
+import {isNullOrUndefined} from '@src/Support/helpers';
 import {Interface} from '@typings/.';
 
 describe('ReflectionParameter', (): void => {
@@ -19,7 +20,7 @@ describe('ReflectionParameter', (): void => {
         },
         {
             param: new ParameterDescriptor({name: 'impl', type: Interface, position: 2}),
-            className: 'Symbol(IReflectionClassContractStub)',
+            className: 'IReflectionClassContractStub',
             name: 'impl',
             isNative: false
         }
@@ -38,8 +39,10 @@ describe('ReflectionParameter', (): void => {
         it(`returns the type of the reflected [${param.name}] parameter as a reflection class instance`, (): void => {
             const type = reflector.getClass();
 
-            expect(type).toBeInstanceOf(ReflectionClass);
-            expect(type.getName()).toBe(className);
+            if (!isNullOrUndefined(type)) {
+                expect(type).toBeInstanceOf(ReflectionClass);
+                expect(type.getName()).toBe(className);
+            }
         });
 
         it(`returns the name of the reflected [${param.name}] parameter`, (): void => {

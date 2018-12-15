@@ -2,37 +2,6 @@ import Arr from './Arr';
 import {Instantiable, Instance} from '@typings/.';
 
 /**
- * Set a property of an object to the given value.
- *
- * This method returns a shallow copy of the original object, where the property
- * denoted by the given key is replaced for the given value.
- *
- * @param {Object} target
- * @param {string} key
- * @param {mixed} value
- * @returns {Object}
- */
-export const set = (target: object, key: string, value: any): object => ({
-    ...target, [key]: value
-});
-
-/**
- * Remove a property from an object.
- *
- * This method returns a shallow copy of the original object that no longer
- * contains the property associated with the given key.
- *
- * @param {Object} target
- * @param {string} key
- * @returns {Object}
- */
-export const remove = (target: any, key: string): object => {
-    const {[key]: d, ...rest} = target;
-
-    return rest;
-};
-
-/**
  * Determine if the given value is undefined.
  *
  * @param {mixed} value
@@ -88,24 +57,6 @@ export const isString = (value: any): value is string => (
  */
 export const isMap = (value: any): value is Map<unknown, unknown> => (
     value instanceof Map
-);
-
-/**
- * Return the last item in an array.
- *
- * @param {Array} array
- * @returns {mixed}
- */
-export const last = (array: unknown[]): any => array[array.length - 1];
-
-/**
- * Check if an array has any elements or an object has any properties.
- *
- * @param {Array|Object} target
- * @returns {boolean}
- */
-export const empty = (target: Array<any> | Object): boolean => (
-    !(Array.isArray(target) ? target.length : Object.keys(target).length)
 );
 
 /**

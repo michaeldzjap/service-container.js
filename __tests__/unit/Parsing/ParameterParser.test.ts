@@ -12,12 +12,11 @@ import {Interface} from '@typings/.';
  * @param {mixed} target
  * @returns {ParameterParser}
  */
-const makeParser = (target: any): ParameterParser<unknown> => {
+const makeParser = (target: any): ParameterParser => {
     const tree = ESTreeGenerator.generate(target.toString());
 
     return new ParameterParser(
-        tree.body[0].body.body[0].value.params,
-        {target}
+        tree.body[0].body.body[0].value.params, target
     );
 };
 

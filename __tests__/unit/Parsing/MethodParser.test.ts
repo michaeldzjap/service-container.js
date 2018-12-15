@@ -2,7 +2,7 @@ import ESTreeGenerator from '@src/Parsing/ESTreeGenerator';
 import MethodParser from '@src/Parsing/Parsers/MethodParser';
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
 import {ClassWithPublicMethodStub, ClassWithPublicStaticMethodStub} from '@helpers/Stubs/ParserStubs';
-import {ClassMethod, Interface} from '@typings/.';
+import {Interface} from '@typings/.';
 
 describe('MethodParser', (): void => {
     const EXPECTED = [
@@ -16,10 +16,8 @@ describe('MethodParser', (): void => {
         const tree = ESTreeGenerator.generate(ClassWithPublicMethodStub.toString());
         const parser = new MethodParser(
             tree.body[0].body.body[0],
-            {
-                target: ClassWithPublicMethodStub.prototype,
-                method: 'someMethod'
-            } as unknown as ClassMethod<ClassWithPublicMethodStub>
+            ClassWithPublicMethodStub.prototype,
+            'someMethod'
         );
         const result = parser.getParameters();
 
@@ -30,10 +28,8 @@ describe('MethodParser', (): void => {
         const tree = ESTreeGenerator.generate(ClassWithPublicStaticMethodStub.toString());
         const parser = new MethodParser(
             tree.body[0].body.body[0],
-            {
-                target: ClassWithPublicStaticMethodStub,
-                method: 'someMethod'
-            } as unknown as ClassMethod<ClassWithPublicStaticMethodStub>
+            ClassWithPublicStaticMethodStub,
+            'someMethod'
         );
         const result = parser.getParameters();
 

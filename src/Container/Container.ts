@@ -9,7 +9,7 @@ import LogicError from './LogicError';
 import NestedMap from '@src/Support/NestedMap';
 import {ReflectionClass, ReflectionParameter} from '@src/Reflection';
 import {Binding, Identifier, Instantiable} from '@typings/.';
-import {empty, isClass, isString, last, isNullOrUndefined} from '@src/Support/helpers';
+import {isClass, isString, isNullOrUndefined} from '@src/Support/helpers';
 
 class Container implements IContainer {
 
@@ -253,7 +253,7 @@ class Container implements IContainer {
         // which is bound into this container to the abstract type and we will
         // just wrap it up inside its own Closure to give us more convenience
         // when extending.
-        if (isClass(concrete) || typeof concrete === 'symbol') {
+        if (isClass(concrete) /* || typeof concrete === 'symbol' */) {
             concrete = this._getClosure<U, V>(abstract, concrete as Identifier<V>);
         }
 
@@ -834,7 +834,7 @@ class Container implements IContainer {
     protected _resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
         abstract = this.getAlias<T>(abstract);
 
-        const needsContextualBuild = !empty(parameters)
+        const needsContextualBuild = !Arr.empty(parameters)
             || !!this._getContextualConcrete<T>(abstract);
 
         // If an instance of the type is currently being managed as a singleton
@@ -947,8 +947,8 @@ class Container implements IContainer {
      * @returns {mixed|undefined}
      */
     protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
-        if (this._contextual.has([last(this._buildStack), abstract])) {
-            return this._contextual.get([last(this._buildStack), abstract]);
+        if (this._contextual.has([Arr.last(this._buildStack), abstract])) {
+            return this._contextual.get([Arr.last(this._buildStack), abstract]);
         }
     }
 
@@ -1027,7 +1027,7 @@ class Container implements IContainer {
      * @returns {Array|Object}
      */
     protected _getLastParameterOverride(): any[] | object {
-        return this._with.length ? last(this._with) : [];
+        return this._with.length ? Arr.last(this._with) : [];
     }
 
     /**
@@ -1060,8 +1060,16 @@ class Container implements IContainer {
      * @throws {BindingResolutionError}
      */
     protected _resolveClass(parameter: ReflectionParameter): any {
+        const reflector = parameter.getClass();
+
+        if (isNullOrUndefined(reflector)) {
+            throw new BindingResolutionError('Cannot get parameter type.');
+        }
+
         try {
-            return this.make(parameter.getClass()!.getTarget());
+            const target = reflector.getTarget();
+
+            return this.make(reflector.isInterface() ? target.key : target);
         } catch (e) {
             // If we can not resolve the class instance, we will check to see if
             // the value is optional, and if it is we will return the optional

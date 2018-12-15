@@ -111,6 +111,8 @@ class ReflectionMethod extends AbstractReflectionFunction {
      * Get the parameter types of the reflected method.
      *
      * @returns {ParameterDescriptor|undefined}
+     *
+     * @throws {Error}
      */
     private _getTypes(): ParameterDescriptor[] | undefined {
         if (this.isConstructor()) {

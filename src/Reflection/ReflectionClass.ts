@@ -1,5 +1,6 @@
 import {ReflectionError, ReflectionMethod} from '.';
-import {isSymbol} from '@src/Support/helpers';
+import {isSymbol, isString, isNullOrUndefined} from '@src/Support/helpers';
+import {Interface} from '@typings/.';
 
 class ReflectionClass {
 
@@ -30,11 +31,11 @@ class ReflectionClass {
     /**
      * Create a new reflection instance from a symbol representing an interface.
      *
-     * @param {Symbol} key
+     * @param {Interface} contract
      * @returns {ReflectionClass}
      */
-    public static createFromInterface(key: Symbol): ReflectionClass {
-        const instance = new ReflectionClass(key);
+    public static createFromInterface(contract: Interface): ReflectionClass {
+        const instance = new ReflectionClass(contract);
         instance._isInterface = true;
 
         return instance;
@@ -55,8 +56,18 @@ class ReflectionClass {
      * @returns {string}
      */
     public getName(): string {
-        if (isSymbol(this._target)) {
-            return this._target.toString();
+        if (this._isInterface && isSymbol(this._target.key)) {
+            const result = /Symbol\(([^)]+)\)/.exec(this._target.key.toString());
+
+            if (isNullOrUndefined(result)) {
+                throw new ReflectionError('Could not determine interface name.');
+            }
+
+            return result[1];
+        }
+
+        if (this._isInterface && isString(this._target.key)) {
+            return this._target.key;
         }
 
         return this._target.name;
