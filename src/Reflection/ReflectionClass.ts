@@ -119,7 +119,7 @@ class ReflectionClass {
      * @returns {mixed}
      */
     public newInstanceArgs(dependencies: any[]): any {
-        return new (this._target as any)(...dependencies);
+        return new this._target(...dependencies);
     }
 
 }
