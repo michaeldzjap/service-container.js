@@ -7,7 +7,7 @@
     "dev": "npm run development",
     "production": "./node_modules/.bin/tsc ./bootstrap/app.ts",
     "prod": "npm run production",
-    "test": "cross-env NODE_ENV=test jest",
+    "test": "NODE_ENV=test jest",
     "test:watch": "npm test -- --watch"
   },
   "keywords": [
