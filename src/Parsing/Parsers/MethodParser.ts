@@ -1,22 +1,22 @@
 import AbstractFunctionParser from './AbstractFunctionParser';
 import IFunctionParser from '@src/Contracts/Parsing/IFunctionParser';
 import ParsingError from './ParsingError';
-import {ClassMethod} from '@typings/.';
 
-class MethodParser<T> extends AbstractFunctionParser<T> implements IFunctionParser {
+class MethodParser extends AbstractFunctionParser implements IFunctionParser {
 
     /**
      * Create a new method parser instance.
      *
      * @param {Object} tree
      * @param {mixed} target
+     * @param {string} method
      */
-    public constructor(tree: any, target: ClassMethod<T>) {
+    public constructor(tree: any, target: any, method: string) {
         if (tree.type !== 'MethodDefinition') {
             throw new ParsingError('Invalid ESTree structure provided.');
         }
 
-        super(tree.value, target);
+        super(tree.value, target, method);
     }
 
     /**

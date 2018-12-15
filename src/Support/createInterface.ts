@@ -57,12 +57,13 @@ const checkMetadata = ({name, key}: {name: string, key: Symbol}, target: any,
  * @param {number} position
  * @returns {void}
  */
-const defineMetadata = (identifier: {name: string, key: Symbol}, target: any,
+const defineMetadata = (identifier: {name: string, key: Symbol | string}, target: any,
     propertyName: string | undefined, position: number): void => {
     if (propertyName) {
         Reflect.defineMetadata(
             INTERFACE_SYMBOLS,
-            Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName).set(position, identifier.key),
+            Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName)
+                .set(position, identifier.key),
             target,
             propertyName
         );
@@ -72,7 +73,8 @@ const defineMetadata = (identifier: {name: string, key: Symbol}, target: any,
 
     Reflect.defineMetadata(
         INTERFACE_SYMBOLS,
-        Reflect.getMetadata(INTERFACE_SYMBOLS, target).set(position, identifier.key),
+        Reflect.getMetadata(INTERFACE_SYMBOLS, target)
+            .set(position, identifier.key),
         target
     );
 };

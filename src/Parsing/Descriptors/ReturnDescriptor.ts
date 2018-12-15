@@ -1,18 +1,18 @@
-class ReturnDescriptor<T> {
+class ReturnDescriptor {
 
     /**
      * The return type.
      *
      * @var {mixed}
      */
-    private _type: T;
+    private _type: any;
 
     /**
      * The return value.
      *
      * @var {mixed}
      */
-    private _value: unknown;
+    private _value: any;
 
     /**
      * Create a new parameter descriptor instance.
@@ -20,7 +20,7 @@ class ReturnDescriptor<T> {
      * @param {mixed} type
      * @param {mixed} value
      */
-    public constructor(type: T, value: unknown) {
+    public constructor(type: any, value: any) {
         this._type = type;
         this._value = value;
     }
@@ -30,7 +30,7 @@ class ReturnDescriptor<T> {
      *
      * @returns {mixed}
      */
-    public get type(): T {
+    public get type(): any {
         return this._type;
     }
 
@@ -39,7 +39,7 @@ class ReturnDescriptor<T> {
      *
      * @returns {mixed}
      */
-    public get value(): unknown {
+    public get value(): any {
         return this._value;
     }
 

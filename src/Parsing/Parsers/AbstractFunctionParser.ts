@@ -2,9 +2,8 @@ import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
 import ReturnDescriptor from '@src/Parsing/Descriptors/ReturnDescriptor';
 import ReturnParser from './ReturnParser';
-import {ClassMethod} from '@typings/.';
 
-abstract class AbstractFunctionParser<T> {
+abstract class AbstractFunctionParser {
 
     /**
      * The ESTree structure representing the function.
@@ -16,33 +15,42 @@ abstract class AbstractFunctionParser<T> {
     /**
      * The function to be parsed.
      *
-     * @var {mixed}
+     * @var {Function}
      */
-    private _target: ClassMethod<T>;
+    private _target: Function;
+
+    /**
+     * The name of the function.
+     *
+     * @var {string|undefined}
+     */
+    protected _name?: string;
 
     /**
      * The parameter parser implementation.
      *
      * @var {ParameterParser}
      */
-    protected _parameterParser: ParameterParser<T>;
+    protected _parameterParser: ParameterParser;
 
     /**
      * The return parser implementation.
      *
      * @var {ReturnParser}
      */
-    protected _returnParser?: ReturnParser<T>;
+    protected _returnParser?: ReturnParser;
 
     /**
      * Create a new method parser instance.
      *
      * @param {Object} tree
-     * @param {mixed} target
+     * @param {Function} target
+     * @param {string|undefined} name
      */
-    public constructor(tree: any, target: ClassMethod<T>) {
+    public constructor(tree: any, target: Function, name?: string) {
         this._tree = tree;
         this._target = target;
+        this._name = name;
 
         this._initializeParameterParser();
         this._initializeReturnParser();
@@ -62,7 +70,7 @@ abstract class AbstractFunctionParser<T> {
      *
      * @returns {Array}
      */
-    public getParameters(): ParameterDescriptor<unknown>[] {
+    public getParameters(): ParameterDescriptor<any>[] {
         if (!this._tree.params.length) return [];
 
         return this._parameterParser.all();
@@ -86,7 +94,7 @@ abstract class AbstractFunctionParser<T> {
      *
      * @returns {ReturnDescriptor|undefined}
      */
-    public getReturnValue(): ReturnDescriptor<unknown> | undefined {
+    public getReturnValue(): ReturnDescriptor<any> | undefined {
         if (this.hasReturnValue() && this._returnParser) {
             return this._returnParser.get();
         }
@@ -99,7 +107,9 @@ abstract class AbstractFunctionParser<T> {
      * @returns {void}
      */
     private _initializeParameterParser(): void {
-        this._parameterParser = new ParameterParser<T>(this._tree.params, this._target);
+        this._parameterParser = new ParameterParser(
+            this._tree.params, this._target, this._name
+        );
     }
 
     /**
@@ -112,7 +122,9 @@ abstract class AbstractFunctionParser<T> {
         const statement = this._findReturnStatement();
 
         if (statement) {
-            this._returnParser = new ReturnParser<T>(statement, this._target);
+            this._returnParser = new ReturnParser(
+                statement, this._target, this._name
+            );
         }
     }
 

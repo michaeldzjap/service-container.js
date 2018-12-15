@@ -12,7 +12,9 @@ import {PARAM_TYPES} from '@src/Constants/metadata';
  * @throws {Error}
  */
 const throwError = (): void => {
-    throw new Error('Cannot apply @injectable decorator to the same target multiple times.');
+    throw new Error(
+        'Cannot apply @injectable decorator to the same target multiple times.'
+    );
 };
 
 /**
@@ -29,7 +31,7 @@ const checkMetadataIsNotDefined = (target: any, propertyName?: string): void => 
         return;
     }
 
-    if (Reflect.hasOwnMetadata(PARAM_TYPES, target, propertyName as string)) {
+    if (Reflect.hasOwnMetadata(PARAM_TYPES, target, propertyName)) {
         throwError();
     }
 };
@@ -100,7 +102,7 @@ const defineMetadata = (parameters: Array<ParameterDescriptor<unknown>> | undefi
  */
 const getConstructor = (target: any, propertyName?: string): any => {
     if (propertyName
-        && Reflect.getOwnPropertyDescriptor(target.constructor.prototype as any, propertyName as string)) {
+        && Reflect.getOwnPropertyDescriptor(target.constructor.prototype, propertyName)) {
         return target.constructor;
     }
 
@@ -115,9 +117,7 @@ export default (): Function => (target: any, propertyName?: string): void => {
     );
 
     defineMetadata(
-        getParameters(tree, target, propertyName),
-        target,
-        propertyName
+        getParameters(tree, target, propertyName), target, propertyName
     );
 
     return target;

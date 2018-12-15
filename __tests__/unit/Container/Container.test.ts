@@ -481,7 +481,7 @@ describe('Container', (): void => {
             'ContainerTestCallStub@unresolvable',
             (stub: ContainerTestCallStub): unknown[] => stub.unresolvable('foo', 'bar')
         );
-        result = container.call<ContainerTestCallStub>(
+        result = container.call(
             new Callable(new ContainerTestCallStub, 'unresolvable')
         );
         expect(result).toEqual(['foo', 'bar']);

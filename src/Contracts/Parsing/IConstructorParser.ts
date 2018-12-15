@@ -14,7 +14,7 @@ interface IConstructorParser {
      *
      * @returns {Array}
      */
-    getParameters(): ParameterDescriptor<unknown>[];
+    getParameters(): ParameterDescriptor<any>[];
 
 }
 

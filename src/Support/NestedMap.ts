@@ -1,7 +1,5 @@
-import isString from 'lodash.isstring';
-
 import Arr from './Arr';
-import {last} from './helpers';
+import {isString} from './helpers';
 
 class NestedMap<U, V> extends Map<U, V> {
 
@@ -28,9 +26,10 @@ class NestedMap<U, V> extends Map<U, V> {
 
         let target = this;
         for (const key of keys) {
-            if (key === last(keys)) {
+            if (key === Arr.last(keys)) {
                 target.set(key, value);
             } else {
+                // eslint-disable-next-line max-depth
                 if (!target.has(key)) {
                     target.set(key, new Map);
                 }
@@ -63,7 +62,7 @@ class NestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return;
 
-            if (key === last(keys)) {
+            if (key === Arr.last(keys)) {
                 return target.get(key);
             }
 
@@ -93,7 +92,7 @@ class NestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === last(keys)) {
+            if (key === Arr.last(keys)) {
                 return true;
             }
 
@@ -125,7 +124,7 @@ class NestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === last(keys)) {
+            if (key === Arr.last(keys)) {
                 return target.delete(key);
             }
 

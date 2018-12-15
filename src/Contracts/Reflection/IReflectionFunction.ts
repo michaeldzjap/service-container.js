@@ -1,6 +1,6 @@
 import ReflectionParameter from '@src/Reflection/ReflectionParameter';
 
-interface IReflectionFunction<T> {
+interface IReflectionFunction {
 
     /**
      * Get the name of the reflected function.
@@ -14,7 +14,7 @@ interface IReflectionFunction<T> {
      *
      * @returns {Array}
      */
-    getParameters(): ReflectionParameter<T, unknown>[];
+    getParameters(): ReflectionParameter[];
 
 }
 

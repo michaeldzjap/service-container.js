@@ -1,13 +1,15 @@
-import {ReflectionMethod} from '.';
+import {ReflectionError, ReflectionMethod} from '.';
+import {isSymbol, isString, isNullOrUndefined} from '@src/Support/helpers';
+import {Interface} from '@typings/.';
 
-class ReflectionClass<T> {
+class ReflectionClass {
 
     /**
      * The class that should be reflected.
      *
      * @var {mixed}
      */
-    private _target: T | Symbol;
+    private _target: any;
 
     /**
      * Indicates if the reflected class is an interface.
@@ -21,7 +23,7 @@ class ReflectionClass<T> {
      *
      * @param {mixed} target
      */
-    public constructor(target: T | Symbol) {
+    public constructor(target: any) {
         this._target = target;
         this._isInterface = false;
     }
@@ -29,11 +31,11 @@ class ReflectionClass<T> {
     /**
      * Create a new reflection instance from a symbol representing an interface.
      *
-     * @param {Symbol} key
+     * @param {Interface} contract
      * @returns {ReflectionClass}
      */
-    public static createFromInterface<T>(key: Symbol): ReflectionClass<T> {
-        const instance = new ReflectionClass<T>(key);
+    public static createFromInterface(contract: Interface): ReflectionClass {
+        const instance = new ReflectionClass(contract);
         instance._isInterface = true;
 
         return instance;
@@ -42,16 +44,10 @@ class ReflectionClass<T> {
     /**
      * Get the target of the reflected class.
      *
-     * @returns {mixed|undefined}
+     * @returns {mixed}
      */
-    public getTarget(): T | Symbol | undefined {
-        if (this.isInterface()) {
-            return this._target as Symbol;
-        }
-
-        if (this.isInstantiable()) {
-            return this._target as T;
-        }
+    public getTarget(): any {
+        return this._target;
     }
 
     /**
@@ -60,11 +56,21 @@ class ReflectionClass<T> {
      * @returns {string}
      */
     public getName(): string {
-        if (typeof this._target === 'symbol') {
-            return this._target.toString();
+        if (this._isInterface && isSymbol(this._target.key)) {
+            const result = /Symbol\(([^)]+)\)/.exec(this._target.key.toString());
+
+            if (isNullOrUndefined(result)) {
+                throw new ReflectionError('Could not determine interface name.');
+            }
+
+            return result[1];
         }
 
-        return (this._target as any).name;
+        if (this._isInterface && isString(this._target.key)) {
+            return this._target.key;
+        }
+
+        return this._target.name;
     }
 
     /**
@@ -95,9 +101,15 @@ class ReflectionClass<T> {
      * Get the constructor of the reflected class.
      *
      * @returns {ReflectionMethod}
+     *
+     * @throws {Error}
      */
-    public getConstructor(): ReflectionMethod<T> {
-        return new ReflectionMethod(this._target as T, 'constructor');
+    public getConstructor(): ReflectionMethod {
+        if (this.isInterface()) {
+            throw new ReflectionError('An interface does not have a constructor.');
+        }
+
+        return new ReflectionMethod(this._target, 'constructor');
     }
 
     /**
@@ -106,8 +118,8 @@ class ReflectionClass<T> {
      * @param {Array} dependencies
      * @returns {mixed}
      */
-    public newInstanceArgs(dependencies: any[]): T {
-        return new (this._target as any)(...dependencies) as T;
+    public newInstanceArgs(dependencies: any[]): any {
+        return new (this._target as any)(...dependencies);
     }
 
 }

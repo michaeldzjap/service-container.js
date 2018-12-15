@@ -1,8 +1,6 @@
 import Callable from '@src/Container/Callable';
 import ContextualBindingBuilder from '@src/Container/ContextualBindingBuilder';
-import {Identifier} from '@typings/index';
-
-export const IContainer = Symbol('IContainer');
+import {Identifier, Instantiable} from '@typings/index';
 
 interface IContainer {
 
@@ -98,10 +96,10 @@ interface IContainer {
     /**
      * Define a contextual binding.
      *
-     * @param {mixed} concrete
-     * @returns {@src/Container/ContextualBindingBuilder}
+     * @param {Array|Instantiable} concrete
+     * @returns {ContextualBindingBuilder}
      */
-    when<T>(concrete: T[] | T): ContextualBindingBuilder;
+    when<T>(concrete: Instantiable<T>[] | Instantiable<T>): ContextualBindingBuilder;
 
     /**
      * Get a closure to resolve the given type from the container.

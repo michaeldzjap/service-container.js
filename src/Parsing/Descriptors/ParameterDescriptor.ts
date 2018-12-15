@@ -1,4 +1,4 @@
-class ParameterDescriptor<T> {
+class ParameterDescriptor {
 
     /**
      * The parameter name.
@@ -12,7 +12,7 @@ class ParameterDescriptor<T> {
      *
      * @var {mixed}
      */
-    private _type: T;
+    private _type: any;
 
     /**
      * The parameter position.
@@ -26,7 +26,7 @@ class ParameterDescriptor<T> {
      *
      * @var {mixed}
      */
-    private _value?: unknown;
+    private _value?: any;
 
     /**
      * Create a new parameter descriptor instance.
@@ -35,7 +35,7 @@ class ParameterDescriptor<T> {
      * @param {mixed} value
      */
     public constructor({name, type, position, value}:
-        {name: string, type: T, position: number, value?: any}) {
+        {name: string, type: any, position: number, value?: any}) {
         this._name = name;
         this._type = type;
         this._position = position;
@@ -56,7 +56,7 @@ class ParameterDescriptor<T> {
      *
      * @returns {mixed}
      */
-    public get type(): T {
+    public get type(): any {
         return this._type;
     }
 
@@ -74,7 +74,7 @@ class ParameterDescriptor<T> {
      *
      * @returns {mixed}
      */
-    public get value(): unknown {
+    public get value(): any {
         return this._value;
     }
 

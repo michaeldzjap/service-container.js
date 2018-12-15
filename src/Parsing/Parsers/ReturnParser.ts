@@ -1,9 +1,10 @@
 import ExpressionCollector from '@src/Parsing/ExpressionCollector';
 import ParsingError from './ParsingError';
 import ReturnDescriptor from '@src/Parsing/Descriptors/ReturnDescriptor';
+import {isNullOrUndefined} from '@src/Support/helpers';
 import {DESIGN_RETURN_TYPE} from '@src/Constants/metadata';
 
-class ReturnParser<T> {
+class ReturnParser {
 
     /**
      * The ESTree structure representing the return.
@@ -17,7 +18,14 @@ class ReturnParser<T> {
      *
      * @var {mixed}
      */
-    private _target: T;
+    private _target: any;
+
+    /**
+     * The name of the function.
+     *
+     * @var {string}
+     */
+    private _name?: string;
 
     /**
      * The return type.
@@ -30,16 +38,16 @@ class ReturnParser<T> {
      * Create a new parameter parser instance.
      *
      * @param {Object} tree
-     * @param {mixed} target
+     * @param {Function} target
+     * @param {string} name
      */
-    public constructor(tree: any, target: T) {
+    public constructor(tree: any, target: any, name?: string) {
         this._tree = tree;
         this._target = target;
-        this._type = (target as any).method
-            ? Reflect.getMetadata(DESIGN_RETURN_TYPE, (target as any).target)
-            : Reflect.getMetadata(
-                DESIGN_RETURN_TYPE, (target as any).target, (target as any).method as string
-            );
+        this._name = name;
+        this._type = isNullOrUndefined(this._name)
+            ? Reflect.getMetadata(DESIGN_RETURN_TYPE, this._target)
+            : Reflect.getMetadata(DESIGN_RETURN_TYPE, this._target, this._name);
     }
 
     /**
@@ -47,8 +55,8 @@ class ReturnParser<T> {
      *
      * @returns {ReturnDescriptor}
      */
-    public get(): ReturnDescriptor<unknown> {
-        return this._makeDescriptor<unknown>();
+    public get(): ReturnDescriptor<any> {
+        return this._makeDescriptor();
     }
 
     /**
@@ -56,7 +64,7 @@ class ReturnParser<T> {
      *
      * @returns {ReturnDescriptor}
      */
-    private _makeDescriptor<U>(): ReturnDescriptor<U> {
+    private _makeDescriptor(): ReturnDescriptor<any> {
         switch (this._tree.argument.type) {
             case 'ArrayExpression':
                 return this._parseArrayExpression();
@@ -74,7 +82,7 @@ class ReturnParser<T> {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseArrayExpression<U>(): ReturnDescriptor<U> {
+    private _parseArrayExpression(): ReturnDescriptor<any> {
         return new ReturnDescriptor(
             this._type,
             ExpressionCollector.collectElements(this._tree.argument)
@@ -86,7 +94,7 @@ class ReturnParser<T> {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseObjectExpression<U>(): ReturnDescriptor<U> {
+    private _parseObjectExpression(): ReturnDescriptor<any> {
         return new ReturnDescriptor(
             this._type,
             ExpressionCollector.collectProperties(this._tree.argument)
@@ -98,7 +106,7 @@ class ReturnParser<T> {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseLiteral<U>(): ReturnDescriptor<U> {
+    private _parseLiteral(): ReturnDescriptor<any> {
         return new ReturnDescriptor(this._type, this._tree.argument.value);
     }
 

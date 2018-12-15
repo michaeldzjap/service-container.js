@@ -14,7 +14,7 @@ interface IClassParser {
      *
      * @returns {Array|undefined}
      */
-    getConstructorParameters(): ParameterDescriptor<unknown>[] | undefined;
+    getConstructorParameters(): ParameterDescriptor<any>[] | undefined;
 
 }
 

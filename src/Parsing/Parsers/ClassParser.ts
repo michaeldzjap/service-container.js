@@ -2,16 +2,15 @@ import ConstructorParser from './ConstructorParser';
 import IClassParser from '@src/Contracts/Parsing/IClassParser';
 import MethodParser from './MethodParser';
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
-import {ClassMethod} from '@typings/.';
 
-class ClassParser<T> implements IClassParser {
+class ClassParser implements IClassParser {
 
     /**
      * The class the method belongs to.
      *
      * @var {mixed}
      */
-    private _target: T;
+    private _target: any;
 
     /**
      * The ESTree structure representing the class declaration.
@@ -26,7 +25,7 @@ class ClassParser<T> implements IClassParser {
      * @param {Object} tree
      * @param {mixed} target
      */
-    public constructor(tree: any, target: T) {
+    public constructor(tree: any, target: any) {
         if (tree.type !== 'ClassDeclaration') {
             throw new Error('Invalid ESTree structure provided.');
         }
@@ -50,7 +49,7 @@ class ClassParser<T> implements IClassParser {
      *
      * @returns {Array|undefined}
      */
-    public getConstructorParameters(): ParameterDescriptor<unknown>[] | undefined {
+    public getConstructorParameters(): ParameterDescriptor<any>[] | undefined {
         const parser = this._initializeConstructorParser();
 
         if (parser) {
@@ -64,7 +63,7 @@ class ClassParser<T> implements IClassParser {
      * @param {string} name
      * @returns {Array|undefined}
      */
-    public getMethodParameters(name: string): ParameterDescriptor<unknown>[] | undefined {
+    public getMethodParameters(name: string): ParameterDescriptor<any>[] | undefined {
         const parser = this._initializeMethodParser(name);
 
         if (parser) {
@@ -77,7 +76,7 @@ class ClassParser<T> implements IClassParser {
      *
      * @returns {ConstructorParser|undefined}
      */
-    private _initializeConstructorParser(): ConstructorParser<T> | undefined {
+    private _initializeConstructorParser(): ConstructorParser | undefined {
         if (this.hasConstructor()) {
             return new ConstructorParser(
                 this._tree.body.body[0],
@@ -92,16 +91,13 @@ class ClassParser<T> implements IClassParser {
      * @param {string} name
      * @returns {MethodParser|undefined}
      */
-    private _initializeMethodParser(name: string): MethodParser<T> | undefined {
+    private _initializeMethodParser(name: string): MethodParser | undefined {
         const method = this._tree.body.body.find((_: any): boolean => (
             _.key.name === name
         ));
 
         if (method) {
-            return new MethodParser(
-                method,
-                {target: this._target, method: name} as unknown as ClassMethod<T>
-            );
+            return new MethodParser(method, this._target, name);
         }
     }
 

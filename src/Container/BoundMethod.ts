@@ -1,8 +1,8 @@
 import Callable from './Callable';
 import Container from './Container';
 import {ReflectionMethod, ReflectionParameter} from '@src/Reflection';
-import {Identifier} from '@typings/.';
-import {isNullOrUndefined} from '@src/Support/helpers';
+import {Identifier, Instantiable} from '@typings/.';
+import {isNullOrUndefined, isInstance, isInstantiable} from '@src/Support/helpers';
 
 class BoundMethod {
 
@@ -75,7 +75,7 @@ class BoundMethod {
         // can use to examine the container and see if there are any method
         // bindings for this given method. If there are, we can call this method
         // binding callback immediately.
-        const method = BoundMethod._normalizeMethod(callback);
+        const method = BoundMethod._normalizeMethod<T>(callback);
 
         if (container.hasMethodBinding(method)) {
             return container.callMethodBinding(method, callback.target);
@@ -91,7 +91,9 @@ class BoundMethod {
      * @returns {string}
      */
     protected static _normalizeMethod<T>(callback: Callable<T>): string {
-        const className = callback.target.constructor.name;
+        const className = isInstantiable(callback.target)
+            ? callback.target.name
+            : callback.target.constructor.name;
 
         return `${className}@${callback.method}`;
     }
@@ -116,7 +118,7 @@ class BoundMethod {
             }, {});
         }
 
-        for (const parameter of BoundMethod._getCallReflector(callback).getParameters()) {
+        for (const parameter of BoundMethod._getCallReflector<T>(callback).getParameters()) {
             BoundMethod._addDependencyForCallParameter(
                 container, parameter, parameters, dependencies
             );
@@ -135,17 +137,19 @@ class BoundMethod {
      * @returns {void}
      */
     protected static _addDependencyForCallParameter(container: Container,
-        parameter: ReflectionParameter<any, any>, parameters: object, dependencies: object): void {
+        parameter: ReflectionParameter, parameters: object, dependencies: object): void {
         if (parameters.hasOwnProperty(parameter.getName())) {
             dependencies[parameter.getName()] = parameters[parameter.getName()];
 
             delete parameters[parameter.getName()];
-        } else if (parameter.getClass() && parameters.hasOwnProperty(parameter.getClass()!.getTarget())) {
-            dependencies[parameter.getClass()!.getTarget()] = parameters[parameter.getClass()!.getTarget()];
+        } else if (parameter.getClass() && parameters.hasOwnProperty(parameter.getClass()!.getName())) {
+            dependencies[parameter.getClass()!.getName()] = parameters[parameter.getClass()!.getName()];
 
-            delete parameters[parameter.getClass()!.getTarget()];
+            delete parameters[parameter.getClass()!.getName()];
         } else if (parameter.getClass()) {
-            dependencies[parameter.getClass()!.getTarget()] = container.make(parameter.getClass()!.getTarget());
+            dependencies[parameter.getClass()!.getName()] = container.make(
+                parameter.getClass()!.getTarget()
+            );
         } else if (parameter.isDefaultValueAvailable()) {
             dependencies[parameter.getName()] = parameter.getDefaultValue();
         }
@@ -157,21 +161,41 @@ class BoundMethod {
      * @param {Callable} callback
      * @returns {ReflectionMethod}
      */
-    protected static _getCallReflector<T>(callback: Callable<T>): ReflectionMethod<T> {
-        return new ReflectionMethod<T>(
-            callback.target.constructor as any,
-            callback.method as string
+    protected static _getCallReflector<T>(callback: Callable<T>): ReflectionMethod {
+        if (isNullOrUndefined(callback.method)) {
+            throw new Error('Method name is missing.');
+        }
+
+        return new ReflectionMethod(
+            BoundMethod._getClassDefinition(callback),
+            callback.method
         );
     }
 
     /**
-     * Determine if the given callback is a class definition or an instance.
+     * Return the class definition of the callable target.
+     *
+     * @param {Callable} callback
+     * @returns {Instantiable}
+     */
+    private static _getClassDefinition<T>(callback: Callable<T>): Instantiable<T> {
+        const target = callback.isStatic || isInstantiable(callback.target)
+            ? callback.target
+            : callback.target.constructor
+
+        return target as Instantiable<T>;
+    }
+
+    /**
+     * Determine if the given callback is a reference to a non-static method of
+     * a class definition or an instance.
      *
      * @param {mixed} callback
      * @returns {boolean}
      */
     private static _isCallable<T>(callback: Callable<T>): boolean {
-        return !!(callback.target as any).prototype;
+        return (isInstantiable(callback.target) || isInstance(callback.target))
+         && !callback.isStatic;
     }
 
 }

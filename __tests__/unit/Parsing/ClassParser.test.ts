@@ -12,10 +12,10 @@ import {Interface} from '@typings/.';
  * @param {mixed} target
  * @returns {ClassParser}
  */
-const makeParser = <T extends {}>(target: T): ClassParser<T> => {
+const makeParser = (target: any): ClassParser => {
     const tree = ESTreeGenerator.generate(target.toString());
 
-    return new ClassParser<T>(tree.body[0], target);
+    return new ClassParser(tree.body[0], target);
 };
 
 describe('ClassParser', (): void => {
@@ -23,9 +23,9 @@ describe('ClassParser', (): void => {
         {target: ClassWithConstructorStub, expected: true},
         {target: ClassWithoutConstructorStub, expected: false},
         {target: ClassWithoutBodyStub, expected: false},
-    ].forEach(<T extends {}>({target, expected}: {target: T, expected: boolean}): void => {
+    ].forEach(({target, expected}: {target: any, expected: boolean}): void => {
         it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
-            const parser = makeParser<T>(target);
+            const parser = makeParser(target);
             const result = parser.hasConstructor();
 
             expect(result).toBe(expected);

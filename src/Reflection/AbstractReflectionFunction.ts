@@ -4,17 +4,17 @@ import IReflectionFunction from '@src/Contracts/Reflection/IReflectionFunction';
 import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
 import {ReflectionParameter} from '.';
 
-abstract class AbstractReflectionFunction<T> implements IReflectionFunction<T> {
+abstract class AbstractReflectionFunction implements IReflectionFunction {
 
     /**
      * The target the function belongs to.
      *
-     * @var {Function}
+     * @var {mixed}
      */
-    protected _target: T;
+    protected _target: any;
 
     /**
-     * The name of the method.
+     * The name of the function.
      *
      * @var {string|undefined}
      */
@@ -26,7 +26,7 @@ abstract class AbstractReflectionFunction<T> implements IReflectionFunction<T> {
      * @param {mixed} target
      * @param {string} name
      */
-    public constructor(target: T, name?: string) {
+    public constructor(target: any, name?: string) {
         this._target = target;
         this._name = name;
     }
@@ -46,10 +46,10 @@ abstract class AbstractReflectionFunction<T> implements IReflectionFunction<T> {
      * @param {Array|undefined} types
      * @returns {Array}
      */
-    public getParameters(types?: ParameterDescriptor<unknown>[]): ReflectionParameter<T, unknown>[] {
+    public getParameters(types?: ParameterDescriptor[]): ReflectionParameter[] {
         if (types) {
             return types
-                .map((param: ParameterDescriptor<unknown>): ReflectionParameter<T, unknown> => (
+                .map((param: ParameterDescriptor): ReflectionParameter => (
                     new ReflectionParameter(this._target, param)
                 ));
         }
