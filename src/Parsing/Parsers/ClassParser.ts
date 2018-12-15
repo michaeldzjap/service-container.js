@@ -49,7 +49,7 @@ class ClassParser implements IClassParser {
      *
      * @returns {Array|undefined}
      */
-    public getConstructorParameters(): ParameterDescriptor<any>[] | undefined {
+    public getConstructorParameters(): ParameterDescriptor[] | undefined {
         const parser = this._initializeConstructorParser();
 
         if (parser) {
@@ -63,7 +63,7 @@ class ClassParser implements IClassParser {
      * @param {string} name
      * @returns {Array|undefined}
      */
-    public getMethodParameters(name: string): ParameterDescriptor<any>[] | undefined {
+    public getMethodParameters(name: string): ParameterDescriptor[] | undefined {
         const parser = this._initializeMethodParser(name);
 
         if (parser) {

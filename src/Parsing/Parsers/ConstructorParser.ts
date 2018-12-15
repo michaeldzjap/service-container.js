@@ -66,7 +66,7 @@ class ConstructorParser implements IConstructorParser {
      *
      * @returns {Array}
      */
-    public getParameters(): ParameterDescriptor<any>[] {
+    public getParameters(): ParameterDescriptor[] {
         if (!this._tree.value.params.length) return [];
 
         return this._parameterParser.all();

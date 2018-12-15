@@ -70,9 +70,9 @@ class ParameterParser implements IParameterParser {
      *
      * @returns {Array}
      */
-    public all(): ParameterDescriptor<any>[] {
+    public all(): ParameterDescriptor[] {
         return this._tree
-            .map((param: any, i: number): ParameterDescriptor<any> => (
+            .map((param: any, i: number): ParameterDescriptor => (
                 this._makeDescriptor(param, this._types[i], i)
             ));
     }
@@ -83,7 +83,7 @@ class ParameterParser implements IParameterParser {
      * @param {number} index
      * @returns {ParameterDescriptor}
      */
-    public at(index: number): ParameterDescriptor<any> {
+    public at(index: number): ParameterDescriptor {
         return this._makeDescriptor(
             this._tree[index], this._types[index], index
         );
@@ -97,7 +97,7 @@ class ParameterParser implements IParameterParser {
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _makeDescriptor(param: any, type: any, position: number): ParameterDescriptor<any> {
+    private _makeDescriptor(param: any, type: any, position: number): ParameterDescriptor {
         // The parameter has a value assigned to it. Hence, we need to do
         // some parsing to fetch it. This can become quite complex in the
         // case of deeply nested parameter values
@@ -121,7 +121,7 @@ class ParameterParser implements IParameterParser {
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _parseAssignmentPattern(param: any, type: any, position: number): ParameterDescriptor<any> {
+    private _parseAssignmentPattern(param: any, type: any, position: number): ParameterDescriptor {
         const props = {
             name: param.left.name,
             type: this._parseType(type, position),
@@ -165,7 +165,7 @@ class ParameterParser implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseArrayExpression(expr: any, props: any): ParameterDescriptor<any> {
+    private _parseArrayExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: ExpressionCollector.collectElements(expr)
@@ -179,7 +179,7 @@ class ParameterParser implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseObjectExpression(expr: any, props: any): ParameterDescriptor<any> {
+    private _parseObjectExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: ExpressionCollector.collectProperties(expr)
@@ -193,7 +193,7 @@ class ParameterParser implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseMemberExpression(expr: any, props: any): ParameterDescriptor<any> {
+    private _parseMemberExpression(expr: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({
             ...props,
             value: expr.object.name
@@ -207,7 +207,7 @@ class ParameterParser implements IParameterParser {
      * @param {Object} props
      * @returns {ParameterDescriptor}
      */
-    private _parseLiteral(literal: any, props: any): ParameterDescriptor<any> {
+    private _parseLiteral(literal: any, props: any): ParameterDescriptor {
         return new ParameterDescriptor({...props, value: literal.value});
     }
 

@@ -45,7 +45,7 @@ const checkMetadataIsNotDefined = (target: any, propertyName?: string): void => 
  * @returns {Array|undefined}
  */
 const parseClass = (tree: any, target: any, name?: string):
-    Array<ParameterDescriptor<unknown>> | undefined => {
+    ParameterDescriptor[] | undefined => {
     const parser = new ClassParser(tree.body[0], target);
 
     if (name) {
@@ -64,7 +64,7 @@ const parseClass = (tree: any, target: any, name?: string):
  * @returns {Array|undefined}
  */
 const getParameters = (tree: any, target: any, method?: string):
-    Array<ParameterDescriptor<unknown>> | undefined => {
+    ParameterDescriptor[] | undefined => {
     switch (tree.body[0].type) {
         case 'ClassDeclaration':
             return parseClass(tree, target, method);
@@ -82,7 +82,7 @@ const getParameters = (tree: any, target: any, method?: string):
  * @param {string|undefined} propertyName
  * @returns {void}
  */
-const defineMetadata = (parameters: Array<ParameterDescriptor<unknown>> | undefined,
+const defineMetadata = (parameters: ParameterDescriptor[] | undefined,
     target: any, propertyName?: string): void => {
     if (propertyName) {
         Reflect.defineMetadata(PARAM_TYPES, parameters, target, propertyName);

@@ -12,8 +12,8 @@ export enum PRNG {
 }
 
 /**
- * A class for generating random number with an optional seed. Several different
- * random number generator algorithms are configurable.
+ * A class for generating random numbers. Several different (seedable) random
+ * number generator algorithms are configurable.
  *
  * See https://stackoverflow.com/a/47593316/7024747 for more info.
  */
