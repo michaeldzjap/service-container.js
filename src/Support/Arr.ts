@@ -1,4 +1,4 @@
-import {generator} from './rand';
+import Rand from './Rand';
 import {dataGet, isNullOrUndefined, isObject, isString, value} from './helpers';
 
 class Arr {
@@ -493,9 +493,9 @@ class Arr {
             return Arr._shuffle(array);
         }
 
-        const rand = generator(seed);
+        const rand = new Rand(seed);
         array = [...array];
-        array.sort((): number => Math.floor(rand() * 2 - 1));
+        array.sort((): number => Math.floor(rand.next() * 2 - 1));
 
         return array;
     }
