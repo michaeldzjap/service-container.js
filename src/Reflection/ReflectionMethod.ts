@@ -4,6 +4,7 @@ import {
     ReflectionClass,
     ReflectionParameter
 } from '.';
+import {isNullOrUndefined} from '@src/Support/helpers';
 import {PARAM_TYPES} from '@src/Constants/metadata';
 
 class ReflectionMethod extends AbstractReflectionFunction {
@@ -116,12 +117,16 @@ class ReflectionMethod extends AbstractReflectionFunction {
             return Reflect.getMetadata(PARAM_TYPES, this._target);
         }
 
+        if (isNullOrUndefined(this._name)) {
+            throw new Error('Method name is missing.');
+        }
+
         if (this.isStatic()) {
-            return Reflect.getMetadata(PARAM_TYPES, this._target, this._name as string);
+            return Reflect.getMetadata(PARAM_TYPES, this._target, this._name);
         }
 
         return Reflect.getMetadata(
-            PARAM_TYPES, this._target.prototype, this._name as string
+            PARAM_TYPES, this._target.prototype, this._name
         );
     }
 
