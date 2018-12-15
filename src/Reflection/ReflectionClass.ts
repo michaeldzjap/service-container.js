@@ -1,13 +1,14 @@
-import {ReflectionMethod} from '.';
+import {ReflectionError, ReflectionMethod} from '.';
+import {isSymbol} from '@src/Support/helpers';
 
 class ReflectionClass {
 
     /**
      * The class that should be reflected.
      *
-     * @var {Function|Symbol}
+     * @var {mixed}
      */
-    private _target: Function | Symbol;
+    private _target: any;
 
     /**
      * Indicates if the reflected class is an interface.
@@ -21,7 +22,7 @@ class ReflectionClass {
      *
      * @param {mixed} target
      */
-    public constructor(target: Function | Symbol) {
+    public constructor(target: any) {
         this._target = target;
         this._isInterface = false;
     }
@@ -42,16 +43,10 @@ class ReflectionClass {
     /**
      * Get the target of the reflected class.
      *
-     * @returns {mixed|undefined}
+     * @returns {mixed}
      */
-    public getTarget(): Function | Symbol | undefined {
-        if (this.isInterface()) {
-            return this._target as Symbol;
-        }
-
-        if (this.isInstantiable()) {
-            return this._target as Function;
-        }
+    public getTarget(): any {
+        return this._target;
     }
 
     /**
@@ -60,11 +55,11 @@ class ReflectionClass {
      * @returns {string}
      */
     public getName(): string {
-        if (typeof this._target === 'symbol') {
+        if (isSymbol(this._target)) {
             return this._target.toString();
         }
 
-        return (this._target as Function).name;
+        return this._target.name;
     }
 
     /**
@@ -95,9 +90,15 @@ class ReflectionClass {
      * Get the constructor of the reflected class.
      *
      * @returns {ReflectionMethod}
+     *
+     * @throws {Error}
      */
     public getConstructor(): ReflectionMethod {
-        return new ReflectionMethod(this._target as Function, 'constructor');
+        if (this.isInterface()) {
+            throw new ReflectionError('An interface does not have a constructor.');
+        }
+
+        return new ReflectionMethod(this._target, 'constructor');
     }
 
     /**
@@ -106,7 +107,7 @@ class ReflectionClass {
      * @param {Array} dependencies
      * @returns {mixed}
      */
-    public newInstanceArgs(dependencies: any[]): object {
+    public newInstanceArgs(dependencies: any[]): any {
         return new (this._target as any)(...dependencies);
     }
 

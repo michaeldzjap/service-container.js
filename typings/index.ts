@@ -7,9 +7,13 @@ export interface Abstract<T> {
     name: string;
 }
 
-export type Class<T> = Newable<T> | Abstract<T>;
+export interface Instance<T extends {}> {
+    constructor: Abstract<T>;
+}
 
-export type Identifier<T> = string | symbol | Class<T>;
+export type Instantiable<T> = Newable<T> | Abstract<T>;
+
+export type Identifier<T> = string | symbol | Instantiable<T>;
 
 export interface Binding {
     concrete: Function;

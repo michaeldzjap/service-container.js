@@ -10,7 +10,7 @@ class ReflectionParameter {
      *
      * @var mixed
      */
-    private _target: Function;
+    private _target: any;
 
     /**
      * The type of the reflected parameter.
@@ -22,11 +22,11 @@ class ReflectionParameter {
     /**
      * Create a new reflection parameter instance.
      *
-     * @param {Function} target
+     * @param {mixed} target
      * @param {ParameterDescriptor} descriptor
      * @param {number} position
      */
-    public constructor(target: Function, descriptor: ParameterDescriptor) {
+    public constructor(target: any, descriptor: ParameterDescriptor) {
         this._target = target;
         this._descriptor = descriptor;
     }

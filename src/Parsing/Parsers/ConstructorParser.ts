@@ -17,7 +17,7 @@ class ConstructorParser implements IConstructorParser {
      *
      * @var {mixed}
      */
-    private _target: Function;
+    private _target: any;
 
     /**
      * The parameter parser implementation.
@@ -32,7 +32,7 @@ class ConstructorParser implements IConstructorParser {
      * @param {Object} tree
      * @param {Function} target
      */
-    public constructor(tree: any, target: Function) {
+    public constructor(tree: any, target: any) {
         if (tree.kind !== 'constructor') {
             throw new ParsingError('Invalid ESTree structure provided.');
         }
@@ -66,7 +66,7 @@ class ConstructorParser implements IConstructorParser {
      *
      * @returns {Array}
      */
-    public getParameters(): ParameterDescriptor[] {
+    public getParameters(): ParameterDescriptor<any>[] {
         if (!this._tree.value.params.length) return [];
 
         return this._parameterParser.all();

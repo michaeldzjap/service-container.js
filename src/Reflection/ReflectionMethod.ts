@@ -18,10 +18,10 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * Create a new reflection method instance.
      *
-     * @param {Function} target
+     * @param {mixed} target
      * @param {string} name
      */
-    public constructor(target: Function, name: string) {
+    public constructor(target: any, name: string) {
         super(target, name);
 
         const descriptor = ReflectionMethod._findDescriptor(target, name);
@@ -32,19 +32,19 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * Find the method descriptor object.
      *
-     * @param {Function} target
+     * @param {mixed} target
      * @param {string} name
      * @returns {Object}
      *
      * @throws {ReferenceError}
      */
-    private static _findDescriptor(target: Function, name: string): PropertyDescriptor | undefined {
+    private static _findDescriptor(target: any, name: string): PropertyDescriptor | undefined {
         if (Reflect.has(target.prototype, name)) {
             // Regular method
             return Reflect.getOwnPropertyDescriptor(target.prototype, name);
         }
 
-        if (Reflect.has(target as unknown as object, name)) {
+        if (Reflect.has(target, name)) {
             // Static method
             return Reflect.getOwnPropertyDescriptor(target, name);
         }

@@ -1,4 +1,5 @@
 import Arr from './Arr';
+import {Instantiable, Instance} from '@typings/.';
 
 /**
  * Set a property of an object to the given value.
@@ -55,7 +56,7 @@ export const isNull = (value: unknown): value is null => value === null;
  * @param {mixed} value
  * @returns {boolean}
  */
-export const isNullOrUndefined = (value: unknown): boolean => (
+export const isNullOrUndefined = (value: unknown): value is null | undefined => (
     isNull(value) || isUndefined(value)
 );
 
@@ -118,7 +119,7 @@ export const empty = (target: Array<any> | Object): boolean => (
  * @param {mixed} target
  * @returns {boolean}
  */
-export const isClass = (target: any): boolean => {
+export const isClass = (target: any): target is Function => {
     if (typeof target !== 'function' || isNullOrUndefined(target.prototype)
         || target.prototype.constructor.name === '') {
         return false;
@@ -127,6 +128,56 @@ export const isClass = (target: any): boolean => {
     return target.prototype.constructor.name[0]
         === target.prototype.constructor.name[0].toUpperCase();
 };
+
+/**
+ * Determine if the given target is a symbol.
+ *
+ * @param {mixed} target
+ * @returns {boolean}
+ */
+export const isSymbol = (target: any): target is Symbol => (
+    typeof target === 'symbol'
+);
+
+/**
+ * Determine if the given target has a prototype.
+ *
+ * @param {mixed} target
+ * @returns {boolean}
+ */
+export const hasPrototype = (target: any): boolean => (
+    target.hasOwnProperty('prototype')
+);
+
+/**
+ * Determine if the given target has a constructor.
+ *
+ * @param {mixed} target
+ * @returns {boolean}
+ */
+export const hasConstructor = (target: any): boolean => (
+    target.hasOwnProperty('constructor')
+);
+
+/**
+ * Determine if the given target is instantiable.
+ *
+ * @param {mixed} target
+ * @returns {boolean}
+ */
+export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
+    hasPrototype(target)
+);
+
+/**
+ * Determine if the given target is an instance.
+ *
+ * @param {mixed} target
+ * @returns {boolean}
+ */
+export const isInstance = <T>(target: any): target is Instance<T> => (
+    !hasPrototype(target) && hasConstructor(target)
+);
 
 /**
  * Return the default value of the given value.

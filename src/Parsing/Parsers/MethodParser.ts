@@ -8,10 +8,10 @@ class MethodParser extends AbstractFunctionParser implements IFunctionParser {
      * Create a new method parser instance.
      *
      * @param {Object} tree
-     * @param {Function} target
+     * @param {mixed} target
      * @param {string} method
      */
-    public constructor(tree: any, target: Function, method: string) {
+    public constructor(tree: any, target: any, method: string) {
         if (tree.type !== 'MethodDefinition') {
             throw new ParsingError('Invalid ESTree structure provided.');
         }

@@ -70,7 +70,7 @@ abstract class AbstractFunctionParser {
      *
      * @returns {Array}
      */
-    public getParameters(): ParameterDescriptor[] {
+    public getParameters(): ParameterDescriptor<any>[] {
         if (!this._tree.params.length) return [];
 
         return this._parameterParser.all();
@@ -94,7 +94,7 @@ abstract class AbstractFunctionParser {
      *
      * @returns {ReturnDescriptor|undefined}
      */
-    public getReturnValue(): ReturnDescriptor | undefined {
+    public getReturnValue(): ReturnDescriptor<any> | undefined {
         if (this.hasReturnValue() && this._returnParser) {
             return this._returnParser.get();
         }

@@ -3,24 +3,24 @@ class ReturnDescriptor {
     /**
      * The return type.
      *
-     * @var {Function}
+     * @var {mixed}
      */
-    private _type: Function;
+    private _type: any;
 
     /**
      * The return value.
      *
      * @var {mixed}
      */
-    private _value: unknown;
+    private _value: any;
 
     /**
      * Create a new parameter descriptor instance.
      *
-     * @param {Function} type
+     * @param {mixed} type
      * @param {mixed} value
      */
-    public constructor(type: Function, value: unknown) {
+    public constructor(type: any, value: any) {
         this._type = type;
         this._value = value;
     }
@@ -30,7 +30,7 @@ class ReturnDescriptor {
      *
      * @returns {mixed}
      */
-    public get type(): Function {
+    public get type(): any {
         return this._type;
     }
 
@@ -39,7 +39,7 @@ class ReturnDescriptor {
      *
      * @returns {mixed}
      */
-    public get value(): unknown {
+    public get value(): any {
         return this._value;
     }
 

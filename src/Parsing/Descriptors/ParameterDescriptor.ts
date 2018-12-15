@@ -10,9 +10,9 @@ class ParameterDescriptor {
     /**
      * The parameter type.
      *
-     * @var {Function}
+     * @var {mixed}
      */
-    private _type: Function;
+    private _type: any;
 
     /**
      * The parameter position.
@@ -26,7 +26,7 @@ class ParameterDescriptor {
      *
      * @var {mixed}
      */
-    private _value?: unknown;
+    private _value?: any;
 
     /**
      * Create a new parameter descriptor instance.
@@ -35,7 +35,7 @@ class ParameterDescriptor {
      * @param {mixed} value
      */
     public constructor({name, type, position, value}:
-        {name: string, type: Function, position: number, value?: any}) {
+        {name: string, type: any, position: number, value?: any}) {
         this._name = name;
         this._type = type;
         this._position = position;
@@ -56,7 +56,7 @@ class ParameterDescriptor {
      *
      * @returns {mixed}
      */
-    public get type(): Function {
+    public get type(): any {
         return this._type;
     }
 
@@ -74,7 +74,7 @@ class ParameterDescriptor {
      *
      * @returns {mixed}
      */
-    public get value(): unknown {
+    public get value(): any {
         return this._value;
     }
 

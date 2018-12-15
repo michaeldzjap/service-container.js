@@ -1,7 +1,6 @@
 import AbstractFunctionParser from './AbstractFunctionParser';
 import IFunctionParser from '@src/Contracts/Parsing/IFunctionParser';
 import ParsingError from './ParsingError';
-import {ClassMethod} from '@typings/.';
 
 class ArrowFunctionExpression extends AbstractFunctionParser implements IFunctionParser {
 

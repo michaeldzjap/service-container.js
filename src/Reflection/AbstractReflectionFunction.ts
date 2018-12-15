@@ -9,9 +9,9 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * The target the function belongs to.
      *
-     * @var {Function}
+     * @var {mixed}
      */
-    protected _target: Function;
+    protected _target: any;
 
     /**
      * The name of the function.
@@ -23,10 +23,10 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Create a new abstract reflection function instance.
      *
-     * @param {Function} target
+     * @param {mixed} target
      * @param {string} name
      */
-    public constructor(target: Function, name?: string) {
+    public constructor(target: any, name?: string) {
         this._target = target;
         this._name = name;
     }

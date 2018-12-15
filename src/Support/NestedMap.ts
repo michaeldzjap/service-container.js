@@ -1,7 +1,5 @@
-import isString from 'lodash.isstring';
-
 import Arr from './Arr';
-import {last} from './helpers';
+import {isString, last} from './helpers';
 
 class NestedMap<U, V> extends Map<U, V> {
 

@@ -10,7 +10,7 @@ class ClassParser implements IClassParser {
      *
      * @var {mixed}
      */
-    private _target: Function;
+    private _target: any;
 
     /**
      * The ESTree structure representing the class declaration.
@@ -23,9 +23,9 @@ class ClassParser implements IClassParser {
      * Create a new method parser instance.
      *
      * @param {Object} tree
-     * @param {Function} target
+     * @param {mixed} target
      */
-    public constructor(tree: any, target: Function) {
+    public constructor(tree: any, target: any) {
         if (tree.type !== 'ClassDeclaration') {
             throw new Error('Invalid ESTree structure provided.');
         }
@@ -49,7 +49,7 @@ class ClassParser implements IClassParser {
      *
      * @returns {Array|undefined}
      */
-    public getConstructorParameters(): ParameterDescriptor[] | undefined {
+    public getConstructorParameters(): ParameterDescriptor<any>[] | undefined {
         const parser = this._initializeConstructorParser();
 
         if (parser) {
@@ -63,7 +63,7 @@ class ClassParser implements IClassParser {
      * @param {string} name
      * @returns {Array|undefined}
      */
-    public getMethodParameters(name: string): ParameterDescriptor[] | undefined {
+    public getMethodParameters(name: string): ParameterDescriptor<any>[] | undefined {
         const parser = this._initializeMethodParser(name);
 
         if (parser) {

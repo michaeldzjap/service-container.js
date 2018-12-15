@@ -3,16 +3,16 @@ class ReflectionType {
     /**
      * The reflected type.
      *
-     * @var {Function}
+     * @var {mixed}
      */
-    private _type: Function;
+    private _type: any;
 
     /**
      * Create a new reflection type instance.
      *
-     * @param {Function} type
+     * @param {mixed} type
      */
-    public constructor(type: Function) {
+    public constructor(type: any) {
         this._type = type;
     }
 

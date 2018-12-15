@@ -495,7 +495,7 @@ class Arr {
      * @param  {mixed}  value
      * @returns {Array}
      */
-    public static wrap(value: unknown): unknown[] {
+    public static wrap(value: unknown): any[] {
         if (isNullOrUndefined(value)) {
             return [];
         }

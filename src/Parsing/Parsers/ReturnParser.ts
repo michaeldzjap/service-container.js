@@ -18,7 +18,7 @@ class ReturnParser {
      *
      * @var {mixed}
      */
-    private _target: Function;
+    private _target: any;
 
     /**
      * The name of the function.
@@ -41,7 +41,7 @@ class ReturnParser {
      * @param {Function} target
      * @param {string} name
      */
-    public constructor(tree: any, target: Function, name?: string) {
+    public constructor(tree: any, target: any, name?: string) {
         this._tree = tree;
         this._target = target;
         this._name = name;
@@ -55,7 +55,7 @@ class ReturnParser {
      *
      * @returns {ReturnDescriptor}
      */
-    public get(): ReturnDescriptor {
+    public get(): ReturnDescriptor<any> {
         return this._makeDescriptor();
     }
 
@@ -64,7 +64,7 @@ class ReturnParser {
      *
      * @returns {ReturnDescriptor}
      */
-    private _makeDescriptor(): ReturnDescriptor {
+    private _makeDescriptor(): ReturnDescriptor<any> {
         switch (this._tree.argument.type) {
             case 'ArrayExpression':
                 return this._parseArrayExpression();
@@ -82,7 +82,7 @@ class ReturnParser {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseArrayExpression(): ReturnDescriptor {
+    private _parseArrayExpression(): ReturnDescriptor<any> {
         return new ReturnDescriptor(
             this._type,
             ExpressionCollector.collectElements(this._tree.argument)
@@ -94,7 +94,7 @@ class ReturnParser {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseObjectExpression(): ReturnDescriptor {
+    private _parseObjectExpression(): ReturnDescriptor<any> {
         return new ReturnDescriptor(
             this._type,
             ExpressionCollector.collectProperties(this._tree.argument)
@@ -106,7 +106,7 @@ class ReturnParser {
      *
      * @returns {ReturnDescriptor}
      */
-    private _parseLiteral(): ReturnDescriptor {
+    private _parseLiteral(): ReturnDescriptor<any> {
         return new ReturnDescriptor(this._type, this._tree.argument.value);
     }
 

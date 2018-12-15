@@ -1,13 +1,14 @@
-import {Newable} from '@typings/.';
+import {isInstance, isInstantiable} from '@src/Support/helpers';
+import {Instantiable, Instance} from '@typings/.';
 
 class Callable<T> {
 
     /**
      * The class definition or instance to target.
      *
-     * @var {Function|Newable}
+     * @var {Instantiable|Instance}
      */
-    private _target: Function | Newable<T>;
+    private _target: Instantiable<T> | Instance<T>;
 
     /**
      * The name of the method that is to be called on the class / instance.
@@ -26,11 +27,11 @@ class Callable<T> {
     /**
      * Create a new callable instance.
      *
-     * @param {Function|Newable} target
+     * @param {Instantiable|Instance} target
      * @param {string|undefined} method
      * @param {boolean} isStatic
      */
-    public constructor(target: Function | Newable<T>, method?: string, isStatic: boolean = false) {
+    public constructor(target: Instantiable<T> | Instance<T>, method?: string, isStatic: boolean = false) {
         this._target = target;
         this._method = method;
         this._isStatic = isStatic;
@@ -39,9 +40,9 @@ class Callable<T> {
     /**
      * Get the class definition or instance.
      *
-     * @returns {Function|Newable}
+     * @returns {Instantiable|Instance}
      */
-    public get target(): Function | Newable<T> {
+    public get target(): Instantiable<T> | Instance<T> {
         return this._target;
     }
 
@@ -68,7 +69,7 @@ class Callable<T> {
      *
      * @returns {Array}
      */
-    public asArray(): [Function | Newable<T>, string | undefined, boolean] {
+    public asArray(): [Instantiable<T> | Instance<T>, string | undefined, boolean] {
         return [this._target, this._method, this._isStatic];
     }
 
@@ -81,17 +82,19 @@ class Callable<T> {
      */
     public call(args: any[]): any {
         if (!this._method) {
-            throw new Error('Cannot call a non-existent function on a callable.');
+            throw new Error(
+                'Cannot call a non-existent function on a callable.'
+            );
         }
 
-        if (this._target.prototype && !this._isStatic) {
-            throw new Error('Cannot call an instance method on a class definition.');
+        if (isInstantiable(this._target) && !this._isStatic) {
+            throw new Error(
+                'Cannot call an instance method on a class definition.'
+            );
         }
 
-        if (this._isStatic) {
-            return this._target.prototype
-                ? this._target[this._method](...args)
-                : this._target.constructor[this._method](...args);
+        if (isInstance(this._target) && this._isStatic) {
+            return this._target.constructor[this._method](...args);
         }
 
         return this._target[this._method](...args);
