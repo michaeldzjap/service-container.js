@@ -1,5 +1,5 @@
 import {isInstance, isInstantiable} from '@src/Support/helpers';
-import {Instantiable, Instance} from '@typings/.';
+import {Instantiable, Instance} from '@src/Support/types';
 
 class Callable<T> {
 

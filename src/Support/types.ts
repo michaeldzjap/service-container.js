@@ -22,6 +22,6 @@ export interface Binding {
 
 export class Interface {
 
-    public key: Symbol;
+    public key?: Symbol;
 
 }

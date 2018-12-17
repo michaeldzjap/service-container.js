@@ -1,7 +1,8 @@
 import Callable from './Callable';
 import Container from './Container';
-import {ReflectionMethod, ReflectionParameter} from '@src/Reflection';
-import {Identifier, Instantiable} from '@typings/.';
+import ReflectionMethod from '@src/Reflection/ReflectionMethod';
+import ReflectionParameter from '@src/Reflection/ReflectionParameter';
+import {Identifier, Instantiable} from '@src/Support/types';
 import {isNullOrUndefined, isInstance, isInstantiable} from '@src/Support/helpers';
 
 class BoundMethod {
@@ -181,7 +182,7 @@ class BoundMethod {
     private static _getClassDefinition<T>(callback: Callable<T>): Instantiable<T> {
         const target = callback.isStatic || isInstantiable(callback.target)
             ? callback.target
-            : callback.target.constructor
+            : callback.target.constructor;
 
         return target as Instantiable<T>;
     }

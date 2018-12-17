@@ -1,8 +1,6 @@
-import 'reflect-metadata';
-
 import ClassParser from '@src/Parsing/Parsers/ClassParser';
 import ESTreeGenerator from '@src/Parsing/ESTreeGenerator';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import ParsingError from '@src/Parsing/Parsers/ParsingError';
 import {PARAM_TYPES} from '@src/Constants/metadata';
 

@@ -1,9 +1,7 @@
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
-import {
-    AbstractReflectionFunction,
-    ReflectionClass,
-    ReflectionParameter
-} from '.';
+import AbstractReflectionFunction from './AbstractReflectionFunction';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ReflectionClass from './ReflectionClass';
+import ReflectionParameter from './ReflectionParameter';
 import {isNullOrUndefined} from '@src/Support/helpers';
 import {PARAM_TYPES} from '@src/Constants/metadata';
 

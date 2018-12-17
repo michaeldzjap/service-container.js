@@ -1,8 +1,8 @@
 import ESTreeGenerator from '@src/Parsing/ESTreeGenerator';
 import MethodParser from '@src/Parsing/Parsers/MethodParser';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {ClassWithPublicMethodStub, ClassWithPublicStaticMethodStub} from '@helpers/Stubs/ParserStubs';
-import {Interface} from '@typings/.';
+import {Interface} from '@src/Support/types';
 
 describe('MethodParser', (): void => {
     const EXPECTED = [

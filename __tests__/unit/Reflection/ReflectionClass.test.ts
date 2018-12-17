@@ -1,9 +1,7 @@
-import {
-    ReflectionClass,
-    ReflectionMethod,
-    ReflectionParameter,
-    ReflectionType
-} from '@src/Reflection';
+import ReflectionClass from '@src/Reflection/ReflectionClass';
+import ReflectionMethod from '@src/Reflection/ReflectionMethod';
+import ReflectionParameter from '@src/Reflection/ReflectionParameter';
+import ReflectionType from '@src/Reflection/ReflectionType';
 import ReflectionClassStub, {DependencyStub} from '@helpers/Stubs/ReflectionClassStub';
 
 describe('ReflectionClass', (): void => {

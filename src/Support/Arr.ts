@@ -1,4 +1,5 @@
-import Rand from './Rand';
+import Rand from 'rand-seed';
+
 import {dataGet, isNullOrUndefined, isObject, isString, value} from './helpers';
 
 class Arr {

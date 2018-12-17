@@ -1,6 +1,6 @@
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
-import ReturnDescriptor from '@src/Parsing/Descriptors/ReturnDescriptor';
+import ReturnDescriptor from '@src/Descriptors/ReturnDescriptor';
 import ReturnParser from './ReturnParser';
 
 abstract class AbstractFunctionParser {
@@ -52,8 +52,8 @@ abstract class AbstractFunctionParser {
         this._target = target;
         this._name = name;
 
-        this._initializeParameterParser();
-        this._initializeReturnParser();
+        this._parameterParser = this._initializeParameterParser();
+        this._returnParser = this._initializeReturnParser();
     }
 
     /**
@@ -104,10 +104,10 @@ abstract class AbstractFunctionParser {
      * Initialize the parameter parser.
      *
      * @param {mixed} params
-     * @returns {void}
+     * @returns {ParameterParser}
      */
-    private _initializeParameterParser(): void {
-        this._parameterParser = new ParameterParser(
+    private _initializeParameterParser(): ParameterParser {
+        return new ParameterParser(
             this._tree.params, this._target, this._name
         );
     }
@@ -116,13 +116,13 @@ abstract class AbstractFunctionParser {
      * Initialize the return parser.
      *
      * @param {mixed} returnStatement
-     * @returns {void}
+     * @returns {ReturnParser}
      */
-    private _initializeReturnParser(): void {
+    private _initializeReturnParser(): ReturnParser | undefined {
         const statement = this._findReturnStatement();
 
         if (statement) {
-            this._returnParser = new ReturnParser(
+            return new ReturnParser(
                 statement, this._target, this._name
             );
         }

@@ -1,10 +1,8 @@
-import 'reflect-metadata';
-
 import ExpressionCollector from '@src/Parsing/ExpressionCollector';
 import IParameterParser from '@src/Contracts/Parsing/IParameterParser';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {isNullOrUndefined} from '@src/Support/helpers';
-import {Interface} from '@typings/index';
+import {Interface} from '@src/Support/types';
 import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '@src/Constants/metadata';
 
 class ParameterParser implements IParameterParser {

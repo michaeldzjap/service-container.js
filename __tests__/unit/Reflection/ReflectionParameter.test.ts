@@ -1,8 +1,10 @@
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
-import {ReflectionClass, ReflectionParameter, ReflectionType} from '@src/Reflection';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ReflectionClass from '@src/Reflection/ReflectionClass';
+import ReflectionParameter from '@src/Reflection/ReflectionParameter';
+import ReflectionType from '@src/Reflection/ReflectionType';
 import ReflectionClassStub, {DependencyStub} from '@helpers/Stubs/ReflectionClassStub';
 import {isNullOrUndefined} from '@src/Support/helpers';
-import {Interface} from '@typings/.';
+import {Interface} from '@src/Support/types';
 
 describe('ReflectionParameter', (): void => {
     const DATA_PROVIDER = [

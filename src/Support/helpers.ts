@@ -1,5 +1,5 @@
 import Arr from './Arr';
-import {Instantiable, Instance} from '@typings/.';
+import {Instantiable, Instance} from '@src/Support/types';
 
 /**
  * Determine if the given value is undefined.

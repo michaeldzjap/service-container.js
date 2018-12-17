@@ -1,6 +1,6 @@
 import ExpressionCollector from '@src/Parsing/ExpressionCollector';
 import ParsingError from './ParsingError';
-import ReturnDescriptor from '@src/Parsing/Descriptors/ReturnDescriptor';
+import ReturnDescriptor from '@src/Descriptors/ReturnDescriptor';
 import {isNullOrUndefined} from '@src/Support/helpers';
 import {DESIGN_RETURN_TYPE} from '@src/Constants/metadata';
 

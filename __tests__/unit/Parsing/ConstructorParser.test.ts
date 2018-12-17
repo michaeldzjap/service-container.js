@@ -1,10 +1,10 @@
 import ConstructorParser from '@src/Parsing/Parsers/ConstructorParser';
 import ESTreeGenerator from '@src/Parsing/ESTreeGenerator';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {
     ClassWithConstructorStub, ClassWithSimpleConstructorStub
 } from '@helpers/Stubs/ParserStubs';
-import {Interface} from '@typings/.';
+import {Interface} from '@src/Support/types';
 
 /**
  * Generate the full ESTree and return the relevant parser.

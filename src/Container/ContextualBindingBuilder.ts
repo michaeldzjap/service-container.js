@@ -1,6 +1,7 @@
 import Arr from '@src/Support/Arr';
 import Container from './Container';
 import IContextualBindingBuilder from '@src/Contracts/Container/IContextualBindingBuilder';
+import {isNullOrUndefined} from '@src/Support/helpers';
 
 class ContextualBindingBuilder implements IContextualBindingBuilder {
 
@@ -23,7 +24,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
      *
      * @var {string}
      */
-    protected _needs: string;
+    protected _needs?: string;
 
     /**
      * Create a new contextual binding builder.
@@ -55,6 +56,10 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
      * @returns {void}
      */
     public give<T>(implementation: T | Function): void {
+        if (isNullOrUndefined(this._needs)) {
+            throw new Error('The abstract target is undefined.');
+        }
+
         for (const concrete of Arr.wrap(this._concrete)) {
             this._container.addContextualBinding(
                 concrete,

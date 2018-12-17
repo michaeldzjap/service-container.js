@@ -1,26 +1,25 @@
 {
     "compilerOptions": {
-        "allowJs": false,
         "baseUrl": ".",
         "paths": {
-            "@src/*": ["./src/*"],
-            "@typings/*": ["./typings/*"]
+            "@src/*": ["src/*"]
         },
         "emitDecoratorMetadata": true,
-        "esModuleInterop": true,
         "experimentalDecorators": true,
-        "lib": ["dom", "es5", "es6", "es7"],
-        "module": "esNext",
-        "noImplicitAny": true,
-        "outDir": "dist",
+        "moduleResolution": "node",
+        "target": "es6",
+        "module": "es6",
+        "lib": ["es5", "es6", "es7", "dom"],
+        "removeComments": true,
+        "strict": true,
         "sourceMap": true,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "target": "es2017"
+        "declaration": true,
+        "declarationDir": "./dist",
+        "outDir": "./dist",
+        "suppressImplicitAnyIndexErrors": true
     },
     "include": [
-        "src/**/*",
-        "typings/*"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",

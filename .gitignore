@@ -6,3 +6,4 @@ npm-debug.log
 .env.development
 .env.production
 .DS_Store
+.rpt2_cache

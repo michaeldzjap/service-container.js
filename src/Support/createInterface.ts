@@ -1,5 +1,4 @@
-import 'reflect-metadata';
-
+import {isNullOrUndefined} from '@src/Support/helpers';
 import {INTERFACE_SYMBOLS} from '@src/Constants/metadata';
 
 /**
@@ -10,7 +9,8 @@ import {INTERFACE_SYMBOLS} from '@src/Constants/metadata';
  * @returns {void}
  */
 const initializeMetadata = (target: any, propertyName: string | undefined): void => {
-    if (propertyName && !Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target, propertyName)) {
+    if (!isNullOrUndefined(propertyName)
+        && !Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target, propertyName)) {
         Reflect.defineMetadata(INTERFACE_SYMBOLS, new Map, target, propertyName);
 
         return;
@@ -32,17 +32,17 @@ const initializeMetadata = (target: any, propertyName: string | undefined): void
  *
  * @throws {Error}
  */
-const checkMetadata = ({name, key}: {name: string, key: Symbol}, target: any,
+const checkMetadata = ({name, key}: {name: string, key: Symbol}, target: any, // eslint-disable-line
     propertyName: string | undefined, position: number): void => {
-    const metadata = propertyName
-        ? Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName)
-        : Reflect.getMetadata(INTERFACE_SYMBOLS, target);
+    const metadata = isNullOrUndefined(propertyName)
+        ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
+        : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName);
 
     if (metadata.has(position)) {
         throw new Error(`Cannot apply @${name} decorator to the same target multiple times.`);
     }
 
-    if (Array.from(metadata.values()).find((_: Symbol): boolean => _ === key)) {
+    if (Array.from(metadata.values()).find((_: any): boolean => _ === key)) {
         throw new Error(`Injecting the same [${name}] interface multiple times is redundant.`);
     }
 };
@@ -57,7 +57,7 @@ const checkMetadata = ({name, key}: {name: string, key: Symbol}, target: any,
  * @param {number} position
  * @returns {void}
  */
-const defineMetadata = (identifier: {name: string, key: Symbol | string}, target: any,
+const defineMetadata = (identifier: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
     propertyName: string | undefined, position: number): void => {
     if (propertyName) {
         Reflect.defineMetadata(

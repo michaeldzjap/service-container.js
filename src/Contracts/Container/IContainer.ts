@@ -1,6 +1,6 @@
 import Callable from '@src/Container/Callable';
 import ContextualBindingBuilder from '@src/Container/ContextualBindingBuilder';
-import {Identifier, Instantiable} from '@typings/index';
+import {Identifier, Instantiable} from '@src/Support/types';
 
 interface IContainer {
 

@@ -7,8 +7,9 @@ import EntryNotFoundError from './EntryNotFoundError';
 import IContainer from '@src/Contracts/Container/IContainer';
 import LogicError from './LogicError';
 import NestedMap from '@src/Support/NestedMap';
-import {ReflectionClass, ReflectionParameter} from '@src/Reflection';
-import {Binding, Identifier, Instantiable} from '@typings/.';
+import ReflectionClass from '@src/Reflection/ReflectionClass';
+import ReflectionParameter from '@src/Reflection/ReflectionParameter';
+import {Binding, Identifier, Instantiable} from '@src/Support/types';
 import {isClass, isString, isNullOrUndefined} from '@src/Support/helpers';
 
 class Container implements IContainer {

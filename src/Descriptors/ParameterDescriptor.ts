@@ -35,7 +35,7 @@ class ParameterDescriptor {
      * @param {mixed} value
      */
     public constructor({name, type, position, value}:
-        {name: string, type: any, position: number, value?: any}) {
+        {name: string, type: any, position: number, value?: any}) { // eslint-disable-line
         this._name = name;
         this._type = type;
         this._position = position;

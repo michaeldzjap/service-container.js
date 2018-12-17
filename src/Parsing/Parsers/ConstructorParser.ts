@@ -1,5 +1,5 @@
 import IConstructorParser from '@src/Contracts/Parsing/IConstructorParser';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
 import ParsingError from './ParsingError';
 
@@ -40,7 +40,7 @@ class ConstructorParser implements IConstructorParser {
         this._tree = tree;
         this._target = target;
 
-        this._initializeParameterParser();
+        this._parameterParser = this._initializeParameterParser();
     }
 
     /**
@@ -75,10 +75,10 @@ class ConstructorParser implements IConstructorParser {
     /**
      * Initialize the parameter parser.
      *
-     * @returns {void}
+     * @returns {ParameterParser}
      */
-    private _initializeParameterParser(): void {
-        this._parameterParser = new ParameterParser(
+    private _initializeParameterParser(): ParameterParser {
+        return new ParameterParser(
             this._tree.value.params,
             this._target
         );

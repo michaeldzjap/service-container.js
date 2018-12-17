@@ -1,8 +1,6 @@
-import 'reflect-metadata';
-
 import IReflectionFunction from '@src/Contracts/Reflection/IReflectionFunction';
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
-import {ReflectionParameter} from '.';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ReflectionParameter from './ReflectionParameter';
 
 abstract class AbstractReflectionFunction implements IReflectionFunction {
 

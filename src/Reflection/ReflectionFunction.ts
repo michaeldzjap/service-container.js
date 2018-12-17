@@ -1,4 +1,4 @@
-import {AbstractReflectionFunction} from '.';
+import AbstractReflectionFunction from './AbstractReflectionFunction';
 
 class ReflectionFunction extends AbstractReflectionFunction {
 

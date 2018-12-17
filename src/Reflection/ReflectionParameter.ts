@@ -1,5 +1,6 @@
-import ParameterDescriptor from '@src/Parsing/Descriptors/ParameterDescriptor';
-import {ReflectionClass, ReflectionType} from '.';
+import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ReflectionClass from './ReflectionClass';
+import ReflectionType from './ReflectionType';
 import {isNullOrUndefined, isClass} from '@src/Support/helpers';
 
 class ReflectionParameter {

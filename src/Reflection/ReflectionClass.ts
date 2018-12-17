@@ -1,6 +1,7 @@
-import {ReflectionError, ReflectionMethod} from '.';
+import ReflectionError from './ReflectionError';
+import ReflectionMethod from './ReflectionMethod';
 import {isSymbol, isString, isNullOrUndefined} from '@src/Support/helpers';
-import {Interface} from '@typings/.';
+import {Interface} from '@src/Support/types';
 
 class ReflectionClass {
 
