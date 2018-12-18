@@ -1,6 +1,6 @@
-import createInterface from '@src/Support/createInterface';
+import InterfaceService from '@src/Support/InterfaceService';
 
-export const IReflectionClassContractStub = createInterface('IReflectionClassContractStub');
+export const IReflectionClassContractStub = InterfaceService.createInterface('IReflectionClassContractStub');
 
 // eslint-disable-next-line typescript/no-empty-interface
 export interface IReflectionClassContractStub {
