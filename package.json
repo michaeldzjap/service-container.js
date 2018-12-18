@@ -35,7 +35,6 @@
     "jest": "^23.6.0",
     "rand-seed": "0.0.3",
     "rollup": "^0.68.0",
-    "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-eslint": "^5.0.0",
     "rollup-plugin-node-resolve": "^4.0.0",

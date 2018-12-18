@@ -13,8 +13,6 @@
         "removeComments": true,
         "strict": true,
         "sourceMap": true,
-        "declaration": true,
-        "declarationDir": "./dist",
         "outDir": "./dist",
         "suppressImplicitAnyIndexErrors": true
     },
