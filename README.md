@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/michaeldzjap/container.js.svg?branch=master)](https://travis-ci.org/michaeldzjap/container.js)
+![dependencies](https://img.shields.io/david/michaeldzjap/container.js.svg)
+![dev dependencies](https://img.shields.io/david/dev/michaeldzjap/container.js.svg)
+[![License](https://img.shields.io/npm/l/container.js.svg)](https://github.com/michaeldzjap/container.js/blob/master/LICENSE)
+
 # container.js
 The Laravel service container re-written in TypeScript
 
