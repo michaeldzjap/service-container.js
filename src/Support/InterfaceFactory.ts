@@ -1,7 +1,7 @@
 import {isNullOrUndefined} from '@src/Support/helpers';
 import {INTERFACE_SYMBOLS} from '@src/Constants/metadata';
 
-class InterfaceService {
+class InterfaceFactory {
 
     /**
      * Define metadata for a given interface name.
@@ -9,14 +9,14 @@ class InterfaceService {
      * @param {string} name
      * @returns {Function}
      */
-    public static createInterface(name: string): any {
+    public static make(name: string): any {
         const identifier = {name, key: Symbol.for(name)};
 
         // eslint-disable-next-line require-jsdoc
         function fn(target: any, propertyName: string, index: number): any {
-            InterfaceService._initializeMetadata(target, propertyName);
-            InterfaceService._checkMetadata(identifier, target, propertyName, index);
-            InterfaceService._defineMetadata(identifier, target, propertyName, index);
+            InterfaceFactory._initializeMetadata(target, propertyName);
+            InterfaceFactory._checkMetadata(identifier, target, propertyName, index);
+            InterfaceFactory._defineMetadata(identifier, target, propertyName, index);
 
             return target;
         }
@@ -106,4 +106,4 @@ class InterfaceService {
 
 }
 
-export default InterfaceService;
+export default InterfaceFactory;

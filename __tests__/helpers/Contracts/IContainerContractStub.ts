@@ -1,6 +1,6 @@
-import InterfaceService from '@src/Support/InterfaceService';
+import InterfaceFactory from '@src/Support/InterfaceFactory';
 
-export const IContainerContractStub = InterfaceService.createInterface('IContainerContractStub');
+export const IContainerContractStub = InterfaceFactory.make('IContainerContractStub');
 
 // eslint-disable-next-line typescript/no-empty-interface
 export interface IContainerContractStub {
