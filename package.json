@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "The Laravel container re-written in TypeScript",
   "main": "dist/container.js",
-  "module": "dist/container.es.js",
   "files": [
     "dist"
   ],
@@ -13,7 +12,8 @@
     "test": "NODE_ENV=test jest",
     "test:watch": "npm test -- --watch",
     "build": "./node_modules/.bin/rollup --config",
-    "watch": "./node_modules/.bin/rollup --config --watch"
+    "watch": "./node_modules/.bin/rollup --config --watch",
+    "clean": "rm -rf ./dist"
   },
   "keywords": [
     "laravel",
