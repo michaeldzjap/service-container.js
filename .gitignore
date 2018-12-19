@@ -7,3 +7,5 @@ npm-debug.log
 .env.production
 .DS_Store
 .rpt2_cache
+example/node_modules
+example/dist
