@@ -57,7 +57,7 @@ class InterfaceFactory {
      *
      * @throws {Error}
      */
-    private static _checkMetadata({name, key}: {name: string, key: Symbol}, target: any, // eslint-disable-line
+    private static _checkMetadata({name, key}: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
         propertyName: string | undefined, position: number): void {
         const metadata = isNullOrUndefined(propertyName)
             ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
