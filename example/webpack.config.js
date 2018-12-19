@@ -3,7 +3,8 @@ const path = require('path');
 module.exports = {
     mode: 'development',
     entry: {
-        simple: './src/simple'
+        simple: './src/simple',
+        concrete: './src/concrete'
     },
     output: {
         filename: '[name].js',
