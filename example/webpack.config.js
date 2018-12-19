@@ -5,7 +5,8 @@ module.exports = {
     entry: {
         simple: './src/simple',
         concrete: './src/concrete',
-        interface: './src/interface'
+        interface: './src/interface',
+        singleton: './src/singleton'
     },
     output: {
         filename: '[name].js',
