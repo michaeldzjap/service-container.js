@@ -17,6 +17,21 @@ class ReflectionType {
     }
 
     /**
+     * Return the relevant global object.
+     *
+     * @returns {mixed}
+     *
+     * @throws {ReferenceError}
+     */
+    private static _getGlobal(): any {
+        if (typeof window !== 'undefined') return window;
+
+        if (typeof global !== 'undefined') return global;
+
+        throw new ReferenceError('No global variable is defined.');
+    }
+
+    /**
      * Check if the type is built-in.
      *
      * NOTE: Any custom type that is added to the global object will be seen as
@@ -29,7 +44,7 @@ class ReflectionType {
      * @returns {boolean}
      */
     public isBuiltin(): boolean {
-        const target = window || global;
+        const target = ReflectionType._getGlobal();
 
         if (target) {
             return !!target[this._type.prototype.constructor.name];
