@@ -4,7 +4,8 @@ module.exports = {
     mode: 'development',
     entry: {
         simple: './src/simple',
-        concrete: './src/concrete'
+        concrete: './src/concrete',
+        interface: './src/interface'
     },
     output: {
         filename: '[name].js',
