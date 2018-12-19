@@ -1,9 +1,9 @@
 import AbstractReflectionFunction from './AbstractReflectionFunction';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionParameter from './ReflectionParameter';
-import {isNullOrUndefined} from '@src/Support/helpers';
-import {PARAM_TYPES} from '@src/Constants/metadata';
+import {isNullOrUndefined} from '../Support/helpers';
+import {PARAM_TYPES} from '../Constants/metadata';
 
 class ReflectionMethod extends AbstractReflectionFunction {
 

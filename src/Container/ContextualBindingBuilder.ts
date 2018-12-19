@@ -1,7 +1,7 @@
-import Arr from '@src/Support/Arr';
+import Arr from '../Support/Arr';
 import Container from './Container';
-import IContextualBindingBuilder from '@src/Contracts/Container/IContextualBindingBuilder';
-import {isNullOrUndefined} from '@src/Support/helpers';
+import IContextualBindingBuilder from '../Contracts/Container/IContextualBindingBuilder';
+import {isNullOrUndefined} from '../Support/helpers';
 
 class ContextualBindingBuilder implements IContextualBindingBuilder {
 

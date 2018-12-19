@@ -1,5 +1,5 @@
-import IConstructorParser from '@src/Contracts/Parsing/IConstructorParser';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import IConstructorParser from '../../Contracts/Parsing/IConstructorParser';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
 import ParsingError from './ParsingError';
 

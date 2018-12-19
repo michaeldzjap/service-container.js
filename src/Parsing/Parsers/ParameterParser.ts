@@ -1,9 +1,9 @@
-import ExpressionCollector from '@src/Parsing/ExpressionCollector';
-import IParameterParser from '@src/Contracts/Parsing/IParameterParser';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
-import {isNullOrUndefined} from '@src/Support/helpers';
-import {Interface} from '@src/Support/types';
-import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '@src/Constants/metadata';
+import ExpressionCollector from '../../Parsing/ExpressionCollector';
+import IParameterParser from '../../Contracts/Parsing/IParameterParser';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
+import {isNullOrUndefined} from '../../Support/helpers';
+import {Interface} from '../../Support/types';
+import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../Constants/metadata';
 
 class ParameterParser implements IParameterParser {
 

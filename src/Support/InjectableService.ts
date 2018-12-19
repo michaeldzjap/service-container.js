@@ -1,9 +1,9 @@
-import ClassParser from '@src/Parsing/Parsers/ClassParser';
-import ESTreeGenerator from '@src/Parsing/ESTreeGenerator';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
-import ParsingError from '@src/Parsing/Parsers/ParsingError';
+import ClassParser from '../Parsing/Parsers/ClassParser';
+import ESTreeGenerator from '../Parsing/ESTreeGenerator';
+import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
+import ParsingError from '../Parsing/Parsers/ParsingError';
 import {isNullOrUndefined} from './helpers';
-import {PARAM_TYPES} from '@src/Constants/metadata';
+import {PARAM_TYPES} from '../Constants/metadata';
 
 class InjectableService {
 

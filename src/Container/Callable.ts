@@ -1,5 +1,5 @@
-import {isInstance, isInstantiable} from '@src/Support/helpers';
-import {Instantiable, Instance} from '@src/Support/types';
+import {isInstance, isInstantiable} from '../Support/helpers';
+import {Instantiable, Instance} from '../Support/types';
 
 class Callable<T> {
 

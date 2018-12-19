@@ -1,16 +1,16 @@
-import Arr from '@src/Support/Arr';
+import Arr from '../Support/Arr';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
-import IContainer from '@src/Contracts/Container/IContainer';
+import IContainer from '../Contracts/Container/IContainer';
 import LogicError from './LogicError';
-import NestedMap from '@src/Support/NestedMap';
-import ReflectionClass from '@src/Reflection/ReflectionClass';
-import ReflectionParameter from '@src/Reflection/ReflectionParameter';
-import {Binding, Identifier, Instantiable} from '@src/Support/types';
-import {isClass, isString, isNullOrUndefined} from '@src/Support/helpers';
+import NestedMap from '../Support/NestedMap';
+import ReflectionClass from '../Reflection/ReflectionClass';
+import ReflectionParameter from '../Reflection/ReflectionParameter';
+import {Binding, Identifier, Instantiable} from '../Support/types';
+import {isClass, isString, isNullOrUndefined} from '../Support/helpers';
 
 class Container implements IContainer {
 

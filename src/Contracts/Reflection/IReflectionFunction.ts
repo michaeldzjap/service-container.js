@@ -1,4 +1,4 @@
-import ReflectionParameter from '@src/Reflection/ReflectionParameter';
+import ReflectionParameter from '../../Reflection/ReflectionParameter';
 
 interface IReflectionFunction {
 

@@ -1,5 +1,5 @@
 import AbstractFunctionParser from './AbstractFunctionParser';
-import IFunctionParser from '@src/Contracts/Parsing/IFunctionParser';
+import IFunctionParser from '../../Contracts/Parsing/IFunctionParser';
 import ParsingError from './ParsingError';
 
 class MethodParser extends AbstractFunctionParser implements IFunctionParser {

@@ -1,5 +1,5 @@
 import IConstructorParser from './IConstructorParser';
-import ReturnDescriptor from '@src/Parsing/Descriptors/ReturnDescriptor';
+import ReturnDescriptor from '../../Descriptors/ReturnDescriptor';
 
 interface IFunctionParser extends IConstructorParser {
 

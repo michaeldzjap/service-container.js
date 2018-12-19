@@ -1,6 +1,6 @@
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import ParameterParser from './ParameterParser';
-import ReturnDescriptor from '@src/Descriptors/ReturnDescriptor';
+import ReturnDescriptor from '../../Descriptors/ReturnDescriptor';
 import ReturnParser from './ReturnParser';
 
 abstract class AbstractFunctionParser {

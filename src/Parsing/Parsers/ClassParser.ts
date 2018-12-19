@@ -1,7 +1,7 @@
 import ConstructorParser from './ConstructorParser';
-import IClassParser from '@src/Contracts/Parsing/IClassParser';
+import IClassParser from '../../Contracts/Parsing/IClassParser';
 import MethodParser from './MethodParser';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 
 class ClassParser implements IClassParser {
 

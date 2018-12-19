@@ -1,4 +1,4 @@
-import ContextualBindingBuilder from '@src/Container/ContextualBindingBuilder';
+import ContextualBindingBuilder from '../../Container/ContextualBindingBuilder';
 
 interface IContextualBindingBuilder {
 

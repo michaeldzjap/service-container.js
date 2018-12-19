@@ -1,7 +1,7 @@
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionType from './ReflectionType';
-import {isNullOrUndefined, isClass} from '@src/Support/helpers';
+import {isNullOrUndefined, isClass} from '../Support/helpers';
 
 class ReflectionParameter {
 

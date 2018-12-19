@@ -1,5 +1,5 @@
-import IReflectionFunction from '@src/Contracts/Reflection/IReflectionFunction';
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import IReflectionFunction from '../Contracts/Reflection/IReflectionFunction';
+import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionParameter from './ReflectionParameter';
 
 abstract class AbstractReflectionFunction implements IReflectionFunction {

@@ -1,5 +1,5 @@
-import {isNullOrUndefined} from '@src/Support/helpers';
-import {INTERFACE_SYMBOLS} from '@src/Constants/metadata';
+import {isNullOrUndefined} from '../Support/helpers';
+import {INTERFACE_SYMBOLS} from '../Constants/metadata';
 
 class InterfaceFactory {
 

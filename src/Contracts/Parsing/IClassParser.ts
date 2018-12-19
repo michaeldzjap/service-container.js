@@ -1,4 +1,4 @@
-import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 
 interface IClassParser {
 

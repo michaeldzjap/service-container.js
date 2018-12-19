@@ -1,8 +1,8 @@
-import ExpressionCollector from '@src/Parsing/ExpressionCollector';
+import ExpressionCollector from '../../Parsing/ExpressionCollector';
 import ParsingError from './ParsingError';
-import ReturnDescriptor from '@src/Descriptors/ReturnDescriptor';
-import {isNullOrUndefined} from '@src/Support/helpers';
-import {DESIGN_RETURN_TYPE} from '@src/Constants/metadata';
+import ReturnDescriptor from '../../Descriptors/ReturnDescriptor';
+import {isNullOrUndefined} from '../../Support/helpers';
+import {DESIGN_RETURN_TYPE} from '../../Constants/metadata';
 
 class ReturnParser {
 

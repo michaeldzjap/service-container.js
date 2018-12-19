@@ -1,3 +1,10 @@
 {
-    "extends": "./tsconfig.base"
+    "extends": "./tsconfig.base",
+    "compilerOptions": {
+        "declaration": true,
+        "declarationDir": "./dist",
+        "removeComments": true,
+        "sourceMap": true,
+        "outDir": "./dist"
+    }
 }

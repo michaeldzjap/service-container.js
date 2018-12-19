@@ -1,6 +1,7 @@
 {
     "extends": "./tsconfig.base",
     "compilerOptions": {
+        "baseUrl": ".",
         "paths": {
             "@helpers/*": ["__tests__/helpers/*"],
             "@src/*": ["src/*"]
