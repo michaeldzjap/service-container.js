@@ -14,12 +14,13 @@ This project offers almost completely the same functionality as the original _La
 Documentation for this project is rather minimal at this point. However, the relevant tests from the rather extensive test suite of the original _Laravel_ version has been ported. This should give a good indication of what is possible. There is also an _example_ folder with some preliminary, basic examples.
 
 ## Considerations
-Below are some important things to take into account when w
+Below are some important things to take into account when trying out this project for yourself.
 
 ### Environment requirements
+This project currently only works in environments targeting _ES6_ or higher. Part of its internal dependency resolution mechanism relies on the `class` construct being available at runtime, which is not available in _ES5_ or lower. It should work both in the browser as well as _node_ environments.
 
 ### Binding to an interface
-Since _TypeScript_ interfaces are compiled away and do not exist anymore at runtime, an alternative approach was needed to facilitate binding a certain implementation to a given interface / contract.
+Since _TypeScript_ interfaces are compiled away and do not exist anymore at runtime, an alternative approach was needed to facilitate binding a certain implementation to a given interface / contract. The approach taken is largely borrowed from [Aurelia](https://aurelia.io), as this seemed like quite an elegant and minimal invasive way of working around this problem.
 
 ### Dependency injection inside ordinary functions
 
