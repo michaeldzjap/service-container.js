@@ -22,9 +22,11 @@ This project currently only works in environments targeting _ES6_ or higher. Par
 ### Binding to an interface
 Since _TypeScript_ interfaces are compiled away and do not exist anymore at runtime, an alternative approach was needed to facilitate binding a certain implementation to a given interface / contract. The approach taken is largely borrowed from [Aurelia](https://aurelia.io), as this was found to be a quite elegant and minimally invasive workaround. See the test suite and examples for more details.
 
-### Dependency injection inside ordinary functions
+### Dependency injection and ordinary functions
+The original _Laravel_ container does allow for this by passing a closure as the first argument to `container.call()`. However, since this project relies on _reflect-metada_ for type deduction and _reflect-metada_ only emits metadata for decorated class definitions, dependency injection only works for class methods (i.e. not for ordinary functions).
 
 ### Discerning ordinary functions from class definitions
+This is a little bit tricky, because in _JavaScript_ there really is no difference between the two at runtime. One option would be to use parsing to determine the real nature of a target. A the moment a different, more efficient, but less robust method is used. This partly relies on the convention that the first character of a class name is in uppercase.
 
 ## Short questions & answers
 - Is this project _ES5_ compatible?
