@@ -1,66 +1,68 @@
-import ExpressionCollector from '../../Parsing/ExpressionCollector';
-import IParameterParser from '../../Contracts/Parsing/IParameterParser';
-import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
-import {isNullOrUndefined} from '../../Support/helpers';
-import {Interface} from '../../Support/types';
-import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../Constants/metadata';
+import ExpressionCollector from './ExpressionCollector';
+import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
+import ParsingError from './ParsingError';
+import {isUndefined} from '../Support/helpers';
+import {Interface} from '../Support/types';
+import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../Constants/metadata';
 
-class ParameterParser implements IParameterParser {
+abstract class ParameterParserBase {
 
     /**
-     * The ESTree structure representing an array of function parameters.
+     * The ESTree-compatible abstract syntax tree representing the constructor.
      *
-     * @var {Array}
+     * @var {Object}
      */
-    private _tree: any[];
+    protected _ast: any;
 
     /**
-     * The function the parameters belong to.
+     * The class that owns the constructor to be parsed.
      *
      * @var {mixed}
      */
-    private _target: any;
+    protected _target: any;
 
     /**
      * The name of the function.
      *
-     * @var {string}
+     * @var {?string}
      */
-    private _name?: string;
+    protected _name?: string;
 
     /**
      * The parameter types.
      *
      * @var {Array}
      */
-    private _types: any[];
+    protected _types: any[];
 
     /**
      * The keys of any interfaces that might have been specified.
      *
      * @var {Map}
      */
-    private _keys?: Map<number, Symbol>;
+    protected _keys?: Map<number, Symbol>;
 
     /**
-     * Create a new parameter parser instance.
+     * Create a new parameter parser base instance.
      *
-     * @param {Array} tree
+     * @param {Object} ast
      * @param {mixed} target
-     * @param {string} name
+     * @param {?string} name
      */
-    public constructor(tree: any[], target: any, name?: string) {
-        const types = this._fetchMetadata(DESIGN_PARAM_TYPES, target, name) || [];
-
-        if (tree.length !== types.length) {
-            throw new Error('The number of parameters and types must match.');
-        }
-
-        this._tree = tree;
+    public constructor(ast: any, target: any, name?: string) {
+        this._ast = ast;
         this._target = target;
         this._name = name;
-        this._types = types;
-        this._keys = this._fetchMetadata(INTERFACE_SYMBOLS, target, name);
+        this._types = ParameterParserBase._fetchMetadata(
+            DESIGN_PARAM_TYPES, this._target, this._name
+        ) || [];
+        this._keys = ParameterParserBase._fetchMetadata(
+            INTERFACE_SYMBOLS, this._target, this._name
+        );
+
+        if (ast.param.length !== this._types.length) {
+            throw new ParsingError('The number of parameters and types must match.');
+        }
     }
 
     /**
@@ -69,7 +71,7 @@ class ParameterParser implements IParameterParser {
      * @returns {Array}
      */
     public all(): ParameterDescriptor[] {
-        return this._tree
+        return this._ast
             .map((param: any, i: number): ParameterDescriptor => (
                 this._makeDescriptor(param, this._types[i], i)
             ));
@@ -83,8 +85,24 @@ class ParameterParser implements IParameterParser {
      */
     public at(index: number): ParameterDescriptor {
         return this._makeDescriptor(
-            this._tree[index], this._types[index], index
+            this._ast[index], this._types[index], index
         );
+    }
+
+    /**
+     * Attempt to fetch metadata.
+     *
+     * @param {string} key
+     * @param {mixed} target
+     * @param {?string} name
+     * @returns {Array|Map}
+     */
+    private static _fetchMetadata(key: string, target: any, name?: string): any {
+        if (!isUndefined(name)) {
+            return Reflect.getMetadata(key, target, name);
+        }
+
+        return Reflect.getMetadata(key, target);
     }
 
     /**
@@ -95,12 +113,14 @@ class ParameterParser implements IParameterParser {
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _makeDescriptor(param: any, type: any, position: number): ParameterDescriptor {
-        // The parameter has a value assigned to it. Hence, we need to do
-        // some parsing to fetch it. This can become quite complex in the
-        // case of deeply nested parameter values
-        if (param.type === 'AssignmentPattern') {
-            return this._parseAssignmentPattern(param, type, position);
+    protected _makeDescriptor(param: any, type: any, position: number): ParameterDescriptor {
+        const assignment = this._findAssignment(param);
+
+        if (!isUndefined(assignment)) {
+            // The parameter has a value assigned to it. Hence, we need to do
+            // some parsing to fetch it. This can become quite complex in the
+            // case of deeply nested parameter values
+            return this._parseAssignment(assignment, type, position);
         }
 
         // Simplest case: parameter does not have a value assigned
@@ -112,29 +132,37 @@ class ParameterParser implements IParameterParser {
     }
 
     /**
+     * Find the assignment expression for the given parameter (if it exists).
+     *
+     * @param {Object} param
+     * @returns {?Object}
+     */
+    protected abstract _findAssignment(param: any): any;
+
+    /**
      * Parse an assignment pattern parameter type.
      *
-     * @param {Object} expr
+     * @param {Object} assignment
      * @param {mixed} type
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    private _parseAssignmentPattern(expr: any, type: any, position: number): ParameterDescriptor {
+    private _parseAssignment(assignment: any, type: any, position: number): ParameterDescriptor {
         const props = {
-            name: expr.left.name,
+            name: assignment.left.name,
             type: this._parseType(type, position),
             position
         };
 
-        switch (expr.right.type) {
+        switch (assignment.right.type) {
             case 'ArrayExpression':
-                return this._parseArrayExpression(expr.right, props);
+                return this._parseArrayExpression(assignment.right, props);
             case 'ObjectExpression':
-                return this._parseObjectExpression(expr.right, props);
+                return this._parseObjectExpression(assignment.right, props);
             case 'MemberExpression':
-                return this._parseMemberExpression(expr.right, props);
+                return this._parseMemberExpression(assignment.right, props);
             case 'Literal':
-                return this._parseLiteral(expr.right, props);
+                return this._parseLiteral(assignment.right, props);
             default:
                 return new ParameterDescriptor(props);
         }
@@ -209,22 +237,6 @@ class ParameterParser implements IParameterParser {
         return new ParameterDescriptor({...props, value: literal.value});
     }
 
-    /**
-     * Attempt to fetch metadata.
-     *
-     * @param {string} key
-     * @param {mixed} target
-     * @param {string|undefined} name
-     * @returns {Array|Map}
-     */
-    private _fetchMetadata(key: string, target: any, name?: string): any {
-        if (!isNullOrUndefined(name)) {
-            return Reflect.getMetadata(key, target, name);
-        }
-
-        return Reflect.getMetadata(key, target);
-    }
-
 }
 
-export default ParameterParser;
+export default ParameterParserBase;

@@ -1,6 +1,6 @@
 import {parseScript, Options} from 'cherow';
 
-class ESTreeGenerator {
+class ESTree {
 
     /**
      * Get the ESTree instance.

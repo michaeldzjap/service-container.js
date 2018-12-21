@@ -3,8 +3,8 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "moduleResolution": "node",
-        "target": "es6",
-        "module": "es6",
+        "target": "esnext",
+        "module": "esnext",
         "lib": ["es5", "es6", "es7", "dom"],
         "strict": true,
         "suppressImplicitAnyIndexErrors": true

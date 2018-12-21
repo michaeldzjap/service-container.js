@@ -7,7 +7,7 @@ interface IParameterParser {
      *
      * @returns {Array}
      */
-    all(): ParameterDescriptor<any>[];
+    all(): ParameterDescriptor[];
 
     /**
      * Get the parsed parameter at the given index.
@@ -15,7 +15,7 @@ interface IParameterParser {
      * @param {number} index
      * @returns {ParameterDescriptor}
      */
-    at(index: number): ParameterDescriptor<any>;
+    at(index: number): ParameterDescriptor;
 
 }
 

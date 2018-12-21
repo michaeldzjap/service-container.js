@@ -1,4 +1,4 @@
-import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
+import IParameterParser from './IParameterParser';
 
 interface IConstructorParser {
 
@@ -12,9 +12,9 @@ interface IConstructorParser {
     /**
      * Get the constructor parameters.
      *
-     * @returns {Array}
+     * @returns {?IParameterParser}
      */
-    getParameters(): ParameterDescriptor<any>[];
+    getParameters(): IParameterParser | undefined;
 
 }
 

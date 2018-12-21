@@ -1,7 +1,9 @@
-import InjectableService from './InjectableService';
+// import InjectableService from './InjectableService';
+//
+// export default (): Function => (target: any, propertyName?: string): void => {
+//     InjectableService.defineMetadata(target, propertyName);
+//
+//     return target;
+// };
 
-export default (): Function => (target: any, propertyName?: string): void => {
-    InjectableService.defineMetadata(target, propertyName);
-
-    return target;
-};
+export default (): Function => (): void => {};

@@ -1,20 +1,20 @@
-import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
+import IConstructorParser from './IConstructorParser';
 
 interface IClassParser {
 
     /**
-     * Check if the class has a body.
+     * Determine if the class has a constructor.
      *
      * @returns {boolean}
      */
     hasConstructor(): boolean;
 
     /**
-     * Get the parameters of the class constructor.
+     * Get class constructor (if there is one).
      *
-     * @returns {Array|undefined}
+     * @returns {?IConstructorParser}
      */
-    getConstructorParameters(): ParameterDescriptor<any>[] | undefined;
+    getConstructor(): IConstructorParser | undefined;
 
 }
 

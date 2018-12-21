@@ -15,7 +15,7 @@ class ClassParser implements IClassParser {
     /**
      * The ESTree structure representing the class declaration.
      *
-     * @var {Object}
+     * @var {mixed}
      */
     private _tree: any;
 

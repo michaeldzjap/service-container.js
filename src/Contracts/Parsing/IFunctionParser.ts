@@ -15,7 +15,7 @@ interface IFunctionParser extends IConstructorParser {
      *
      * @returns {ReturnDescriptor|undefined}
      */
-    getReturnValue(): ReturnDescriptor<any> | undefined;
+    getReturnValue(): ReturnDescriptor | undefined;
 
 }
 
