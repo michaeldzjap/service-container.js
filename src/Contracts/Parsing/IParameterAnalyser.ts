@@ -1,6 +1,6 @@
 import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 
-interface IParameterParser {
+interface IParameterAnalyser {
 
     /**
      * Get all the parsed parameters.
@@ -19,4 +19,4 @@ interface IParameterParser {
 
 }
 
-export default IParameterParser;
+export default IParameterAnalyser;

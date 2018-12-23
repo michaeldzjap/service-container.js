@@ -1,8 +1,8 @@
 import ClassParser from '../Parsing/Parsers/ClassParser';
 import ESTreeGenerator from '../Parsing/ESTreeGenerator';
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
-import ParsingError from '../Parsing/Parsers/ParsingError';
-import {isNullOrUndefined} from './helpers';
+import ParsingError from '../Parsing/ParsingError';
+import {isUndefined} from './helpers';
 import {PARAM_TYPES} from '../Constants/metadata';
 
 class InjectableService {
@@ -12,7 +12,7 @@ class InjectableService {
      * constructors.
      *
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @returns {void}
      */
     public static defineMetadata(target: any, propertyName?: string): void {
@@ -33,11 +33,11 @@ class InjectableService {
      * Check if the custom metadata is not already defined.
      *
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @returns {void}
      */
     private static _avoidMultipleDefinition(target: any, propertyName?: string): void {
-        if (isNullOrUndefined(propertyName)) {
+        if (isUndefined(propertyName)) {
             if (Reflect.hasOwnMetadata(PARAM_TYPES, target)) {
                 InjectableService._throwError();
             }
@@ -65,11 +65,11 @@ class InjectableService {
      * Get the constructor of the given target.
      *
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @returns {mixed}
      */
     private static _getConstructor(target: any, propertyName?: string): any {
-        if (!isNullOrUndefined(propertyName)
+        if (!isUndefined(propertyName)
             && Reflect.getOwnPropertyDescriptor(target.constructor.prototype, propertyName)) {
             return target.constructor;
         }
@@ -83,12 +83,12 @@ class InjectableService {
      *
      * @param {Array} parameters
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @returns {void}
      */
     private static _defineMetadata(parameters: ParameterDescriptor[] | undefined,
         target: any, propertyName?: string): void {
-        if (isNullOrUndefined(propertyName)) {
+        if (isUndefined(propertyName)) {
             Reflect.defineMetadata(PARAM_TYPES, parameters, target);
 
             return;
@@ -102,8 +102,8 @@ class InjectableService {
      *
      * @param {Object} tree
      * @param {mixed} target
-     * @param {string|undefined} method
-     * @returns {Array|undefined}
+     * @param {?string} method
+     * @returns {?Array}
      */
     private static _getParameters(tree: any, target: any, method?: string):
         ParameterDescriptor[] | undefined {
@@ -120,8 +120,8 @@ class InjectableService {
      *
      * @param {Object} tree
      * @param {mixed} target
-     * @param {string|undefined} name
-     * @returns {Array|undefined}
+     * @param {?string} name
+     * @returns {?Array}
      */
     private static _parseClass(tree: any, target: any, name?: string):
         ParameterDescriptor[] | undefined {

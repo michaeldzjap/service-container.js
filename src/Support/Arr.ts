@@ -79,7 +79,7 @@ class Arr {
      * Divide an array or object into two arrays. One with keys and the other
      * with values.
      *
-     * @param {Array|Object} array
+     * @param {(Array|Object)} array
      * @returns {Array}
      */
     public static divide(array: unknown[] | object): unknown[] {
@@ -118,7 +118,7 @@ class Arr {
      * Get all of the given object except for a specified array of keys.
      *
      * @param {Object} obj
-     * @param {Array|string} keys
+     * @param {(Array|string)} keys
      * @returns {Object}
      */
     public static except(obj: object, keys: string[] | string): object {
@@ -132,8 +132,8 @@ class Arr {
     /**
      * Determine if the given key exists in the provided array.
      *
-     * @param {Array|Object} array
-     * @param {number|string} key
+     * @param {(Array|Object)} array
+     * @param {(number|string)} key
      * @returns {boolean}
      */
     public static exists(array: unknown[] | object, key: number | string): boolean {
@@ -148,7 +148,7 @@ class Arr {
      * Return the first element in an array passing a given truth test.
      *
      * @param {Array} array
-     * @param {Function|undefined} callback
+     * @param {?Function} callback
      * @param {mixed} dflt
      * @returns {mixed}
      */
@@ -172,8 +172,8 @@ class Arr {
      * Return the last element in an array passing a given truth test.
      *
      * @param {Array} array
-     * @param {Function|undefined} callback
-     * @param {mixed|undefined} dflt
+     * @param {?Function} callback
+     * @param {?mixed} dflt
      * @returns {mixed}
      */
     public static last(array: unknown[], callback?: Function, dflt?: unknown): any {
@@ -212,7 +212,7 @@ class Arr {
      * notation.
      *
      * @param {Object} obj
-     * @param {Array|string} keys
+     * @param {(Array|string)} keys
      * @returns {void}
      */
     public static forget(obj: object, keys: string[] | string): void {
@@ -256,7 +256,7 @@ class Arr {
      * Get an item from an array using "dot" notation.
      *
      * @param {Object} obj
-     * @param {string|undefined} key
+     * @param {?string} key
      * @param {mixed} dflt
      * @returns {mixed}
      */
@@ -287,7 +287,7 @@ class Arr {
     /**
      * Check if an array has any elements or an object has any properties.
      *
-     * @param {Array|Object} array
+     * @param {(Array|Object)} array
      * @returns {boolean}
      */
     public static empty(array: unknown[] | object): boolean {
@@ -299,8 +299,8 @@ class Arr {
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
-     * @param {Object|undefined} obj
-     * @param {Array|string|undefined} keys
+     * @param {?Object} obj
+     * @param {?(Array|string)} keys
      * @returns {boolean}
      */
     public static has(obj?: object, keys?: string[] | string): boolean {
@@ -334,7 +334,7 @@ class Arr {
      * Get a subset of the items from the given array.
      *
      * @param {Object} obj
-     * @param {Array|string} keys
+     * @param {(Array|string)} keys
      * @returns {Object}
      */
     public static only(obj: object, keys: unknown[] | string): object {
@@ -351,8 +351,8 @@ class Arr {
      * Pluck an array of values from an array.
      *
      * @param {Array} array
-     * @param {string|Array|null} value
-     * @param {string|Array|undefined} key
+     * @param {(string|Array|null)} value
+     * @param {?(string|Array)} key
      * @returns {Object}
      */
     public static pluck(array: object[], value: string | string[] | null, key?: string | string[]): unknown[] | object {
@@ -382,10 +382,10 @@ class Arr {
     /**
      * Push an item onto the beginning of an array.
      *
-     * @param {Array|Object} array
+     * @param {(Array|Object)} array
      * @param {mixed} value
-     * @param {string|undefined} key
-     * @returns {Array|Object}
+     * @param {?string} key
+     * @returns {(Array|Object)}
      */
     public static prepend(array: unknown[] | object, value: unknown, key?: string): unknown[] | object {
         if (isNullOrUndefined(key) && Array.isArray(array)) {
@@ -417,7 +417,7 @@ class Arr {
      * Get one or a specified number of random values from an array.
      *
      * @param {Array} array
-     * @param {number|undefined} number
+     * @param {?number} number
      * @returns {mixed}
      *
      * @throws {Error}
@@ -454,7 +454,7 @@ class Arr {
      * If no key is given to the method, the entire object will be replaced.
      *
      * @param {Object} obj
-     * @param {string|null} key
+     * @param {(string|null)} key
      * @param {mixed} value
      * @returns {Object}
      */
@@ -486,7 +486,7 @@ class Arr {
      * Shuffle the given array and return the result.
      *
      * @param {Array} array
-     * @param {string|undefined} seed
+     * @param {?string} seed
      * @returns {Array}
      */
     public static shuffle(array: unknown[], seed?: string): unknown[] {
@@ -547,8 +547,8 @@ class Arr {
     /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param {Array|string|null} value
-     * @param {Array|string|undefined} key
+     * @param {(Array|string|null)} value
+     * @param {?(Array|string)} key
      * @returns {Array}
      */
     private static _explodePluckParameters(value: string[] | string | null,

@@ -1,7 +1,7 @@
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionType from './ReflectionType';
-import {isNullOrUndefined, isClass} from '../Support/helpers';
+import {isUndefined, isClass} from '../Support/helpers';
 
 class ReflectionParameter {
 
@@ -34,7 +34,7 @@ class ReflectionParameter {
     /**
      * Get the class definition for the reflected parameter (if it exists).
      *
-     * @returns {ReflectionClass|undefined}
+     * @returns {?ReflectionClass}
      */
     public getDeclaringClass(): ReflectionClass | undefined {
         if (isClass(this._target)) {
@@ -45,7 +45,7 @@ class ReflectionParameter {
     /**
      * Get the class type hinted for the reflected parameter.
      *
-     * @returns {ReflectionClass|undefined}
+     * @returns {?ReflectionClass}
      */
     public getClass(): ReflectionClass | undefined {
         if (this.getType().isBuiltin()) return;
@@ -90,7 +90,7 @@ class ReflectionParameter {
      * @returns {boolean}
      */
     public isDefaultValueAvailable(): boolean {
-        return !isNullOrUndefined(this._descriptor.value);
+        return !isUndefined(this._descriptor.value);
     }
 
     /**

@@ -42,7 +42,7 @@ interface IContainer {
      * Register a binding with the container.
      *
      * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
+     * @param {?mixed} concrete
      * @param {boolean} shared
      * @returns {void}
      */
@@ -60,7 +60,7 @@ interface IContainer {
      * Register a binding if it hasn't already been registered.
      *
      * @param {string} abstract
-     * @param mixed|undefined} concrete
+     * @param {?mixed} concrete
      * @param {boolean} shared
      * @returns {void}
      */
@@ -70,7 +70,7 @@ interface IContainer {
      * Register a shared binding in the container.
      *
      * @param {string} abstract
-     * @param {mixed|undefined} concrete
+     * @param {?mixed} concrete
      * @returns {void}
      */
     singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void;
@@ -96,7 +96,7 @@ interface IContainer {
     /**
      * Define a contextual binding.
      *
-     * @param {Array|Instantiable} concrete
+     * @param {(Array|Instantiable)} concrete
      * @returns {ContextualBindingBuilder}
      */
     when<T>(concrete: Instantiable<T>[] | Instantiable<T>): ContextualBindingBuilder;
@@ -113,7 +113,7 @@ interface IContainer {
      * Resolve the given type from the container.
      *
      * @param {mixed} abstract
-     * @param {Array|Object} parameters
+     * @param {(Array|Object)} parameters
      * @returns {mixed}
      */
     make<T>(abstract: Identifier<T>, parameters: any[] | object): any;
@@ -122,8 +122,8 @@ interface IContainer {
      * Call the given Closure / class method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {Array|Object|undefined} parameters
-     * @param {string|undefined} defaultMethod
+     * @param {?(Array|Object)} parameters
+     * @param {?string} defaultMethod
      * @returns {unknown}
      */
     call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any;
@@ -140,7 +140,7 @@ interface IContainer {
      * Register a new resolving callback.
      *
      * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {?Function} callback
      * @returns {void}
      */
     resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;
@@ -149,7 +149,7 @@ interface IContainer {
      * Register a new after resolving callback.
      *
      * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {?Function} callback
      * @returns {void}
      */
     afterResolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;

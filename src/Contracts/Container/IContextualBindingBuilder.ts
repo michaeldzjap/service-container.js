@@ -13,7 +13,7 @@ interface IContextualBindingBuilder {
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param {Function|string} implementation
+     * @param {(Function|string)} implementation
      * @returns {void}
      */
     give(implementation: Function | string): void;

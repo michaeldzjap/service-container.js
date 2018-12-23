@@ -32,7 +32,7 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Get the name of the reflected function.
      *
-     * @returns {string|undefined}
+     * @returns {?string}
      */
     public getName(): string | undefined {
         return this._name;
@@ -41,7 +41,7 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Get the parameters of the reflected function.
      *
-     * @param {Array|undefined} types
+     * @param {?Array} types
      * @returns {Array}
      */
     public getParameters(types?: ParameterDescriptor[]): ReflectionParameter[] {

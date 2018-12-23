@@ -1,4 +1,4 @@
-import {isNullOrUndefined} from '../Support/helpers';
+import {isUndefined} from '../Support/helpers';
 import {INTERFACE_SYMBOLS} from '../Constants/metadata';
 
 class InterfaceFactory {
@@ -30,11 +30,11 @@ class InterfaceFactory {
      * Initialize metadata container if it doesn't exist yet.
      *
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @returns {void}
      */
     private static _initializeMetadata(target: any, propertyName?: string): void {
-        if (!isNullOrUndefined(propertyName)
+        if (!isUndefined(propertyName)
             && !Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target, propertyName)) {
             Reflect.defineMetadata(INTERFACE_SYMBOLS, new Map, target, propertyName);
 
@@ -51,7 +51,7 @@ class InterfaceFactory {
      *
      * @param {Object} identifier
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @param {number} position
      * @returns {void}
      *
@@ -59,7 +59,7 @@ class InterfaceFactory {
      */
     private static _checkMetadata({name, key}: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
         propertyName: string | undefined, position: number): void {
-        const metadata = isNullOrUndefined(propertyName)
+        const metadata = isUndefined(propertyName)
             ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
             : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName);
 
@@ -78,7 +78,7 @@ class InterfaceFactory {
      *
      * @param {Object} identifier
      * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {?string} propertyName
      * @param {number} position
      * @returns {void}
      */

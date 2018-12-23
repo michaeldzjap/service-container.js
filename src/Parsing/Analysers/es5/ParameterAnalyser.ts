@@ -1,10 +1,9 @@
-import IParameterParser from '../../Contracts/Parsing/IParameterParser';
-import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
-import ParameterParserBase from '../ParameterParserBase';
-import ParsingError from '../ParsingError';
-import {isUndefined} from '../../Support/helpers';
+import IParameterAnalyser from '../../../Contracts/Parsing/IParameterAnalyser';
+import AbstractParameterAnalyser from '../AbstractParameterAnalyser';
+import ParsingError from '../../ParsingError';
+import {isUndefined} from '../../../Support/helpers';
 
-class ParameterParser extends ParameterParserBase implements IParameterParser {
+class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterAnalyser {
 
     /**
      * The block statement belonging to the function that owns the parameters.
@@ -23,7 +22,7 @@ class ParameterParser extends ParameterParserBase implements IParameterParser {
      */
     public constructor(ast: any, block: any, target: any, name?: string) {
         if (block.type !== 'BlockStatement') {
-            throw new ParsingError('Invalid AST provided.');
+            throw new ParsingError('Invalid parameter AST provided.');
         }
 
         super(ast, target, name);
@@ -36,7 +35,7 @@ class ParameterParser extends ParameterParserBase implements IParameterParser {
      * @returns {?Object}
      */
     protected _findAssignment(param: any): any {
-        const statement = this._ast.body
+        const statement = this._block.body
             .filter((statement: any): boolean => statement.type === 'IfStatement')
             .find((statement: any): any => (
                 statement.consequent.body[0].expression.left.name === param.name
@@ -49,4 +48,4 @@ class ParameterParser extends ParameterParserBase implements IParameterParser {
 
 }
 
-export default ParameterParser;
+export default ParameterAnalyser;

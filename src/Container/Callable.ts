@@ -6,14 +6,14 @@ class Callable<T> {
     /**
      * The class definition or instance to target.
      *
-     * @var {Instantiable|Instance}
+     * @var {(Instantiable|Instance)}
      */
     private _target: Instantiable<T> | Instance<T>;
 
     /**
      * The name of the method that is to be called on the class / instance.
      *
-     * @var {string|undefined}
+     * @var {?string}
      */
     private _method?: string;
 
@@ -27,8 +27,8 @@ class Callable<T> {
     /**
      * Create a new callable instance.
      *
-     * @param {Instantiable|Instance} target
-     * @param {string|undefined} method
+     * @param {(Instantiable|Instance)} target
+     * @param {?string} method
      * @param {boolean} isStatic
      */
     public constructor(target: Instantiable<T> | Instance<T>, method?: string, isStatic: boolean = false) {
@@ -40,7 +40,7 @@ class Callable<T> {
     /**
      * Get the class definition or instance.
      *
-     * @returns {Instantiable|Instance}
+     * @returns {(Instantiable|Instance)}
      */
     public get target(): Instantiable<T> | Instance<T> {
         return this._target;

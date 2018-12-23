@@ -5,7 +5,7 @@ interface IReflectionFunction {
     /**
      * Get the name of the reflected function.
      *
-     * @returns {string|undefined}
+     * @returns {?string}
      */
     getName(): string | undefined;
 

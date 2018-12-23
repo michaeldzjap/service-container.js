@@ -1,28 +1,29 @@
 import ExpressionCollector from './ExpressionCollector';
-import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
-import ParsingError from './ParsingError';
-import {isUndefined} from '../Support/helpers';
-import {Interface} from '../Support/types';
-import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../Constants/metadata';
+import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
+import ParsingError from '../ParsingError';
+import {isUndefined} from '../../Support/helpers';
+import {Interface} from '../../Support/types';
+import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../Constants/metadata';
 
-abstract class ParameterParserBase {
+abstract class AbstractParameterAnalyser {
 
     /**
-     * The ESTree-compatible abstract syntax tree representing the constructor.
+     * The ESTree-compatible abstract syntax tree representing an array of
+     * function parameters.
      *
      * @var {Object}
      */
     protected _ast: any;
 
     /**
-     * The class that owns the constructor to be parsed.
+     * The class definition.
      *
      * @var {mixed}
      */
     protected _target: any;
 
     /**
-     * The name of the function.
+     * The name of the function / method.
      *
      * @var {?string}
      */
@@ -45,7 +46,7 @@ abstract class ParameterParserBase {
     /**
      * Create a new parameter parser base instance.
      *
-     * @param {Object} ast
+     * @param {Array} ast
      * @param {mixed} target
      * @param {?string} name
      */
@@ -53,14 +54,16 @@ abstract class ParameterParserBase {
         this._ast = ast;
         this._target = target;
         this._name = name;
-        this._types = ParameterParserBase._fetchMetadata(
+
+        // Get the parameter types and interface keys from metadata
+        this._types = AbstractParameterAnalyser._fetchMetadata(
             DESIGN_PARAM_TYPES, this._target, this._name
         ) || [];
-        this._keys = ParameterParserBase._fetchMetadata(
+        this._keys = AbstractParameterAnalyser._fetchMetadata(
             INTERFACE_SYMBOLS, this._target, this._name
         );
 
-        if (ast.param.length !== this._types.length) {
+        if (this._ast.length !== this._types.length) {
             throw new ParsingError('The number of parameters and types must match.');
         }
     }
@@ -98,7 +101,7 @@ abstract class ParameterParserBase {
      * @returns {Array|Map}
      */
     private static _fetchMetadata(key: string, target: any, name?: string): any {
-        if (!isUndefined(name)) {
+        if (!isUndefined(name) && name !== 'constructor') {
             return Reflect.getMetadata(key, target, name);
         }
 
@@ -239,4 +242,4 @@ abstract class ParameterParserBase {
 
 }
 
-export default ParameterParserBase;
+export default AbstractParameterAnalyser;

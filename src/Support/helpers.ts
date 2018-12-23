@@ -144,7 +144,7 @@ export const value = (value: unknown): unknown => (
  * Get an item from an array or object using "dot" notation.
  *
  * @param {mixed} target
- * @param {string|Array|null} key
+ * @param {(string|Array|null)} key
  * @param {mixed} dflt
  * @returns {mixed}
  */

@@ -2,12 +2,16 @@ import CherowParser from './Parsers/CherowParser';
 import IParser from '../Contracts/Parsing/IParser';
 import Manager from '../Support/Manager';
 
+export enum Driver {
+    CHEROW = 'cherow'
+}
+
 class ParserManager extends Manager {
 
     /**
      * Get the ESTree-compatible AST.
      *
-     * @param {any} target
+     * @param {mixed} target
      * @returns {Object}
      */
     public ast(target: any): any {
@@ -20,7 +24,7 @@ class ParserManager extends Manager {
      * @returns {string}
      */
     public getDefaultDriver(): string {
-        return 'cherow';
+        return Driver.CHEROW;
     }
 
     /**
@@ -32,7 +36,7 @@ class ParserManager extends Manager {
     protected _createDriver(driver: string): IParser {
         return super._handleDriverCreation(
             driver,
-            {cherow: this._createCherowParser.bind(this)}
+            {[Driver.CHEROW]: this._createCherowParser.bind(this)}
         );
     }
 

@@ -18,13 +18,17 @@ export default {
     },
     plugins: [
         eslint(),
-        resolve(),
+        resolve({
+            jsnext: true,
+            main: true,
+            browser: true
+        }),
         commonjs(),
         typescript({
             typescript: require('typescript'),
             rollupCommonJSResolveHack: true
         }),
         sourceMaps(),
-        terser()
+        terser(),
     ]
 };

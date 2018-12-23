@@ -108,7 +108,7 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * Get the parameter types of the reflected method.
      *
-     * @returns {ParameterDescriptor|undefined}
+     * @returns {?ParameterDescriptor}
      *
      * @throws {Error}
      */

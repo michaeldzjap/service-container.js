@@ -149,7 +149,7 @@ class Container implements IContainer {
     /**
      * Set the shared instance of the container.
      *
-     * @param {Container|undefined} container
+     * @param {?Container} container
      * @returns {Container}
      */
     public static setInstance(container?: Container): Container | undefined {
@@ -234,7 +234,7 @@ class Container implements IContainer {
      * Register a binding with the container.
      *
      * @param {Identifier} abstract
-     * @param {Identifier|Function|undefined} concrete
+     * @param {?(Identifier|Function)} concrete
      * @param {boolean} shared
      * @returns {void}
      */
@@ -292,7 +292,7 @@ class Container implements IContainer {
     /**
      * Bind a callback to resolve with Container::call.
      *
-     * @param {Array|string} method
+     * @param {(Array|string)} method
      * @param {Function} callback
      * @returns {void}
      */
@@ -331,7 +331,7 @@ class Container implements IContainer {
      * Register a binding if it hasn't already been registered.
      *
      * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
+     * @param {?mixed} concrete
      * @param {boolean} shared
      * @returns {void}
      */
@@ -346,7 +346,7 @@ class Container implements IContainer {
      * Register a shared binding in the container.
      *
      * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
+     * @param {?mixed} concrete
      * @returns {void}
      */
     public singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void {
@@ -413,7 +413,7 @@ class Container implements IContainer {
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param {Array|Identifier} abstracts
+     * @param {(Array|Identifier)} abstracts
      * @param {Array} tags
      * @returns {void}
      */
@@ -469,7 +469,7 @@ class Container implements IContainer {
      *
      * @param {mixed} abstract
      * @param {Function} callback
-     * @returns {mixed|undefined}
+     * @returns {?mixed}
      */
     public rebinding<T>(abstract: Identifier<T>, callback: Function): unknown | undefined {
         abstract = this.getAlias<T>(abstract);
@@ -504,7 +504,7 @@ class Container implements IContainer {
      * executed.
      *
      * @param {Callable} callback
-     * @param {Object|Array|undefined} parameters
+     * @param {?(Object|Array)} parameters
      * @returns {Function}
      */
     public wrap<T>(callback: Callable<T>, parameters?: any[] | object): Function {
@@ -515,8 +515,8 @@ class Container implements IContainer {
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {Object|Array|undefined} parameters
-     * @param {string|undefined} defaultMethod
+     * @param {?(Object|Array)} parameters
+     * @param {?string} defaultMethod
      * @returns {mixed}
      */
     public call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any {
@@ -537,7 +537,7 @@ class Container implements IContainer {
      * Resolve the given type from the container.
      *
      * @param {mixed} abstract
-     * @param {Array|Object} parameters
+     * @param {(Array|Object)} parameters
      * @returns {mixed}
      */
     public make<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
@@ -550,7 +550,7 @@ class Container implements IContainer {
      * @param {mixed} id
      * @returns {mixed}
      *
-     * @throws {@src/Container/EntryNotFoundError}
+     * @throws {EntryNotFoundError}
      */
     public get<T>(id: Identifier<T>): any {
         try {
@@ -634,7 +634,7 @@ class Container implements IContainer {
      * Register a new resolving callback.
      *
      * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {?Function} callback
      * @returns {void}
      */
     public resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void {
@@ -769,7 +769,7 @@ class Container implements IContainer {
     /**
      * Get the method to be bound in class@method format.
      *
-     * @param {Array|string} method
+     * @param {(Array|string)} method
      * @returns {string}
      */
     protected _parseBindMethod<T>(method: [T, string] | string): string {
@@ -891,7 +891,7 @@ class Container implements IContainer {
      * Get the concrete type for a given abstract.
      *
      * @param {mixed} abstract
-     * @returns {mixed} concrete
+     * @returns {mixed}
      */
     protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
         const concrete = this._getContextualConcrete<T>(abstract);
@@ -944,8 +944,8 @@ class Container implements IContainer {
      * Find the concrete binding for the given abstract in the contextual
      * binding array.
      *
-     * @param {Function|string} abstract
-     * @returns {mixed|undefined}
+     * @param {(Function|string)} abstract
+     * @returns {?mixed}
      */
     protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
         if (this._contextual.has([Arr.last(this._buildStack), abstract])) {
@@ -1025,7 +1025,7 @@ class Container implements IContainer {
     /**
      * Get the last parameter override.
      *
-     * @returns {Array|Object}
+     * @returns {(Array|Object)}
      */
     protected _getLastParameterOverride(): any[] | object {
         return this._with.length ? Arr.last(this._with) : [];
@@ -1035,7 +1035,7 @@ class Container implements IContainer {
      * Resolve a non-class hinted primitive dependency.
      *
      * @param {ReflectionParameter} parameter
-     * @returns {mixed|undefined}
+     * @returns {?mixed}
      */
     protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
         const concrete = this._getContextualConcrete(parameter.getName());
@@ -1090,7 +1090,7 @@ class Container implements IContainer {
      * @param {string} concrete
      * @returns {void}
      *
-     * @throws {@src/Container/BindingResolutionError}
+     * @throws {BindingResolutionError}
      */
     protected _notInstantiable<T>(concrete: T): void {
         let message = `Target [${typeof concrete === 'symbol' ? concrete.toString() : (concrete as any).name}] is not instantiable`;

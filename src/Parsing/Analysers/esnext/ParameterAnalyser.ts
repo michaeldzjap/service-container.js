@@ -1,7 +1,7 @@
-import IParameterParser from '../../Contracts/Parsing/IParameterParser';
-import ParameterParserBase from '../ParameterParserBase';
+import IParameterAnalyser from '../../../Contracts/Parsing/IParameterAnalyser';
+import AbstractParameterAnalyser from '../AbstractParameterAnalyser';
 
-class ParameterParser extends ParameterParserBase implements IParameterParser {
+class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterAnalyser {
 
     /**
      * Find the assignment expression for the given parameter (if it exists).
@@ -17,4 +17,4 @@ class ParameterParser extends ParameterParserBase implements IParameterParser {
 
 }
 
-export default ParameterParser;
+export default ParameterAnalyser;

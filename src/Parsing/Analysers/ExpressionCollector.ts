@@ -1,4 +1,4 @@
-import ParsingError from './Parsers/ParsingError';
+import ParsingError from '../ParsingError';
 
 class ExpressionCollector {
 
@@ -62,10 +62,10 @@ class ExpressionCollector {
      *
      * @returns {void}
      *
-     * @throws {Error}
+     * @throws {ParsingError}
      */
     private static _unresolvableExpression(): void {
-        throw new ParsingError('ESTree expression cannot be resolved.');
+        throw new ParsingError('AST expression cannot be resolved.');
     }
 
 }
