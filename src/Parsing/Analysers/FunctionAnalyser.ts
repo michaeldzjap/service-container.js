@@ -33,7 +33,7 @@ class FunctionAnalyser implements IFunctionAnalyser {
      * @param {mixed} target
      */
     public constructor(ast: any, target: any) {
-        if (ast.type !== 'FunctionDeclaration') {
+        if (!(ast.type === 'FunctionDeclaration' || ast.type === 'FunctionExpression')) {
             throw new ParsingError('Invalid function AST provided.');
         }
 

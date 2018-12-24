@@ -22,7 +22,7 @@ class CherowParser implements IParser {
     /**
      * Parse the given source.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @returns {Object}
      */
     public ast(target: any): any {

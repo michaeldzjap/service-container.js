@@ -4,12 +4,7 @@ import IClassAnalyser from '../../Contracts/Parsing/IClassAnalyser';
 import IParser from '../../Contracts/Parsing/IParser';
 import Manager from '../../Support/Manager';
 import ParserManager from '../ParserManager';
-import * as tsConfig from '../../../tsconfig.base.json';
-
-export enum Driver {
-    ES5 = 'es5',
-    ESNEXT = 'esnext'
-}
+import {TARGET} from '../../Constants/.';
 
 class ClassAnalyserManager extends Manager {
 
@@ -23,21 +18,21 @@ class ClassAnalyserManager extends Manager {
     /**
      * The class definition.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _target: any;
 
     /**
      * The AST representing the parsed class.
      *
-     * @var {mixed}
+     * @var {Object}
      */
     private _ast: any;
 
     /**
      * Create a new class analyser manager instance.
      *
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(target: any) {
         super();
@@ -53,7 +48,7 @@ class ClassAnalyserManager extends Manager {
      * @returns {string}
      */
     public getDefaultDriver(): string {
-        return tsConfig.compilerOptions.target || Driver.ESNEXT;
+        return TARGET;
     }
 
     /**
@@ -66,8 +61,8 @@ class ClassAnalyserManager extends Manager {
         return super._handleDriverCreation(
             driver,
             {
-                [Driver.ES5]: this._createES5ClassAnalyser.bind(this),
-                [Driver.ESNEXT]: this._createESNextClassAnalyser.bind(this)
+                es5: this._createES5ClassAnalyser.bind(this),
+                esnext: this._createESNextClassAnalyser.bind(this)
             }
         );
     }

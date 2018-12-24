@@ -5,7 +5,7 @@ interface IParameterAnalyser {
     /**
      * Get all the parsed parameters.
      *
-     * @returns {Array}
+     * @returns {ParameterDescriptor[]}
      */
     all(): ParameterDescriptor[];
 

@@ -10,7 +10,7 @@ class ParameterDescriptor {
     /**
      * The parameter type.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _type: any;
 
@@ -24,7 +24,7 @@ class ParameterDescriptor {
     /**
      * The parameter value.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _value?: any;
 
@@ -32,7 +32,7 @@ class ParameterDescriptor {
      * Create a new parameter descriptor instance.
      *
      * @param {Object} props
-     * @param {mixed} value
+     * @param {*} value
      */
     public constructor({name, type, position, value}:
         {name: string, type: any, position: number, value?: any}) { // eslint-disable-line
@@ -54,7 +54,7 @@ class ParameterDescriptor {
     /**
      * Get the type of the parameter.
      *
-     * @returns {mixed}
+     * @returns {*}
      */
     public get type(): any {
         return this._type;
@@ -72,7 +72,7 @@ class ParameterDescriptor {
     /**
      * Get the value of the parameter.
      *
-     * @returns {mixed}
+     * @returns {*}
      */
     public get value(): any {
         return this._value;

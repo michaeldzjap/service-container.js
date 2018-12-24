@@ -10,14 +10,14 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * The method descriptor object.
      *
-     * @var {PropertyDescriptor}
+     * @var {(PropertyDescriptor|undefined)}
      */
     private _descriptor?: PropertyDescriptor;
 
     /**
      * Create a new reflection method instance.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @param {string} name
      */
     public constructor(target: any, name: string) {
@@ -31,7 +31,7 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * Find the method descriptor object.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @param {string} name
      * @returns {Object}
      *

@@ -8,8 +8,8 @@ class NestedMap<U, V> extends Map<U, V> {
      * Providing multiple keys in the form of an array or dot separated key
      * string results in a nested map structure.
      *
-     * @param {mixed} keys
-     * @param {mixed} value
+     * @param {*} keys
+     * @param {*} value
      * @returns {void}
      */
     public set(keys: any, value: any): this {
@@ -45,8 +45,8 @@ class NestedMap<U, V> extends Map<U, V> {
     /**
      * Return the element of a map at the given (sequence of) key(s).
      *
-     * @param {mixed} keys
-     * @returns {mixed}
+     * @param {*} keys
+     * @returns {*}
      */
     public get(keys: any): any {
         keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
@@ -75,7 +75,7 @@ class NestedMap<U, V> extends Map<U, V> {
     /**
      * Check if the map contains an element with the given (sequence of) key(s).
      *
-     * @param {mixed} keys
+     * @param {*} keys
      * @returns {boolean}
      */
     public has(keys: any): boolean {
@@ -107,7 +107,7 @@ class NestedMap<U, V> extends Map<U, V> {
     /**
      * Remove an element with the given (sequence of) key(s) from a map.
      *
-     * @param {mixed} keys
+     * @param {*} keys
      * @returns {boolean}
      */
     public delete(keys: any): boolean {

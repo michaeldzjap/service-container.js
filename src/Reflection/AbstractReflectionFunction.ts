@@ -7,21 +7,21 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * The target the function belongs to.
      *
-     * @var {mixed}
+     * @var {*}
      */
     protected _target: any;
 
     /**
      * The name of the function.
      *
-     * @var {string|undefined}
+     * @var {(string|undefined)}
      */
     protected _name?: string;
 
     /**
      * Create a new abstract reflection function instance.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @param {string} name
      */
     public constructor(target: any, name?: string) {
@@ -32,7 +32,7 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Get the name of the reflected function.
      *
-     * @returns {?string}
+     * @returns {(string|undefined)}
      */
     public getName(): string | undefined {
         return this._name;
@@ -41,8 +41,8 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Get the parameters of the reflected function.
      *
-     * @param {?Array} types
-     * @returns {Array}
+     * @param {ParameterDescriptor[]} types
+     * @returns {ReflectionParameter[]}
      */
     public getParameters(types?: ParameterDescriptor[]): ReflectionParameter[] {
         if (types) {

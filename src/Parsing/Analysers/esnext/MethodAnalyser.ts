@@ -8,7 +8,7 @@ class MethodAnalyser extends AbstractMethodAnalyser {
      * Create a new function analyser instance.
      *
      * @param {Object} ast
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(ast: any, target: any) {
         if (!isUndefined(ast) && ast.type !== 'MethodDefinition') {

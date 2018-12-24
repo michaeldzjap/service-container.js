@@ -18,14 +18,14 @@ abstract class AbstractParameterAnalyser {
     /**
      * The class definition.
      *
-     * @var {mixed}
+     * @var {*}
      */
     protected _target: any;
 
     /**
      * The name of the function / method.
      *
-     * @var {?string}
+     * @var {(string|undefined)}
      */
     protected _name?: string;
 
@@ -47,8 +47,8 @@ abstract class AbstractParameterAnalyser {
      * Create a new parameter parser base instance.
      *
      * @param {Array} ast
-     * @param {mixed} target
-     * @param {?string} name
+     * @param {*} target
+     * @param {(string|undefined)} name
      */
     public constructor(ast: any, target: any, name?: string) {
         this._ast = ast;
@@ -71,7 +71,7 @@ abstract class AbstractParameterAnalyser {
     /**
      * Get all the parsed parameters.
      *
-     * @returns {Array}
+     * @returns {ParameterDescriptor[]}
      */
     public all(): ParameterDescriptor[] {
         return this._ast
@@ -96,9 +96,9 @@ abstract class AbstractParameterAnalyser {
      * Attempt to fetch metadata.
      *
      * @param {string} key
-     * @param {mixed} target
-     * @param {?string} name
-     * @returns {Array|Map}
+     * @param {*} target
+     * @param {(string|undefined)} name
+     * @returns {(Array|Map)}
      */
     private static _fetchMetadata(key: string, target: any, name?: string): any {
         if (!isUndefined(name) && name !== 'constructor') {
@@ -112,7 +112,7 @@ abstract class AbstractParameterAnalyser {
      * Create a new parameter descriptor for the given parameter and type.
      *
      * @param {Object} param
-     * @param {mixed} type
+     * @param {*} type
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
@@ -138,7 +138,7 @@ abstract class AbstractParameterAnalyser {
      * Find the assignment expression for the given parameter (if it exists).
      *
      * @param {Object} param
-     * @returns {?Object}
+     * @returns {(Object|undefined)}
      */
     protected abstract _findAssignment(param: any): any;
 
@@ -146,7 +146,7 @@ abstract class AbstractParameterAnalyser {
      * Parse an assignment pattern parameter type.
      *
      * @param {Object} assignment
-     * @param {mixed} type
+     * @param {*} type
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
@@ -174,9 +174,9 @@ abstract class AbstractParameterAnalyser {
     /**
      * Parse the parameter type.
      *
-     * @param {mixed} type
+     * @param {*} type
      * @param {number} position
-     * @returns {mixed}
+     * @returns {*}
      */
     private _parseType(type: any, position: number): any {
         if (this._keys && this._keys.has(position)) {

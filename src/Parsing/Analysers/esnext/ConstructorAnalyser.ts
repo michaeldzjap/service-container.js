@@ -8,7 +8,7 @@ class ConstructorAnalyser extends AbstractMethodAnalyser {
      * Create a new constructor analyser instance.
      *
      * @param {Object} ast
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(ast: any, target: any) {
         if (!isUndefined(ast) && ast.type !== 'MethodDefinition'

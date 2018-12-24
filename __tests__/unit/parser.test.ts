@@ -30,14 +30,8 @@ class A {
         this._c = c;
     }
 
-    public static publicStaticMethod(): number[] {
-        const a = true;
-
-        if (a) {
-            return [1, 2, 3];
-        }
-
-        return [100, 200, 300];
+    public static publicStaticMethod(a: Number = 333): void {
+        //
     }
 
     public publicMethod(): void {
@@ -62,12 +56,14 @@ describe('Parser', (): void => {
     it('parser manager', (): void => {
         // console.log(JSON.stringify(parse(Stub.toString()), null, 4));
 
-        const analyser = (new ClassAnalyserManager(A)).driver();
-        const params = analyser.getConstructorAnalyser().getParameterAnalyser().all();
-        console.log(JSON.stringify(params, null, 4));
+        // const analyser = (new ClassAnalyserManager(A)).driver();
+        // const params = analyser.getConstructorAnalyser().getParameterAnalyser().all();
+        // console.log(JSON.stringify(params, null, 4));
         // const ast = manager.ast(A.publicStaticMethod);
         // const fn = Reflect.getOwnPropertyDescriptor(A, 'publicStaticMethod')!.value;
-        // console.log(A.prototype.publicMethod.toString());
+        const fn = A.publicStaticMethod;
+        const parsed = parse(`fn = ${fn.toString()}`);
+        console.log(JSON.stringify(parsed, null, 4));
         // const ast = manager.ast(fn);
 
         // console.log(Reflect.getOwnPropertyDescriptor(Stub.prototype, 'constructor'));

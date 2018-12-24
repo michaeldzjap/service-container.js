@@ -17,8 +17,8 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      *
      * @param {Object} ast
      * @param {Object} block
-     * @param {mixed} target
-     * @param {?string} name
+     * @param {*} target
+     * @param {(string|undefined)} name
      */
     public constructor(ast: any, block: any, target: any, name?: string) {
         if (block.type !== 'BlockStatement') {
@@ -32,7 +32,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * Find the assignment expression for the given parameter (if it exists).
      *
      * @param {Object} param
-     * @returns {?Object}
+     * @returns {(Object|undefined)}
      */
     protected _findAssignment(param: any): any {
         const statement = this._block.body

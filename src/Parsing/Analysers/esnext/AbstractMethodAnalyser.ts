@@ -15,7 +15,7 @@ abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
     /**
      * The class or function definition.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _target: any;
 
@@ -30,7 +30,7 @@ abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
      * Create a new function analyser instance.
      *
      * @param {Object} ast
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(ast: any, target: any) {
         this._ast = ast;

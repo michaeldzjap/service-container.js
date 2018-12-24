@@ -26,7 +26,7 @@ abstract class Manager {
     /**
      * Get the given driver instance.
      *
-     * @param {?string} driver
+     * @param {(string|undefined)} driver
      * @returns {IParser}
      *
      * @throws {Error}
@@ -58,7 +58,7 @@ abstract class Manager {
      * Create a new driver instance.
      *
      * @param {string} driver
-     * @returns {mixed}
+     * @returns {*}
      */
     protected abstract _createDriver(driver: string): any;
 
@@ -67,7 +67,7 @@ abstract class Manager {
      *
      * @param {string} driver
      * @param {Object} creators
-     * @returns {mixed}
+     * @returns {*}
      *
      * @throws {Error}
      */
@@ -87,7 +87,7 @@ abstract class Manager {
      * Call a custom driver instance.
      *
      * @param {string} driver
-     * @returns {mixed}
+     * @returns {*}
      */
     private _callCustomCreator(driver: string): any {
         return (this._customCreators.get(driver) as Function)();

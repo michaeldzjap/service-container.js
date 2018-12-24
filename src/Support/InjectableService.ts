@@ -1,7 +1,5 @@
-import ClassParser from '../Parsing/Parsers/ClassParser';
-import ESTreeGenerator from '../Parsing/ESTreeGenerator';
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
-import ParsingError from '../Parsing/ParsingError';
+import ClassAnalyserManager from '../Parsing/Analysers/ClassAnalyserManager';
 import {isUndefined} from './helpers';
 import {PARAM_TYPES} from '../Constants/metadata';
 
@@ -11,33 +9,29 @@ class InjectableService {
      * Define our custom meta data for dependency injection purposes in class
      * constructors.
      *
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
      * @returns {void}
      */
-    public static defineMetadata(target: any, propertyName?: string): void {
-        InjectableService._avoidMultipleDefinition(target, propertyName);
-
-        const tree = ESTreeGenerator.generate(
-            InjectableService._getConstructor(target, propertyName).toString()
-        );
+    public static defineMetadata(target: any, propertyKey?: string | symbol): void {
+        InjectableService._avoidMultipleDefinition(target, propertyKey);
 
         InjectableService._defineMetadata(
-            InjectableService._getParameters(tree, target, propertyName),
+            InjectableService._getParameters(target, propertyKey),
             target,
-            propertyName
+            propertyKey
         );
     }
 
     /**
      * Check if the custom metadata is not already defined.
      *
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
      * @returns {void}
      */
-    private static _avoidMultipleDefinition(target: any, propertyName?: string): void {
-        if (isUndefined(propertyName)) {
+    private static _avoidMultipleDefinition(target: any, propertyKey?: string | symbol): void {
+        if (isUndefined(propertyKey)) {
             if (Reflect.hasOwnMetadata(PARAM_TYPES, target)) {
                 InjectableService._throwError();
             }
@@ -45,7 +39,7 @@ class InjectableService {
             return;
         }
 
-        if (Reflect.hasOwnMetadata(PARAM_TYPES, target, propertyName)) {
+        if (Reflect.hasOwnMetadata(PARAM_TYPES, target, propertyKey)) {
             InjectableService._throwError();
         }
     }
@@ -62,76 +56,59 @@ class InjectableService {
     }
 
     /**
-     * Get the constructor of the given target.
-     *
-     * @param {mixed} target
-     * @param {?string} propertyName
-     * @returns {mixed}
-     */
-    private static _getConstructor(target: any, propertyName?: string): any {
-        if (!isUndefined(propertyName)
-            && Reflect.getOwnPropertyDescriptor(target.constructor.prototype, propertyName)) {
-            return target.constructor;
-        }
-
-        return target;
-    }
-
-    /**
      * Define our custom meta data for dependency injection purposes in class
      * constructors.
      *
-     * @param {Array} parameters
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {(ParameterDescriptor[]|undefined)} parameters
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
      * @returns {void}
      */
     private static _defineMetadata(parameters: ParameterDescriptor[] | undefined,
-        target: any, propertyName?: string): void {
-        if (isUndefined(propertyName)) {
+        target: any, propertyKey?: string | symbol): void {
+        if (isUndefined(propertyKey)) {
             Reflect.defineMetadata(PARAM_TYPES, parameters, target);
 
             return;
         }
 
-        Reflect.defineMetadata(PARAM_TYPES, parameters, target, propertyName);
+        Reflect.defineMetadata(PARAM_TYPES, parameters, target, propertyKey);
     }
 
     /**
      * Get the constructor or function parameters.
      *
-     * @param {Object} tree
-     * @param {mixed} target
-     * @param {?string} method
-     * @returns {?Array}
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
+     * @returns {(ParameterDescriptor[]|undefined)}
      */
-    private static _getParameters(tree: any, target: any, method?: string):
+    private static _getParameters(target: any, propertyKey?: string | symbol):
         ParameterDescriptor[] | undefined {
-        switch (tree.body[0].type) {
-            case 'ClassDeclaration':
-                return InjectableService._parseClass(tree, target, method);
-            default:
-                throw new ParsingError('Invalid ESTree structure provided.');
+        const analyser = (new ClassAnalyserManager(
+            this._getConstructor(target)
+        )).driver();
+
+        if (propertyKey) {
+            return analyser.getMethodParameters(propertyKey);
         }
+
+        return analyser.getConstructorParameters();
     }
 
     /**
-     * Parse a class declaration.
+     * Get the constructor of the given target.
      *
-     * @param {Object} tree
-     * @param {mixed} target
-     * @param {?string} name
-     * @returns {?Array}
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
+     * @returns {mixed}
      */
-    private static _parseClass(tree: any, target: any, name?: string):
-        ParameterDescriptor[] | undefined {
-        const parser = new ClassParser(tree.body[0], target);
-
-        if (name) {
-            return parser.getMethodParameters(name);
+    private static _getConstructor(target: any, propertyKey?: string | symbol): any {
+        if (!isUndefined(propertyKey)
+            && Reflect.getOwnPropertyDescriptor(target.constructor.prototype, propertyKey)) {
+            return target.constructor;
         }
 
-        return parser.getConstructorParameters();
+        return target;
     }
 
 }

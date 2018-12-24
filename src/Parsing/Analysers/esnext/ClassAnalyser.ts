@@ -1,3 +1,4 @@
+import AbstractClassAnalyser from '../AbstractClassAnalyser';
 import ConstructorAnalyser from './ConstructorAnalyser';
 import IClassAnalyser from '../../../Contracts/Parsing/IClassAnalyser';
 import IFunctionAnalyser from '../../../Contracts/Parsing/IFunctionAnalyser';
@@ -5,7 +6,7 @@ import MethodAnalyser from './MethodAnalyser';
 import ParsingError from '../../ParsingError';
 import {isUndefined} from '../../../Support/helpers';
 
-class ClassAnalyser implements IClassAnalyser {
+class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
 
     /**
      * The ESTree-compatible abstract syntax tree representing a class.
@@ -17,21 +18,21 @@ class ClassAnalyser implements IClassAnalyser {
     /**
      * The class definition.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _target: any;
 
     /**
      * The constructor analyser instance.
      *
-     * @var {?IFunctionAnalyser}
+     * @var {(IFunctionAnalyser|undefined)}
      */
     private _constructorAnalyser?: IFunctionAnalyser;
 
     /**
-     * The method analyser instance.
+     * The method analyser instances.
      *
-     * @var {Array}
+     * @var {Map}
      */
     private _methodAnalysers: Map<string, IFunctionAnalyser> = new Map;
 
@@ -39,11 +40,13 @@ class ClassAnalyser implements IClassAnalyser {
      * Create a new class analyser instance.
      *
      * @param {Object} ast
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(ast: any, target: any) {
+        super();
+
         if (ast.type !== 'ClassDeclaration') {
-            throw new ParsingError('Invalid AST provided.');
+            throw new ParsingError('Invalid class AST provided.');
         }
 
         this._ast = ast;
@@ -65,7 +68,7 @@ class ClassAnalyser implements IClassAnalyser {
     /**
      * Get the constructor analyser.
      *
-     * @returns {?IFunctionAnalyser}
+     * @returns {(IFunctionAnalyser|undefined)}
      */
     public getConstructorAnalyser(): IFunctionAnalyser | undefined {
         return this._constructorAnalyser;
@@ -75,7 +78,7 @@ class ClassAnalyser implements IClassAnalyser {
      * Get the method analyser
      *
      * @param {string} name
-     * @returns {?IFunctionAnalyser}
+     * @returns {(IFunctionAnalyser|undefined)}
      */
     public getMethodAnalyser(name: string): IFunctionAnalyser | undefined {
         return this._methodAnalysers.get(name);
@@ -99,7 +102,7 @@ class ClassAnalyser implements IClassAnalyser {
     /**
      * Attempt to find the constructor definition in the class body.
      *
-     * @returns {?Object}
+     * @returns {(Object|undefined)}
      */
     private _findConstructor(): any {
         return this._ast.body.body.find(

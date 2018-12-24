@@ -19,7 +19,7 @@ interface IConstructorAnalyser {
     /**
      * Get the parameter analyser instance.
      *
-     * @returns {?IParameterAnalyser}
+     * @returns {(IParameterAnalyser|undefined)}
      */
     getParameterAnalyser(): IParameterAnalyser | undefined;
 

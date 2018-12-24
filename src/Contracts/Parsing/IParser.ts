@@ -3,7 +3,7 @@ interface IParser {
     /**
      * Parse the given source.
      *
-     * @param {any} target
+     * @param {*} target
      * @returns {Object}
      */
     ast(target: any): any;

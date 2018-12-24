@@ -11,7 +11,7 @@ class ParserManager extends Manager {
     /**
      * Get the ESTree-compatible AST.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @returns {Object}
      */
     public ast(target: any): any {

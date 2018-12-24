@@ -29,8 +29,8 @@ class InterfaceFactory {
     /**
      * Initialize metadata container if it doesn't exist yet.
      *
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyName
      * @returns {void}
      */
     private static _initializeMetadata(target: any, propertyName?: string): void {
@@ -50,18 +50,18 @@ class InterfaceFactory {
      * Perform some checks before attempting to define metadata.
      *
      * @param {Object} identifier
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyKey
      * @param {number} position
      * @returns {void}
      *
      * @throws {Error}
      */
-    private static _checkMetadata({name, key}: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
-        propertyName: string | undefined, position: number): void {
-        const metadata = isUndefined(propertyName)
+    private static _checkMetadata({name, key}: {name: string, key: string | symbol}, target: any, // eslint-disable-line
+        propertyKey: string | undefined, position: number): void {
+        const metadata = isUndefined(propertyKey)
             ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
-            : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName);
+            : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey);
 
         if (metadata.has(position)) {
             throw new Error(`Cannot apply @${name} decorator to the same target multiple times.`);
@@ -77,20 +77,20 @@ class InterfaceFactory {
      * parameter list of a function.
      *
      * @param {Object} identifier
-     * @param {mixed} target
-     * @param {?string} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyKey
      * @param {number} position
      * @returns {void}
      */
-    private static _defineMetadata(identifier: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
-        propertyName: string | undefined, position: number): void {
-        if (propertyName) {
+    private static _defineMetadata(identifier: {name: string, key: string | symbol}, target: any, // eslint-disable-line
+        propertyKey: string | undefined, position: number): void {
+        if (propertyKey) {
             Reflect.defineMetadata(
                 INTERFACE_SYMBOLS,
-                Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName)
+                Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey)
                     .set(position, identifier.key),
                 target,
-                propertyName
+                propertyKey
             );
 
             return;

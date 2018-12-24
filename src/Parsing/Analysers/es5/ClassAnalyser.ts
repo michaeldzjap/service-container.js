@@ -1,9 +1,12 @@
+import AbstractClassAnalyser from '../AbstractClassAnalyser';
 import FunctionAnalyser from '../FunctionAnalyser';
 import IClassAnalyser from '../../../Contracts/Parsing/IClassAnalyser';
 import IFunctionAnalyser from '../../../Contracts/Parsing/IFunctionAnalyser';
+import ParserManager from '../../ParserManager';
 import ParsingError from '../../ParsingError';
+import {isUndefined} from '../../../Support/helpers';
 
-class ClassAnalyser implements IClassAnalyser {
+class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
 
     /**
      * The ESTree-compatible abstract syntax tree representing a class.
@@ -27,13 +30,22 @@ class ClassAnalyser implements IClassAnalyser {
     private _constructorAnalyser: IFunctionAnalyser;
 
     /**
+     * The method analyser instances.
+     *
+     * @var {Map}
+     */
+    private _methodAnalysers: Map<string, IFunctionAnalyser> = new Map;
+
+    /**
      * Create a new class parser instance.
      *
      * @param {Object} ast
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(ast: any, target: any) {
-        if (ast.type !== 'FunctionDeclaration') {
+        super();
+
+        if (ast.type === 'FunctionDeclaration') {
             throw new ParsingError('Invalid class AST provided.');
         }
 
@@ -59,6 +71,42 @@ class ClassAnalyser implements IClassAnalyser {
      */
     public getConstructorAnalyser(): IFunctionAnalyser {
         return this._constructorAnalyser;
+    }
+
+    /**
+     * Get the method analyser
+     *
+     * @param {string} name
+     * @returns {(IFunctionAnalyser|undefined)}
+     */
+    public getMethodAnalyser(name: string): IFunctionAnalyser | undefined {
+        if (!this._methodAnalysers.has(name)) {
+            this._addMethodAnalyser(name);
+        }
+
+        return this._methodAnalysers.get(name);
+    }
+
+    /**
+     * Add a method analyser instance for the given method.
+     *
+     * @param {string} name
+     * @returns {void}
+     */
+    private _addMethodAnalyser(name: string): void {
+        const fn = Reflect.has(this._target, name)
+            ? this._target[name] // Static method
+            : this._target.prototype[name]; // Instance method
+
+        if (isUndefined(fn)) {
+            throw new Error(`Method does not exist on [${this._target.name}]`);
+        }
+
+        const ast = (new ParserManager).ast(`fn = ${fn.toString()}`);
+        this._methodAnalysers.set(
+            name,
+            new FunctionAnalyser(ast.body[0].expression.right, this._target)
+        );
     }
 
 }

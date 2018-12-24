@@ -7,7 +7,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * Find the assignment expression for the given parameter (if it exists).
      *
      * @param {Object} param
-     * @returns {?Object}
+     * @returns {(Object|undefined)}
      */
     protected _findAssignment(param: any): any {
         if (param.type === 'AssignmentPattern') {
