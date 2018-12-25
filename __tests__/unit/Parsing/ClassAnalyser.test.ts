@@ -1,7 +1,7 @@
-import ClassAnalyserManager from '@src/Parsing/Analysers/ClassAnalyserManager';
+import ES5ClassAnalyser from '@src/Parsing/Analysers/es5/ClassAnalyser';
+import ESNextClassAnalyser from '@src/Parsing/Analysers/esnext/ClassAnalyser';
 import IClassAnalyser from '@src/Contracts/Parsing/IClassAnalyser';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
-import ParserManager from '@src/Parsing/ParserManager';
 import {
     ClassWithConstructorStub,
     ClassWithoutConstructorStub,
@@ -9,19 +9,19 @@ import {
     ClassWithPublicMethodStub,
     ClassWithPublicStaticMethodStub
 } from '@helpers/Stubs/ParserStubs';
+import {isUndefined} from '@src/Support/helpers';
 import {Interface} from '@src/Support/types';
-
-/**
- * Generate the full ESTree-compatible AST and return the relevant parser.
- *
- * @param {*} target
- * @returns {IClassAnalyser}
- */
-const makeAnalyser = (ast: any, target: any): IClassAnalyser => {
-    const manager = new ClassAnalyserManager(ast.body[0], target);
-
-    return manager.driver();
-};
+import {DESIGN_PARAM_TYPES} from '@src/Constants/metadata';
+import * as ES5ClassWithConstructorStub from '@helpers/Stubs/es5/ClassWithConstructorStub.json';
+import * as ESNextClassWithConstructorStub from '@helpers/Stubs/esnext/ClassWithConstructorStub.json';
+import * as ES5ClassWithoutConstructorStub from '@helpers/Stubs/es5/ClassWithoutConstructorStub.json';
+import * as ESNextClassWithoutConstructorStub from '@helpers/Stubs/esnext/ClassWithoutConstructorStub.json';
+import * as ES5ClassWithoutBodyStub from '@helpers/Stubs/es5/ClassWithoutBodyStub.json';
+import * as ESNextClassWithoutBodyStub from '@helpers/Stubs/esnext/ClassWithoutBodyStub.json';
+import * as ES5ClassWithPublicMethodStub from '@helpers/Stubs/es5/ClassWithPublicMethodStub.json';
+import * as ESNextClassWithPublicMethodStub from '@helpers/Stubs/esnext/ClassWithPublicMethodStub.json';
+import * as ES5ClassWithPublicStaticMethodStub from '@helpers/Stubs/es5/ClassWithPublicStaticMethodStub.json';
+import * as ESNextClassWithPublicStaticMethodStub from '@helpers/Stubs/esnext/ClassWithPublicStaticMethodStub.json';
 
 const EXPECTED = [
     new ParameterDescriptor({name: 'a', type: Number, position: 0}),
@@ -30,51 +30,144 @@ const EXPECTED = [
     new ParameterDescriptor({name: 'd', type: Interface, position: 3}),
 ];
 
+// Ensure that the type metadata exists for the given targets
+[
+    {target: ClassWithConstructorStub},
+    {target: ClassWithPublicMethodStub.prototype, propertyKey: 'someMethod'},
+    {target: ClassWithPublicStaticMethodStub, propertyKey: 'someMethod'},
+].forEach(({target, propertyKey}): void => {
+    if (!Reflect.hasMetadata(DESIGN_PARAM_TYPES, target)) {
+        isUndefined(propertyKey)
+            ? Reflect.defineMetadata(
+                DESIGN_PARAM_TYPES,
+                EXPECTED.map((_: ParameterDescriptor): any => _.type),
+                target,
+            )
+            : Reflect.defineMetadata(
+                DESIGN_PARAM_TYPES,
+                EXPECTED.map((_: ParameterDescriptor): any => _.type),
+                target,
+                propertyKey
+            );
+    }
+});
+
 describe('ClassAnalyser', (): void => {
     [
-        {target: ClassWithConstructorStub, expected: true},
-        {target: ClassWithoutConstructorStub, expected: false},
-        {target: ClassWithoutBodyStub, expected: false},
-    ].forEach(({target, expected}: {target: any, expected: boolean}): void => { // eslint-disable-line
-        it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
-            const ast = (new ParserManager).ast(target.toString());
-            const analyser = makeAnalyser(ast, target);
-            const result = analyser.hasConstructor();
+        {
+            version: 'es5',
+            ast: [
+                ES5ClassWithConstructorStub.body[0],
+                ES5ClassWithoutConstructorStub.body[0],
+                ES5ClassWithoutBodyStub.body[0],
+            ],
+            analyser: ES5ClassAnalyser
+        },
+        {
+            version: 'esnext',
+            ast: [
+                ESNextClassWithConstructorStub.body[0],
+                ESNextClassWithoutConstructorStub.body[0],
+                ESNextClassWithoutBodyStub.body[0],
+            ],
+            analyser: ESNextClassAnalyser
+        },
+    ].forEach(({version, ast, analyser}): void => {
+        describe(`version: ${version}`, (): void => {
+            [
+                {target: ClassWithConstructorStub, expected: true},
+                {target: ClassWithoutConstructorStub, expected: false},
+                {target: ClassWithoutBodyStub, expected: false},
+            ].forEach(({target, expected}: {target: any, expected: boolean}, i: number): void => { // eslint-disable-line
+                // eslint-disable-next-line max-nested-callbacks
+                it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
+                    const classAnalyser = new analyser(ast[i], target);
+                    const result = classAnalyser.hasConstructor();
 
-            expect(result).toBe(expected);
+                    expect(result).toBe(expected);
+                });
+            });
         });
     });
 
     [
         {
-            target: ClassWithConstructorStub,
-            expected: EXPECTED
+            version: 'es5',
+            ast: [
+                ES5ClassWithConstructorStub.body[0],
+                ES5ClassWithoutConstructorStub.body[0],
+                ES5ClassWithoutBodyStub.body[0],
+            ],
+            analyser: ES5ClassAnalyser
         },
-        {target: ClassWithoutConstructorStub},
-        {target: ClassWithoutBodyStub},
-    ].forEach(({target, expected}): void => {
-        it(`returns the constructor parameters of the parsed [${target.name}] class`, (): void => {
-            const ast = (new ParserManager).ast(target.toString());
-            const analyser = makeAnalyser(ast, target);
-            const result = analyser.getConstructorParameters();
+        {
+            version: 'esnext',
+            ast: [
+                ESNextClassWithConstructorStub.body[0],
+                ESNextClassWithoutConstructorStub.body[0],
+                ESNextClassWithoutBodyStub.body[0],
+            ],
+            analyser: ESNextClassAnalyser
+        },
+    ].forEach(({version, ast, analyser}): void => {
+        describe(`version: ${version}`, (): void => {
+            [
+                {target: ClassWithConstructorStub, expected: EXPECTED},
+                {target: ClassWithoutConstructorStub},
+                {target: ClassWithoutBodyStub},
+            ].forEach(({target, expected}, i: number): void => {
+                // eslint-disable-next-line max-nested-callbacks
+                it(`returns the constructor parameters of the parsed [${target.name}] class`, (): void => {
+                    const classAnalyser = new analyser(ast[i], target);
+                    const result = classAnalyser.getConstructorParameters();
 
-            expect(result).toEqual(expected);
+                    expect(result).toEqual(expected);
+                });
+            });
         });
     });
 
-    it('returns the method parameters of the parsed [ClassWithPublicMethodStub] class', (): void => {
-        const ast = (new ParserManager).ast(ClassWithPublicMethodStub.toString());
-        const analyser = makeAnalyser(ast, ClassWithPublicMethodStub.prototype);
-        const result = analyser.getMethodParameters('someMethod');
+    [
+        {
+            version: 'es5',
+            ast: ES5ClassWithPublicMethodStub.body[0],
+            analyser: ES5ClassAnalyser
+        },
+        {
+            version: 'esnext',
+            ast: ESNextClassWithPublicMethodStub.body[0],
+            analyser: ESNextClassAnalyser
+        },
+    ].forEach(({version, ast, analyser}): void => {
+        describe(`version: ${version}`, (): void => {
+            it('returns the method parameters of the parsed [ClassWithPublicMethodStub] class', (): void => {
+                const classAnalyser = new analyser(ast, ClassWithPublicMethodStub.prototype);
+                const result = classAnalyser.getMethodParameters('someMethod');
 
-        expect(result).toEqual(EXPECTED);
+                expect(result).toEqual(EXPECTED);
+            });
+        });
     });
 
-    it('returns the method parameters of the parsed [ClassWithPublicStaticMethodStub] class', (): void => {
-        const ast = (new ParserManager).ast(ClassWithPublicStaticMethodStub.toString());
-        const analyser = makeAnalyser(ast, ClassWithPublicStaticMethodStub);
-        const result = analyser.getMethodParameters('someMethod');
+    [
+        {
+            version: 'es5',
+            ast: ES5ClassWithPublicStaticMethodStub.body[0],
+            analyser: ES5ClassAnalyser
+        },
+        {
+            version: 'esnext',
+            ast: ESNextClassWithPublicStaticMethodStub.body[0],
+            analyser: ESNextClassAnalyser
+        },
+    ].forEach(({version, ast, analyser}): void => {
+        describe(`version: ${version}`, (): void => {
+            it('returns the method parameters of the parsed [ClassWithPublicStaticMethodStub] class', (): void => {
+                const classAnalyser = new analyser(ast, ClassWithPublicStaticMethodStub);
+                const result = classAnalyser.getMethodParameters('someMethod');
 
-        expect(result).toEqual(EXPECTED);
+                expect(result).toEqual(EXPECTED);
+            });
+        });
     });
 });

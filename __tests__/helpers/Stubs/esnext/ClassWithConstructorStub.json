@@ -1,0 +1,174 @@
+{
+  "type": "Program",
+  "sourceType": "script",
+  "body": [
+      {
+          "type": "ClassDeclaration",
+          "id": {
+              "type": "Identifier",
+              "name": "ClassWithConstructorStub"
+          },
+          "superClass": null,
+          "body": {
+              "type": "ClassBody",
+              "body": [
+                  {
+                      "type": "MethodDefinition",
+                      "kind": "constructor",
+                      "static": false,
+                      "computed": false,
+                      "key": {
+                          "type": "Identifier",
+                          "name": "constructor"
+                      },
+                      "value": {
+                          "type": "FunctionExpression",
+                          "params": [
+                              {
+                                  "type": "Identifier",
+                                  "name": "a"
+                              },
+                              {
+                                  "type": "AssignmentPattern",
+                                  "left": {
+                                      "type": "Identifier",
+                                      "name": "b"
+                                  },
+                                  "right": {
+                                      "type": "Literal",
+                                      "value": "Hey now!"
+                                  }
+                              },
+                              {
+                                  "type": "AssignmentPattern",
+                                  "left": {
+                                      "type": "Identifier",
+                                      "name": "c"
+                                  },
+                                  "right": {
+                                      "type": "ArrayExpression",
+                                      "elements": [
+                                          {
+                                              "type": "Literal",
+                                              "value": 1
+                                          },
+                                          {
+                                              "type": "Literal",
+                                              "value": 2
+                                          },
+                                          {
+                                              "type": "Literal",
+                                              "value": 3
+                                          }
+                                      ]
+                                  }
+                              },
+                              {
+                                  "type": "Identifier",
+                                  "name": "d"
+                              }
+                          ],
+                          "body": {
+                              "type": "BlockStatement",
+                              "body": [
+                                  {
+                                      "type": "ExpressionStatement",
+                                      "expression": {
+                                          "type": "AssignmentExpression",
+                                          "left": {
+                                              "type": "MemberExpression",
+                                              "object": {
+                                                  "type": "ThisExpression"
+                                              },
+                                              "computed": false,
+                                              "property": {
+                                                  "type": "Identifier",
+                                                  "name": "_a"
+                                              }
+                                          },
+                                          "operator": "=",
+                                          "right": {
+                                              "type": "Identifier",
+                                              "name": "a"
+                                          }
+                                      }
+                                  },
+                                  {
+                                      "type": "ExpressionStatement",
+                                      "expression": {
+                                          "type": "AssignmentExpression",
+                                          "left": {
+                                              "type": "MemberExpression",
+                                              "object": {
+                                                  "type": "ThisExpression"
+                                              },
+                                              "computed": false,
+                                              "property": {
+                                                  "type": "Identifier",
+                                                  "name": "_b"
+                                              }
+                                          },
+                                          "operator": "=",
+                                          "right": {
+                                              "type": "Identifier",
+                                              "name": "b"
+                                          }
+                                      }
+                                  },
+                                  {
+                                      "type": "ExpressionStatement",
+                                      "expression": {
+                                          "type": "AssignmentExpression",
+                                          "left": {
+                                              "type": "MemberExpression",
+                                              "object": {
+                                                  "type": "ThisExpression"
+                                              },
+                                              "computed": false,
+                                              "property": {
+                                                  "type": "Identifier",
+                                                  "name": "_c"
+                                              }
+                                          },
+                                          "operator": "=",
+                                          "right": {
+                                              "type": "Identifier",
+                                              "name": "c"
+                                          }
+                                      }
+                                  },
+                                  {
+                                      "type": "ExpressionStatement",
+                                      "expression": {
+                                          "type": "AssignmentExpression",
+                                          "left": {
+                                              "type": "MemberExpression",
+                                              "object": {
+                                                  "type": "ThisExpression"
+                                              },
+                                              "computed": false,
+                                              "property": {
+                                                  "type": "Identifier",
+                                                  "name": "_d"
+                                              }
+                                          },
+                                          "operator": "=",
+                                          "right": {
+                                              "type": "Identifier",
+                                              "name": "d"
+                                          }
+                                      }
+                                  }
+                              ]
+                          },
+                          "async": false,
+                          "generator": false,
+                          "expression": false,
+                          "id": null
+                      }
+                  }
+              ]
+          }
+      }
+  ]
+}
