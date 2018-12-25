@@ -52,38 +52,10 @@
     "reflect-metadata": "^0.1.12"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "moduleNameMapper": {
-      "^@helpers/(.*)$": "<rootDir>/__tests__/helpers/$1",
-      "^@src/(.*)$": "<rootDir>/src/$1",
-      "^@base/(.*)$": "<rootDir>/$1"
-    },
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "setupFiles": [
-      "<rootDir>/__tests__/setup.ts"
-    ],
-    "testMatch": [
-      "**/__tests__/**/*.+(ts|tsx|js)"
-    ],
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/__tests__/helpers/",
-      "<rootDir>/__tests__/setup.ts"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "tsconfig.test.json"
-      }
-    }
+    "projects": [
+      "<rootDir>/jest.config.js",
+      "<rootDir>/jest-es5.config.js",
+      "<rootDir>/jest-esnext.config.js"
+    ]
   }
 }

@@ -96,19 +96,32 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * @returns {void}
      */
     private _addMethodAnalyser(name: string): void {
-        const fn = Reflect.has(this._target, name)
-            ? this._target[name] // Static method
-            : this._target.prototype[name]; // Instance method
+        const descriptor = Reflect.has(this._target, name)
+            ? Reflect.getOwnPropertyDescriptor(this._target, name)
+            : Reflect.getOwnPropertyDescriptor(this._target.prototype, name);
 
-        if (isUndefined(fn)) {
+        if (isUndefined(descriptor)) {
             throw new Error(`Method does not exist on [${this._target.name}]`);
         }
 
-        const ast = (new ParserManager).ast(`fn = ${fn.toString()}`);
+        const ast = (new ParserManager).ast(
+            this._stringify(descriptor.value)
+        );
+        console.log(JSON.stringify(ast, null, 4));
         this._methodAnalysers.set(
             name,
             new FunctionAnalyser(ast.body[0].expression.right, this._target, name)
         );
+    }
+
+    /**
+     * Stringify the given function.
+     *
+     * @param {Function} fn
+     * @returns {string}
+     */
+    private _stringify(fn: Function): string {
+        return `fn = ${fn.toString()}`;
     }
 
 }
