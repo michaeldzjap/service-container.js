@@ -1,7 +1,7 @@
 import ExpressionCollector from './ExpressionCollector';
 import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import ParsingError from '../ParsingError';
-import {isUndefined} from '../../Support/helpers';
+import {isUndefined, getName} from '../../Support/helpers';
 import {Interface} from '../../Support/types';
 import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../Constants/metadata';
 
@@ -56,15 +56,11 @@ abstract class AbstractParameterAnalyser {
         this._name = name;
 
         // Get the parameter types and interface keys from metadata
-        this._types = AbstractParameterAnalyser._fetchMetadata(
-            DESIGN_PARAM_TYPES, this._target, this._name
-        ) || [];
-        this._keys = AbstractParameterAnalyser._fetchMetadata(
-            INTERFACE_SYMBOLS, this._target, this._name
-        );
+        this._types = this._fetchMetadata(DESIGN_PARAM_TYPES) || [];
+        this._keys = this._fetchMetadata(INTERFACE_SYMBOLS);
 
         if (this._ast.length !== this._types.length) {
-            throw new ParsingError('The number of parameters and types must match.');
+            this._throwError();
         }
     }
 
@@ -96,16 +92,29 @@ abstract class AbstractParameterAnalyser {
      * Attempt to fetch metadata.
      *
      * @param {string} key
-     * @param {*} target
-     * @param {(string|undefined)} name
-     * @returns {(Array|Map)}
+     * @returns {(Array|Map|undefined)}
      */
-    private static _fetchMetadata(key: string, target: any, name?: string): any {
-        if (!isUndefined(name) && name !== 'constructor') {
-            return Reflect.getMetadata(key, target, name);
+    private _fetchMetadata(key: string): any {
+        if (!isUndefined(this._name) && this._name !== 'constructor') {
+            return Reflect.getMetadata(key, this._target, this._name);
         }
 
-        return Reflect.getMetadata(key, target);
+        return Reflect.getMetadata(key, this._target);
+    }
+
+    /**
+     * Throw an error.
+     *
+     * @returns {void}
+     *
+     * @throws {ParsingError}
+     */
+    private _throwError(): void {
+        let message = 'The number of parameters and types must match. ';
+        message += 'Perhaps you forgot to apply the @injectable decorator ';
+        message += `to the [${getName(this._target)}] target?`;
+
+        throw new ParsingError(message);
     }
 
     /**

@@ -26,6 +26,8 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
         }
 
         super(ast, target, name);
+
+        this._block = block;
     }
 
     /**

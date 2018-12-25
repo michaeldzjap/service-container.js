@@ -5,4 +5,4 @@ import * as tsConfig from '../../tsconfig.base.json';
  *
  * @returns {string}
  */
-export const {TARGET} = tsConfig.compilerOptions || 'esnext';
+export const TARGET = tsConfig.compilerOptions.target || 'esnext';

@@ -1,6 +1,8 @@
 import injectable from '@src/Support/injectable';
 import {IParserContractStub} from '@helpers/Contracts/IParserContractStub';
 
+export class SimpleStub {}
+
 @injectable()
 export class ClassWithConstructorStub {
 

@@ -1,5 +1,6 @@
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ClassAnalyserManager from '../Parsing/Analysers/ClassAnalyserManager';
+import ParserManager from '../Parsing/ParserManager';
 import {isUndefined} from './helpers';
 import {PARAM_TYPES} from '../Constants/metadata';
 
@@ -84,9 +85,10 @@ class InjectableService {
      */
     private static _getParameters(target: any, propertyKey?: string | symbol):
         ParameterDescriptor[] | undefined {
-        const analyser = (new ClassAnalyserManager(
-            this._getConstructor(target)
-        )).driver();
+        const ast = (new ParserManager).ast(
+            this._getConstructor(target, propertyKey)
+        );
+        const analyser = (new ClassAnalyserManager(ast.body[0], target)).driver();
 
         if (propertyKey) {
             return analyser.getMethodParameters(propertyKey);

@@ -45,7 +45,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     public constructor(ast: any, target: any) {
         super();
 
-        if (ast.type === 'FunctionDeclaration') {
+        if (ast.type !== 'FunctionDeclaration') {
             throw new ParsingError('Invalid class AST provided.');
         }
 
@@ -67,10 +67,12 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Get the constructor analyser.
      *
-     * @returns {IFunctionAnalyser}
+     * @returns {(IFunctionAnalyser|undefined)}
      */
-    public getConstructorAnalyser(): IFunctionAnalyser {
-        return this._constructorAnalyser;
+    public getConstructorAnalyser(): IFunctionAnalyser | undefined {
+        if (this.hasConstructor()) {
+            return this._constructorAnalyser;
+        }
     }
 
     /**
@@ -105,7 +107,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
         const ast = (new ParserManager).ast(`fn = ${fn.toString()}`);
         this._methodAnalysers.set(
             name,
-            new FunctionAnalyser(ast.body[0].expression.right, this._target)
+            new FunctionAnalyser(ast.body[0].expression.right, this._target, name)
         );
     }
 

@@ -20,6 +20,13 @@ class FunctionAnalyser implements IFunctionAnalyser {
     private _target: any;
 
     /**
+     * The name of the function.
+     *
+     * @var {(string|undefined)}
+     */
+    private _name?: string;
+
+    /**
      * The parameter analyser instance.
      *
      * @var {IParameterAnalyser}
@@ -31,17 +38,19 @@ class FunctionAnalyser implements IFunctionAnalyser {
      *
      * @param {Object} ast
      * @param {mixed} target
+     * @param {(string|undefined)} name
      */
-    public constructor(ast: any, target: any) {
+    public constructor(ast: any, target: any, name?: string) {
         if (!(ast.type === 'FunctionDeclaration' || ast.type === 'FunctionExpression')) {
             throw new ParsingError('Invalid function AST provided.');
         }
 
         this._ast = ast;
         this._target = target;
+        this._name = name;
 
         this._parameterAnalyser = new ParameterAnalyser(
-            this._ast.params, this._ast.body, this._target
+            this._ast.params, this._ast.body, this._target, this._name
         );
     }
 

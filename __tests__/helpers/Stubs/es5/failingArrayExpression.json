@@ -1,0 +1,85 @@
+{
+  "type": "Program",
+  "sourceType": "script",
+  "body": [
+      {
+          "type": "ExpressionStatement",
+          "expression": {
+              "type": "AssignmentExpression",
+              "left": {
+                  "type": "Identifier",
+                  "name": "failingArrayExpression"
+              },
+              "operator": "=",
+              "right": {
+                  "type": "FunctionExpression",
+                  "params": [
+                      {
+                          "type": "Identifier",
+                          "name": "arr"
+                      }
+                  ],
+                  "body": {
+                      "type": "BlockStatement",
+                      "body": [
+                          {
+                              "type": "IfStatement",
+                              "test": {
+                                  "type": "BinaryExpression",
+                                  "left": {
+                                      "type": "Identifier",
+                                      "name": "arr"
+                                  },
+                                  "right": {
+                                      "type": "UnaryExpression",
+                                      "operator": "void",
+                                      "argument": {
+                                          "type": "Literal",
+                                          "value": 0
+                                      },
+                                      "prefix": true
+                                  },
+                                  "operator": "==="
+                              },
+                              "consequent": {
+                                  "type": "BlockStatement",
+                                  "body": [
+                                      {
+                                          "type": "ExpressionStatement",
+                                          "expression": {
+                                              "type": "AssignmentExpression",
+                                              "left": {
+                                                  "type": "Identifier",
+                                                  "name": "arr"
+                                              },
+                                              "operator": "=",
+                                              "right": {
+                                                  "type": "ArrayExpression",
+                                                  "elements": [
+                                                      {
+                                                          "type": "NewExpression",
+                                                          "callee": {
+                                                              "type": "Identifier",
+                                                              "name": "FailStub"
+                                                          },
+                                                          "arguments": []
+                                                      }
+                                                  ]
+                                              }
+                                          }
+                                      }
+                                  ]
+                              },
+                              "alternate": null
+                          }
+                      ]
+                  },
+                  "async": false,
+                  "generator": false,
+                  "expression": false,
+                  "id": null
+              }
+          }
+      }
+  ]
+}

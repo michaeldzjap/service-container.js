@@ -9,11 +9,11 @@ import {TARGET} from '../../Constants/.';
 class ClassAnalyserManager extends Manager {
 
     /**
-     * The parser instance.
+     * The AST representing the parsed class.
      *
-     * @var {IParser}
+     * @var {Object}
      */
-    private _parser: IParser;
+    private _ast: any;
 
     /**
      * The class definition.
@@ -23,23 +23,16 @@ class ClassAnalyserManager extends Manager {
     private _target: any;
 
     /**
-     * The AST representing the parsed class.
-     *
-     * @var {Object}
-     */
-    private _ast: any;
-
-    /**
      * Create a new class analyser manager instance.
      *
+     * @param {*} ast
      * @param {*} target
      */
-    public constructor(target: any) {
+    public constructor(ast: any, target: any) {
         super();
 
+        this._ast = ast;
         this._target = target;
-        this._parser = (new ParserManager).driver();
-        this._ast = this._parser.ast(this._target).body[0];
     }
 
     /**

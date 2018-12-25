@@ -96,7 +96,7 @@ export const isSymbol = (target: any): target is Symbol => (
  * @param {*} target
  * @returns {boolean}
  */
-export const hasPrototype = (target: any): boolean => (
+export const hasPrototype = (target: object | Function): target is Function => (
     target.hasOwnProperty('prototype')
 );
 
@@ -106,7 +106,7 @@ export const hasPrototype = (target: any): boolean => (
  * @param {*} target
  * @returns {boolean}
  */
-export const hasConstructor = (target: any): boolean => (
+export const hasConstructor = (target: object | Function): target is object => (
     target.hasOwnProperty('constructor')
 );
 
@@ -129,6 +129,18 @@ export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
 export const isInstance = <T>(target: any): target is Instance<T> => (
     !hasPrototype(target) && hasConstructor(target)
 );
+
+/**
+ * Attempt to get the name of an object or function.
+ *
+ * @param {(Object|Function)} target
+ * @returns {(string|undefined)}
+ */
+export const getName = (target: object | Function): string | undefined => {
+    if (hasPrototype(target)) return target.name;
+
+    return target.constructor.name;
+};
 
 /**
  * Return the default value of the given value.

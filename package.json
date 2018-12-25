@@ -59,7 +59,8 @@
     ],
     "moduleNameMapper": {
       "^@helpers/(.*)$": "<rootDir>/__tests__/helpers/$1",
-      "^@src/(.*)$": "<rootDir>/src/$1"
+      "^@src/(.*)$": "<rootDir>/src/$1",
+      "^@base/(.*)$": "<rootDir>/$1"
     },
     "moduleDirectories": [
       "node_modules",
