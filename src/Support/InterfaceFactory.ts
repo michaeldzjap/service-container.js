@@ -10,7 +10,7 @@ class InterfaceFactory {
      * @returns {Function}
      */
     public static make(name: string): any {
-        const identifier = {name, key: Symbol.for(name)};
+        const identifier = {name, key: Symbol(name)};
 
         // eslint-disable-next-line require-jsdoc
         function fn(target: any, propertyName: string, index: number): any {
@@ -64,7 +64,7 @@ class InterfaceFactory {
             : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey);
 
         if (metadata.has(position)) {
-            throw new Error(`Cannot apply @${name} decorator to the same target multiple times.`);
+            throw new Error(`Cannot apply @${name} decorator to the same parameter multiple times.`);
         }
 
         if (Array.from(metadata.values()).find((_: any): boolean => _ === key)) {
@@ -85,23 +85,14 @@ class InterfaceFactory {
     private static _defineMetadata(identifier: {name: string, key: string | symbol}, target: any, // eslint-disable-line
         propertyKey: string | undefined, position: number): void {
         if (propertyKey) {
-            Reflect.defineMetadata(
-                INTERFACE_SYMBOLS,
-                Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey)
-                    .set(position, identifier.key),
-                target,
-                propertyKey
-            );
+            Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey)
+                .set(position, identifier.key);
 
             return;
         }
 
-        Reflect.defineMetadata(
-            INTERFACE_SYMBOLS,
-            Reflect.getMetadata(INTERFACE_SYMBOLS, target)
-                .set(position, identifier.key),
-            target
-        );
+        Reflect.getMetadata(INTERFACE_SYMBOLS, target)
+            .set(position, identifier.key);
     }
 
 }
