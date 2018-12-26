@@ -390,7 +390,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): void => container.make(ContainerMixedPrimitiveStub, []);
 
-        expect(fn).toThrow(BindingResolutionError);
+        expect(fn).toThrow('Unresolvable dependency resolving [first] in class ContainerMixedPrimitiveStub');
     });
 
     test('binding resolution error message', (): void => {
@@ -399,8 +399,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): void => container.make(IContainerContractStub.key, []);
 
-        expect(fn).toThrow(BindingResolutionError);
-        expect(fn).toThrow('Target [Symbol(IContainerContractStub)] is not instantiable.');
+        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable.');
     });
 
     test('binding resolution error message includes build stack', (): void => {
@@ -409,7 +408,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): void => container.make(ContainerTestContextInjectOne, []);
 
-        expect(fn).toThrow('Target [Symbol(IContainerContractStub)] is not instantiable while building [ContainerTestContextInjectOne].');
+        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable while building [ContainerTestContextInjectOne].');
     });
 
     test('call with class references without method throws error', (): void => {
@@ -768,7 +767,6 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): unknown => container.getAlias('name');
 
-        expect(fn).toThrow(LogicError);
         expect(fn).toThrow('[name] is aliased to itself.');
     });
 
@@ -935,7 +933,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): unknown => container.get('Riley Martin');
 
-        expect(fn).toThrow(EntryNotFoundError);
+        expect(fn).toThrow(Error);
     });
 
     test('bound entries throws container error when not resolvable', (): void => {
@@ -945,7 +943,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): unknown => container.get('Riley Martin');
 
-        expect(fn).toThrow(BindingResolutionError);
+        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable.');
     });
 
     test('container can resolve classes', (): void => {

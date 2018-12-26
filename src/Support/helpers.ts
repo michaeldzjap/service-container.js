@@ -143,6 +143,22 @@ export const getName = (target: object | Function): string | undefined => {
 };
 
 /**
+ * Strip off the "Symbol()" part of a stringified symbol.
+ *
+ * @param {symbol} target
+ * @returns {string}
+ */
+export const getSymbolName = (target: symbol): string => {
+    const result = /Symbol\(([^)]+)\)/.exec(target.toString());
+
+    if (isNullOrUndefined(result)) {
+        throw new Error('Could not determine interface name.');
+    }
+
+    return result[1];
+};
+
+/**
  * Return the default value of the given value.
  *
  * @param {*} value

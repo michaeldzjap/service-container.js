@@ -1,7 +1,7 @@
-import Arr from './Arr';
-import {isString} from './helpers';
+import Arr from '../Arr';
+import {isString} from '../helpers';
 
-class NestedMap<U, V> extends Map<U, V> {
+class ESNextNestedMap<U, V> extends Map<U, V> {
 
     /**
      * Add or update an element of a map at a given (sequence of) key(s).
@@ -138,4 +138,4 @@ class NestedMap<U, V> extends Map<U, V> {
 
 }
 
-export default NestedMap;
+export default ESNextNestedMap;

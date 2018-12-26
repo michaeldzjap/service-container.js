@@ -1,6 +1,6 @@
 import ReflectionError from './ReflectionError';
 import ReflectionMethod from './ReflectionMethod';
-import {isSymbol, isString, isNullOrUndefined} from '../Support/helpers';
+import {isSymbol, isString, isNullOrUndefined, getSymbolName} from '../Support/helpers';
 import {Interface} from '../Support/types';
 
 class ReflectionClass {
@@ -58,13 +58,7 @@ class ReflectionClass {
      */
     public getName(): string {
         if (this._isInterface && isSymbol(this._target.key)) {
-            const result = /Symbol\(([^)]+)\)/.exec(this._target.key.toString());
-
-            if (isNullOrUndefined(result)) {
-                throw new ReflectionError('Could not determine interface name.');
-            }
-
-            return result[1];
+            return getSymbolName(this._target.key);
         }
 
         if (this._isInterface && isString(this._target.key)) {

@@ -6,11 +6,14 @@ import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
 import IContainer from '../Contracts/Container/IContainer';
 import LogicError from './LogicError';
-import NestedMap from '../Support/NestedMap';
+import NestedMap from '../Support/NestedMap/.';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {Binding, Identifier, Instantiable} from '../Support/types';
-import {isClass, isString, isNullOrUndefined} from '../Support/helpers';
+import {
+    isClass, isString, isNullOrUndefined, getSymbolName, isInstance,
+    isInstantiable
+} from '../Support/helpers';
 
 class Container implements IContainer {
 
@@ -26,7 +29,7 @@ class Container implements IContainer {
      *
      * @var {Map}
      */
-    public _contextual: NestedMap<any, Map<any, any>> = new NestedMap;
+    public _contextual: any = new NestedMap;
 
     /**
      * An array of the types that have been resolved.
@@ -154,6 +157,28 @@ class Container implements IContainer {
      */
     public static setInstance(container?: Container): Container | undefined {
         return (Container._instance = container);
+    }
+
+    /**
+     * Format the name of the given concrete.
+     *
+     * @param {*} concrete
+     * @returns {string}
+     */
+    private static _formatName<T>(concrete: T): string {
+        if (typeof concrete === 'symbol') {
+            return getSymbolName(concrete);
+        }
+
+        if (isInstantiable(concrete)) {
+            return concrete.name;
+        }
+
+        if (isInstance(concrete)) {
+            return concrete.constructor.name;
+        }
+
+        return 'undefined';
     }
 
     /**
@@ -1093,7 +1118,7 @@ class Container implements IContainer {
      * @throws {BindingResolutionError}
      */
     protected _notInstantiable<T>(concrete: T): void {
-        let message = `Target [${typeof concrete === 'symbol' ? concrete.toString() : (concrete as any).name}] is not instantiable`;
+        let message = `Target [${Container._formatName(concrete)}] is not instantiable`;
 
         if (this._buildStack.length) {
             const previous = this._buildStack
@@ -1118,8 +1143,7 @@ class Container implements IContainer {
      */
     protected _unresolvablePrimitive(parameter: ReflectionParameter): void {
         const message = `
-            Unresolvable dependency resolving [${parameter.getName()}] in class
-            ${(parameter.getDeclaringClass() as any).getName()}
+            Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}
         `;
 
         throw new BindingResolutionError(message);
