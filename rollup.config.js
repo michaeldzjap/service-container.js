@@ -1,14 +1,15 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import sourceMaps from 'rollup-plugin-sourcemaps';
+import json from 'rollup-plugin-json';
 import typescript from 'rollup-plugin-typescript2';
 import {eslint} from 'rollup-plugin-eslint';
+import {uglify} from 'rollup-plugin-uglify';
 import {terser} from 'rollup-plugin-terser';
 import pkg from './package.json';
 
-export default {
+const base = {
     input: 'src/index.ts',
-    output: {file: pkg.main, format: 'es', sourcemap: true},
     external: [
         ...Object.keys(pkg.dependencies || {}),
         ...Object.keys(pkg.peerDependencies || {}),
@@ -18,6 +19,7 @@ export default {
     },
     plugins: [
         eslint(),
+        json({compact: true}),
         resolve({
             jsnext: true,
             main: true,
@@ -29,6 +31,22 @@ export default {
             rollupCommonJSResolveHack: true
         }),
         sourceMaps(),
-        terser(),
     ]
 };
+
+export default [
+    {
+        ...base,
+        ...{
+            output: {file: pkg.main, format: 'cjs', sourcemap: true},
+            plugins: [...base.plugins, uglify()]
+        }
+    },
+    {
+        ...base,
+        ...{
+            output: {file: pkg.module, format: 'es', sourcemap: true},
+            plugins: [...base.plugins, terser()]
+        }
+    }
+];
