@@ -1,4 +1,4 @@
-import NestedMap from '@src/Support/NestedMap';
+import NestedMap from '@src/Support/NestedMap/.';
 
 class KeyStub {}
 

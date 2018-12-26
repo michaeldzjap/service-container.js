@@ -15,14 +15,14 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
     /**
      * The concrete instance.
      *
-     * @var {string}
+     * @var {*}
      */
     protected _concrete: any;
 
     /**
      * The abstract target.
      *
-     * @var {string}
+     * @var {(string|undefined)}
      */
     protected _needs?: string;
 
@@ -30,7 +30,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
      * Create a new contextual binding builder.
      *
      * @param {Container} container
-     * @param {mixed} concrete
+     * @param {*} concrete
      */
     public constructor(container: Container, concrete: any) {
         this._concrete = concrete;
@@ -52,7 +52,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param {mixed} implementation
+     * @param {*} implementation
      * @returns {void}
      */
     public give<T>(implementation: T | Function): void {

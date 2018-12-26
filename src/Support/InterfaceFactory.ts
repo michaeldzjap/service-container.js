@@ -1,4 +1,4 @@
-import {isNullOrUndefined} from '../Support/helpers';
+import {isUndefined} from '../Support/helpers';
 import {INTERFACE_SYMBOLS} from '../Constants/metadata';
 
 class InterfaceFactory {
@@ -10,7 +10,7 @@ class InterfaceFactory {
      * @returns {Function}
      */
     public static make(name: string): any {
-        const identifier = {name, key: Symbol.for(name)};
+        const identifier = {name, key: Symbol(name)};
 
         // eslint-disable-next-line require-jsdoc
         function fn(target: any, propertyName: string, index: number): any {
@@ -29,12 +29,12 @@ class InterfaceFactory {
     /**
      * Initialize metadata container if it doesn't exist yet.
      *
-     * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyName
      * @returns {void}
      */
     private static _initializeMetadata(target: any, propertyName?: string): void {
-        if (!isNullOrUndefined(propertyName)
+        if (!isUndefined(propertyName)
             && !Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target, propertyName)) {
             Reflect.defineMetadata(INTERFACE_SYMBOLS, new Map, target, propertyName);
 
@@ -50,21 +50,21 @@ class InterfaceFactory {
      * Perform some checks before attempting to define metadata.
      *
      * @param {Object} identifier
-     * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyKey
      * @param {number} position
      * @returns {void}
      *
      * @throws {Error}
      */
-    private static _checkMetadata({name, key}: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
-        propertyName: string | undefined, position: number): void {
-        const metadata = isNullOrUndefined(propertyName)
+    private static _checkMetadata({name, key}: {name: string, key: string | symbol}, target: any, // eslint-disable-line
+        propertyKey: string | undefined, position: number): void {
+        const metadata = isUndefined(propertyKey)
             ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
-            : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName);
+            : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey);
 
         if (metadata.has(position)) {
-            throw new Error(`Cannot apply @${name} decorator to the same target multiple times.`);
+            throw new Error(`Cannot apply @${name} decorator to the same parameter multiple times.`);
         }
 
         if (Array.from(metadata.values()).find((_: any): boolean => _ === key)) {
@@ -77,31 +77,22 @@ class InterfaceFactory {
      * parameter list of a function.
      *
      * @param {Object} identifier
-     * @param {mixed} target
-     * @param {string|undefined} propertyName
+     * @param {*} target
+     * @param {(string|undefined)} propertyKey
      * @param {number} position
      * @returns {void}
      */
-    private static _defineMetadata(identifier: {name: string, key: Symbol | string}, target: any, // eslint-disable-line
-        propertyName: string | undefined, position: number): void {
-        if (propertyName) {
-            Reflect.defineMetadata(
-                INTERFACE_SYMBOLS,
-                Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyName)
-                    .set(position, identifier.key),
-                target,
-                propertyName
-            );
+    private static _defineMetadata(identifier: {name: string, key: string | symbol}, target: any, // eslint-disable-line
+        propertyKey: string | undefined, position: number): void {
+        if (propertyKey) {
+            Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey)
+                .set(position, identifier.key);
 
             return;
         }
 
-        Reflect.defineMetadata(
-            INTERFACE_SYMBOLS,
-            Reflect.getMetadata(INTERFACE_SYMBOLS, target)
-                .set(position, identifier.key),
-            target
-        );
+        Reflect.getMetadata(INTERFACE_SYMBOLS, target)
+            .set(position, identifier.key);
     }
 
 }

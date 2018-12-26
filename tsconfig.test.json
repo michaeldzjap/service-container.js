@@ -4,7 +4,8 @@
         "baseUrl": ".",
         "paths": {
             "@helpers/*": ["__tests__/helpers/*"],
-            "@src/*": ["src/*"]
+            "@src/*": ["src/*"],
+            "@base/*": ["*"]
         }
     },
     "include": [

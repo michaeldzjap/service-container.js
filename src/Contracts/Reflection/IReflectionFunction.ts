@@ -5,14 +5,14 @@ interface IReflectionFunction {
     /**
      * Get the name of the reflected function.
      *
-     * @returns {string|undefined}
+     * @returns {(string|undefined)}
      */
     getName(): string | undefined;
 
     /**
      * Get the parameters of the reflected function.
      *
-     * @returns {Array}
+     * @returns {ReflectionParameter[]}
      */
     getParameters(): ReflectionParameter[];
 

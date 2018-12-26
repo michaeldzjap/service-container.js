@@ -7,7 +7,7 @@ interface IContainer {
     /**
      * Determine of the given abstract type has been bound.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     bound<T>(abstract: Identifier<T>): boolean;
@@ -15,8 +15,8 @@ interface IContainer {
     /**
      * Alias a type to a different name.
      *
-     * @param {mixed} abstract
-     * @param {mixed} alias
+     * @param {Identifier} abstract
+     * @param {Identifier} alias
      * @returns {void}
      */
     alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void;
@@ -24,8 +24,8 @@ interface IContainer {
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param {mixed} abstracts
-     * @param {Array} tags
+     * @param {(Identifier[]|Identifier)} abstracts
+     * @param {string[]} tags
      * @returns {void}
      */
     tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void;
@@ -34,16 +34,16 @@ interface IContainer {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {Array}
+     * @returns {*[]}
      */
     tagged(tag: string): unknown[];
 
     /**
      * Register a binding with the container.
      *
-     * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
-     * @param {boolean} shared
+     * @param {Identifier} abstract
+     * @param {(Identifier|Function|undefined)} concrete
+     * @param {(boolean|undefined)} shared
      * @returns {void}
      */
     bind<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function, shared?: boolean): void;
@@ -51,7 +51,7 @@ interface IContainer {
     /**
      * Unregister a binding with the container.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {void}
      */
     unbind<U>(abstract: Identifier<U>): void;
@@ -59,9 +59,9 @@ interface IContainer {
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param {string} abstract
-     * @param mixed|undefined} concrete
-     * @param {boolean} shared
+     * @param {Identifier} abstract
+     * @param {(Identifier|Function|undefined)} concrete
+     * @param {(boolean|undefined)} shared
      * @returns {void}
      */
     bindIf<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function, shared?: boolean): void;
@@ -69,8 +69,8 @@ interface IContainer {
     /**
      * Register a shared binding in the container.
      *
-     * @param {string} abstract
-     * @param {mixed|undefined} concrete
+     * @param {Identifier} abstract
+     * @param {(Identifier|Function|undefined)} concrete
      * @returns {void}
      */
     singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void;
@@ -78,7 +78,7 @@ interface IContainer {
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @param {Function} closure
      * @returns {void}
      */
@@ -87,16 +87,16 @@ interface IContainer {
     /**
      * Register an existing instance as shared in the container.
      *
-     * @param {mixed} abstract
-     * @param {mixed} instance
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @param {*} instance
+     * @returns {*}
      */
     instance<U, V>(abstract: Identifier<U>, instance: V): V;
 
     /**
      * Define a contextual binding.
      *
-     * @param {Array|Instantiable} concrete
+     * @param {(Instantiable[]|Instantiable)} concrete
      * @returns {ContextualBindingBuilder}
      */
     when<T>(concrete: Instantiable<T>[] | Instantiable<T>): ContextualBindingBuilder;
@@ -104,7 +104,7 @@ interface IContainer {
     /**
      * Get a closure to resolve the given type from the container.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {Function}
      */
     factory<T>(abstract: Identifier<T>): Function;
@@ -112,9 +112,9 @@ interface IContainer {
     /**
      * Resolve the given type from the container.
      *
-     * @param {mixed} abstract
-     * @param {Array|Object} parameters
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @param {(*[]|Object)} parameters
+     * @returns {*}
      */
     make<T>(abstract: Identifier<T>, parameters: any[] | object): any;
 
@@ -122,16 +122,16 @@ interface IContainer {
      * Call the given Closure / class method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {Array|Object|undefined} parameters
-     * @param {string|undefined} defaultMethod
-     * @returns {unknown}
+     * @param {(*[]|Object|undefined)} parameters
+     * @param {(string|undefined)} defaultMethod
+     * @returns {*}
      */
     call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any;
 
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     resolved<T>(abstract: Identifier<T>): boolean;
@@ -139,8 +139,8 @@ interface IContainer {
     /**
      * Register a new resolving callback.
      *
-     * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {(Identifier|Function)} abstract
+     * @param {(Function|undefined)} callback
      * @returns {void}
      */
     resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;
@@ -148,8 +148,8 @@ interface IContainer {
     /**
      * Register a new after resolving callback.
      *
-     * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {(Identifier|Function)} abstract
+     * @param {(Function|undefined)} callback
      * @returns {void}
      */
     afterResolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;
@@ -157,19 +157,19 @@ interface IContainer {
     /**
      * Finds an entry of the container by its identifier and returns it.
      *
-     * @param {mixed} id
-     * @returns {mixed}
+     * @param {Identifier} id
+     * @returns {*}
      *
-     * @throws {@src/Container/EntryNotFoundError}
+     * @throws {EntryNotFoundError}
      */
     get<T>(id: Identifier<T>): any;
 
     /**
      * Set (bind) a new entry of the container by its identifier.
      *
-     * @param {mixed} id
-     * @param {mixed} value
-     * @returns {void}
+     * @param {Identifier} id
+     * @param {*} value
+     * @returns {*}
      */
     set<U, V>(id: Identifier<U>, value: V): void;
 
@@ -177,7 +177,7 @@ interface IContainer {
      * Returns true if the container can return an entry for the given
      * identifier. Returns false otherwise.
      *
-     * @param {mixed} id
+     * @param {Identifier} id
      * @returns {boolean}
      */
     has<T>(id: Identifier<T>): boolean;

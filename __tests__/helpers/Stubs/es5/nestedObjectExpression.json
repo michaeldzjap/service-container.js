@@ -1,0 +1,201 @@
+{
+  "type": "Program",
+  "sourceType": "script",
+  "body": [
+      {
+          "type": "ExpressionStatement",
+          "expression": {
+              "type": "AssignmentExpression",
+              "left": {
+                  "type": "Identifier",
+                  "name": "nestedObjectExpression"
+              },
+              "operator": "=",
+              "right": {
+                  "type": "FunctionExpression",
+                  "params": [
+                      {
+                          "type": "Identifier",
+                          "name": "obj"
+                      }
+                  ],
+                  "body": {
+                      "type": "BlockStatement",
+                      "body": [
+                          {
+                              "type": "IfStatement",
+                              "test": {
+                                  "type": "BinaryExpression",
+                                  "left": {
+                                      "type": "Identifier",
+                                      "name": "obj"
+                                  },
+                                  "right": {
+                                      "type": "UnaryExpression",
+                                      "operator": "void",
+                                      "argument": {
+                                          "type": "Literal",
+                                          "value": 0
+                                      },
+                                      "prefix": true
+                                  },
+                                  "operator": "==="
+                              },
+                              "consequent": {
+                                  "type": "BlockStatement",
+                                  "body": [
+                                      {
+                                          "type": "ExpressionStatement",
+                                          "expression": {
+                                              "type": "AssignmentExpression",
+                                              "left": {
+                                                  "type": "Identifier",
+                                                  "name": "obj"
+                                              },
+                                              "operator": "=",
+                                              "right": {
+                                                  "type": "ObjectExpression",
+                                                  "properties": [
+                                                      {
+                                                          "type": "Property",
+                                                          "key": {
+                                                              "type": "Identifier",
+                                                              "name": "a"
+                                                          },
+                                                          "value": {
+                                                              "type": "ObjectExpression",
+                                                              "properties": [
+                                                                  {
+                                                                      "type": "Property",
+                                                                      "key": {
+                                                                          "type": "Identifier",
+                                                                          "name": "b"
+                                                                      },
+                                                                      "value": {
+                                                                          "type": "ObjectExpression",
+                                                                          "properties": [
+                                                                              {
+                                                                                  "type": "Property",
+                                                                                  "key": {
+                                                                                      "type": "Identifier",
+                                                                                      "name": "c"
+                                                                                  },
+                                                                                  "value": {
+                                                                                      "type": "Literal",
+                                                                                      "value": 1
+                                                                                  },
+                                                                                  "kind": "init",
+                                                                                  "computed": false,
+                                                                                  "method": false,
+                                                                                  "shorthand": false
+                                                                              }
+                                                                          ]
+                                                                      },
+                                                                      "kind": "init",
+                                                                      "computed": false,
+                                                                      "method": false,
+                                                                      "shorthand": false
+                                                                  }
+                                                              ]
+                                                          },
+                                                          "kind": "init",
+                                                          "computed": false,
+                                                          "method": false,
+                                                          "shorthand": false
+                                                      },
+                                                      {
+                                                          "type": "Property",
+                                                          "key": {
+                                                              "type": "Identifier",
+                                                              "name": "d"
+                                                          },
+                                                          "value": {
+                                                              "type": "ObjectExpression",
+                                                              "properties": [
+                                                                  {
+                                                                      "type": "Property",
+                                                                      "key": {
+                                                                          "type": "Identifier",
+                                                                          "name": "e"
+                                                                      },
+                                                                      "value": {
+                                                                          "type": "ArrayExpression",
+                                                                          "elements": [
+                                                                              {
+                                                                                  "type": "Literal",
+                                                                                  "value": 1
+                                                                              },
+                                                                              {
+                                                                                  "type": "Literal",
+                                                                                  "value": 2
+                                                                              },
+                                                                              {
+                                                                                  "type": "Literal",
+                                                                                  "value": 3
+                                                                              }
+                                                                          ]
+                                                                      },
+                                                                      "kind": "init",
+                                                                      "computed": false,
+                                                                      "method": false,
+                                                                      "shorthand": false
+                                                                  }
+                                                              ]
+                                                          },
+                                                          "kind": "init",
+                                                          "computed": false,
+                                                          "method": false,
+                                                          "shorthand": false
+                                                      },
+                                                      {
+                                                          "type": "Property",
+                                                          "key": {
+                                                              "type": "Identifier",
+                                                              "name": "f"
+                                                          },
+                                                          "value": {
+                                                              "type": "ArrayExpression",
+                                                              "elements": [
+                                                                  {
+                                                                      "type": "ArrayExpression",
+                                                                      "elements": [
+                                                                          {
+                                                                              "type": "Literal",
+                                                                              "value": 1
+                                                                          },
+                                                                          {
+                                                                              "type": "Literal",
+                                                                              "value": 2
+                                                                          },
+                                                                          {
+                                                                              "type": "Literal",
+                                                                              "value": 3
+                                                                          }
+                                                                      ]
+                                                                  }
+                                                              ]
+                                                          },
+                                                          "kind": "init",
+                                                          "computed": false,
+                                                          "method": false,
+                                                          "shorthand": false
+                                                      }
+                                                  ]
+                                              }
+                                          }
+                                      }
+                                  ]
+                              },
+                              "alternate": null
+                          }
+                      ]
+                  },
+                  "async": false,
+                  "generator": false,
+                  "expression": false,
+                  "id": null
+              }
+          }
+      }
+  ]
+}

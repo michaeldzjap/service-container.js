@@ -6,18 +6,21 @@ import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
 import IContainer from '../Contracts/Container/IContainer';
 import LogicError from './LogicError';
-import NestedMap from '../Support/NestedMap';
+import NestedMap from '../Support/NestedMap/.';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {Binding, Identifier, Instantiable} from '../Support/types';
-import {isClass, isString, isNullOrUndefined} from '../Support/helpers';
+import {
+    isClass, isString, isNullOrUndefined, getSymbolName, isInstance,
+    isInstantiable
+} from '../Support/helpers';
 
 class Container implements IContainer {
 
     /**
      * The current globally available container (if any).
      *
-     * @var Container
+     * @var {Container}
      */
     protected static _instance?: Container;
 
@@ -26,7 +29,7 @@ class Container implements IContainer {
      *
      * @var {Map}
      */
-    public _contextual: NestedMap<any, Map<any, any>> = new NestedMap;
+    public _contextual: any = new NestedMap;
 
     /**
      * An array of the types that have been resolved.
@@ -87,14 +90,14 @@ class Container implements IContainer {
     /**
      * The stack of concretions currently being built.
      *
-     * @var {Array}
+     * @var {*[]}
      */
     protected _buildStack: any[] = [];
 
     /**
      * The parameter override stack.
      *
-     * @var {Array}
+     * @var {(*|Object)[]}
      */
     protected _with: Array<any[] | object> = [];
 
@@ -108,14 +111,14 @@ class Container implements IContainer {
     /**
      * All of the global resolving callbacks.
      *
-     * @var {Array}
+     * @var {Function[]}
      */
     protected _globalResolvingCallbacks: Function[] = [];
 
     /**
      * All of the global after resolving callbacks.
      *
-     * @var {Array}
+     * @var {Function[]}
      */
     protected _globalAfterResolvingCallbacks: Function[] = [];
 
@@ -149,17 +152,39 @@ class Container implements IContainer {
     /**
      * Set the shared instance of the container.
      *
-     * @param {Container|undefined} container
-     * @returns {Container}
+     * @param {(Container|undefined)} container
+     * @returns {(Container|undefined)}
      */
     public static setInstance(container?: Container): Container | undefined {
         return (Container._instance = container);
     }
 
     /**
+     * Format the name of the given concrete.
+     *
+     * @param {*} concrete
+     * @returns {string}
+     */
+    private static _formatName<T>(concrete: T): string {
+        if (typeof concrete === 'symbol') {
+            return getSymbolName(concrete);
+        }
+
+        if (isInstantiable(concrete)) {
+            return concrete.name;
+        }
+
+        if (isInstance(concrete)) {
+            return concrete.constructor.name;
+        }
+
+        return 'undefined';
+    }
+
+    /**
      * Define a contextual binding.
      *
-     * @param {mixed} concrete
+     * @param {(Instantiable[]|Instantiable)} concrete
      * @returns {ContextualBindingBuilder}
      */
     public when<T>(concrete: Instantiable<T>[] | Instantiable<T>): ContextualBindingBuilder {
@@ -175,7 +200,7 @@ class Container implements IContainer {
     /**
      * Determine if the given abstract type has been bound.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     public bound<T>(abstract: Identifier<T>): boolean {
@@ -187,7 +212,7 @@ class Container implements IContainer {
      * Returns true if the container can return an entry for the given
      * identifier. Returns false otherwise.
      *
-     * @param {mixed} id
+     * @param {Identifier} id
      * @returns {boolean}
      */
     public has<T>(id: Identifier<T>): boolean {
@@ -197,7 +222,7 @@ class Container implements IContainer {
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     public resolved<T>(abstract: Identifier<T>): boolean {
@@ -211,7 +236,7 @@ class Container implements IContainer {
     /**
      * Determine if a given type is shared.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     public isShared<T>(abstract: Identifier<T>): boolean {
@@ -223,7 +248,7 @@ class Container implements IContainer {
     /**
      * Determine if a given string is an alias.
      *
-     * @param {mixed} name
+     * @param {Identifier} name
      * @returns {boolean}
      */
     public isAlias<T>(name: Identifier<T>): boolean {
@@ -234,8 +259,8 @@ class Container implements IContainer {
      * Register a binding with the container.
      *
      * @param {Identifier} abstract
-     * @param {Identifier|Function|undefined} concrete
-     * @param {boolean} shared
+     * @param {(Identifier|Function|undefined)} concrete
+     * @param {boolean} [shared=false]
      * @returns {void}
      */
     public bind<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function,
@@ -292,7 +317,7 @@ class Container implements IContainer {
     /**
      * Bind a callback to resolve with Container::call.
      *
-     * @param {Array|string} method
+     * @param {(Array|string)} method
      * @param {Function} callback
      * @returns {void}
      */
@@ -304,8 +329,8 @@ class Container implements IContainer {
      * Get the method binding for the given method.
      *
      * @param {string} method
-     * @param {mixed} instance
-     * @returns {mixed}
+     * @param {*} instance
+     * @returns {*}
      */
     public callMethodBinding(method: string, instance: any): any {
         return (this._methodBindings as any).get(method)(instance, this);
@@ -314,9 +339,9 @@ class Container implements IContainer {
     /**
      * Add a contextual binding to the container.
      *
-     * @param {mixed} concrete
+     * @param {*} concrete
      * @param {Identifier} abstract
-     * @param {mixed} implementation
+     * @param {*} implementation
      * @returns {void}
      */
     public addContextualBinding<T>(concrete: any, abstract: Identifier<T>,
@@ -330,9 +355,9 @@ class Container implements IContainer {
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
-     * @param {boolean} shared
+     * @param {Identifier} abstract
+     * @param {(Identifier|Function|undefined)} concrete
+     * @param {boolean} [shared=false]
      * @returns {void}
      */
     public bindIf<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function,
@@ -345,8 +370,8 @@ class Container implements IContainer {
     /**
      * Register a shared binding in the container.
      *
-     * @param {mixed} abstract
-     * @param {mixed|undefined} concrete
+     * @param {Identifier} abstract
+     * @param {(Identifier|Function|undefined)} concrete
      * @returns {void}
      */
     public singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void {
@@ -356,7 +381,7 @@ class Container implements IContainer {
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @param {Function} closure
      * @returns {void}
      */
@@ -386,9 +411,9 @@ class Container implements IContainer {
     /**
      * Register an existing instance as shared in the container.
      *
-     * @param {mixed} abstract
-     * @param {mixed} instance
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @param {*} instance
+     * @returns {*}
      */
     public instance<U, V>(abstract: Identifier<U>, instance: V): V {
         this._removeAbstractAlias<U>(abstract);
@@ -413,8 +438,8 @@ class Container implements IContainer {
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param {Array|Identifier} abstracts
-     * @param {Array} tags
+     * @param {(Identifier[]|Identifier)} abstracts
+     * @param {string[]} tags
      * @returns {void}
      */
     public tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void {
@@ -433,7 +458,7 @@ class Container implements IContainer {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {Array}
+     * @returns {*[]}
      */
     public tagged(tag: string): any[] {
         const results: any[] = [];
@@ -450,8 +475,8 @@ class Container implements IContainer {
     /**
      * Alias a type to a different name.
      *
-     * @param {mixed} abstract
-     * @param {mixed} alias
+     * @param {Identifier} abstract
+     * @param {Identifier} alias
      * @returns {void}
      */
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
@@ -467,9 +492,9 @@ class Container implements IContainer {
     /**
      * Bind a new callback to an abstract's rebind event.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @param {Function} callback
-     * @returns {mixed|undefined}
+     * @returns {(*|undefined)}
      */
     public rebinding<T>(abstract: Identifier<T>, callback: Function): unknown | undefined {
         abstract = this.getAlias<T>(abstract);
@@ -488,10 +513,10 @@ class Container implements IContainer {
     /**
      * Refresh an instance on the given target and method.
      *
-     * @param {mixed} abstract
-     * @param {mixed} target
+     * @param {Identifier} abstract
+     * @param {Object} target
      * @param {string} method
-     * @returns {mixed}
+     * @returns {*}
      */
     public refresh<T>(abstract: Identifier<T>, target: object, method: string): unknown {
         return this.rebinding<T>(abstract, (app: unknown, instance: unknown): void => {
@@ -504,7 +529,7 @@ class Container implements IContainer {
      * executed.
      *
      * @param {Callable} callback
-     * @param {Object|Array|undefined} parameters
+     * @param {(*[]|Object)} parameters
      * @returns {Function}
      */
     public wrap<T>(callback: Callable<T>, parameters?: any[] | object): Function {
@@ -515,9 +540,9 @@ class Container implements IContainer {
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {Object|Array|undefined} parameters
-     * @param {string|undefined} defaultMethod
-     * @returns {mixed}
+     * @param {(*[]|Object|undefined)} parameters
+     * @param {(string|undefined)} defaultMethod
+     * @returns {*}
      */
     public call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any {
         return BoundMethod.call<T>(this, callback, parameters, defaultMethod);
@@ -526,7 +551,7 @@ class Container implements IContainer {
     /**
      * Get a closure to resolve the given type from the container.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {Function}
      */
     public factory<T>(abstract: Identifier<T>): Function {
@@ -536,9 +561,9 @@ class Container implements IContainer {
     /**
      * Resolve the given type from the container.
      *
-     * @param {mixed} abstract
-     * @param {Array|Object} parameters
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @param {(*[]|Object)} [parameters=[]]
+     * @returns {*}
      */
     public make<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
         return this._resolve<T>(abstract, parameters);
@@ -547,10 +572,10 @@ class Container implements IContainer {
     /**
      * Finds an entry of the container by its identifier and returns it.
      *
-     * @param {mixed} id
-     * @returns {mixed}
+     * @param {Identifier} id
+     * @returns {*}
      *
-     * @throws {@src/Container/EntryNotFoundError}
+     * @throws {EntryNotFoundError}
      */
     public get<T>(id: Identifier<T>): any {
         try {
@@ -565,8 +590,8 @@ class Container implements IContainer {
     /**
      * Set (bind) a new entry of the container by its identifier.
      *
-     * @param {mixed} id
-     * @param {mixed} value
+     * @param {Identifier} id
+     * @param {*} value
      * @returns {void}
      */
     public set<U, V>(id: Identifier<U>, value: V): void {
@@ -581,8 +606,8 @@ class Container implements IContainer {
     /**
      * Instantiate a concrete instance of the given type.
      *
-     * @param {mixed} concrete
-     * @returns {Object}
+     * @param {(Identifier|Function)} concrete
+     * @returns {*}
      */
     public build<T>(concrete: Instantiable<T> | Function): any {
         // If the concrete type is actually a Closure, we will just execute it
@@ -633,8 +658,8 @@ class Container implements IContainer {
     /**
      * Register a new resolving callback.
      *
-     * @param {mixed} abstract
-     * @param {Function|undefined} callback
+     * @param {(Identifier|Function)} abstract
+     * @param {(Function|undefined)} callback
      * @returns {void}
      */
     public resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void {
@@ -657,7 +682,7 @@ class Container implements IContainer {
     /**
      * Register a new after resolving callback for all types.
      *
-     * @param {mixed} abstract
+     * @param {(Identifier|Function)} abstract
      * @param {Function} callback
      * @returns {void}
      */
@@ -690,8 +715,8 @@ class Container implements IContainer {
     /**
      * Get the alias for an abstract if available.
      *
-     * @param {mixed} abstract
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @returns {Identifier}
      *
      * @throws {LogicError}
      */
@@ -752,8 +777,8 @@ class Container implements IContainer {
     /**
      * Get the Closure to be used when building a type.
      *
-     * @param {mixed} abstract
-     * @param {mixed} concrete
+     * @param {Identifier} abstract
+     * @param {Identifier} concrete
      * @returns {Function}
      */
     protected _getClosure<U, V>(abstract: Identifier<U>, concrete: Identifier<V>): Function {
@@ -769,7 +794,7 @@ class Container implements IContainer {
     /**
      * Get the method to be bound in class@method format.
      *
-     * @param {Array|string} method
+     * @param {(Array|string)} method
      * @returns {string}
      */
     protected _parseBindMethod<T>(method: [T, string] | string): string {
@@ -783,7 +808,7 @@ class Container implements IContainer {
     /**
      * Remove an alias from the contextual binding alias cache.
      *
-     * @param {mixed} searched
+     * @param {Identifier} searched
      * @returns {void}
      */
     protected _removeAbstractAlias<T>(searched: Identifier<T>): void {
@@ -800,7 +825,7 @@ class Container implements IContainer {
     /**
      * Fire the "rebound" callbacks for the given abstract type.
      *
-     * @param {mixed} abstract
+     * @param {Identifier} abstract
      * @returns {void}
      */
     protected _rebound<T>(abstract: Identifier<T>): void {
@@ -814,8 +839,8 @@ class Container implements IContainer {
     /**
      * Get the rebound callbacks for a given type.
      *
-     * @param {mixed} abstract
-     * @returns {Array}
+     * @param {Identifier} abstract
+     * @returns {Function[]}
      */
     protected _getReboundCallbacks<T>(abstract: Identifier<T>): Function[] {
         if (this._reboundCallbacks.has(abstract)) {
@@ -828,9 +853,9 @@ class Container implements IContainer {
     /**
      * Resolve the given type from the container.
      *
-     * @param {mixed} abstract
-     * @param {Map} parameters
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @param {(*[]|Object)} [parameters=[]]
+     * @returns {*}
      */
     protected _resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
         abstract = this.getAlias<T>(abstract);
@@ -890,8 +915,8 @@ class Container implements IContainer {
     /**
      * Get the concrete type for a given abstract.
      *
-     * @param {mixed} abstract
-     * @returns {mixed} concrete
+     * @param {Identifier} abstract
+     * @returns {*}
      */
     protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
         const concrete = this._getContextualConcrete<T>(abstract);
@@ -913,8 +938,8 @@ class Container implements IContainer {
     /**
      * Get the contextual concrete binding for the given abstract.
      *
-     * @param {mixed} abstract
-     * @returns {mixed}
+     * @param {Identifier} abstract
+     * @returns {*}
      */
     protected _getContextualConcrete<T>(abstract: Identifier<T>): any {
         const binding = this._findInContextualBindings(abstract);
@@ -944,8 +969,8 @@ class Container implements IContainer {
      * Find the concrete binding for the given abstract in the contextual
      * binding array.
      *
-     * @param {Function|string} abstract
-     * @returns {mixed|undefined}
+     * @param {Identifier} abstract
+     * @returns {*}
      */
     protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
         if (this._contextual.has([Arr.last(this._buildStack), abstract])) {
@@ -956,8 +981,8 @@ class Container implements IContainer {
     /**
      * Determine if the given concrete is buildable.
      *
-     * @param {mixed} concrete
-     * @param {mixed} abstract
+     * @param {(Identifier|*)} concrete
+     * @param {Identifier} abstract
      * @returns {boolean}
      */
     protected _isBuildable<U, V>(concrete: Identifier<U> | U, abstract: Identifier<V>): boolean {
@@ -968,8 +993,8 @@ class Container implements IContainer {
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param {Array} dependencies
-     * @returns {Array}
+     * @param {ReflectionParameter[]} dependencies
+     * @returns {*[]}
      */
     protected _resolveDependencies(dependencies: ReflectionParameter[]): any[] {
         const results = [];
@@ -1016,7 +1041,7 @@ class Container implements IContainer {
      * Get a parameter override for a dependency.
      *
      * @param {ReflectionParameter} dependency
-     * @returns {mixed}
+     * @returns {*}
      */
     protected _getParameterOverride(dependency: ReflectionParameter): any {
         return this._getLastParameterOverride()[dependency.getName()];
@@ -1025,7 +1050,7 @@ class Container implements IContainer {
     /**
      * Get the last parameter override.
      *
-     * @returns {Array|Object}
+     * @returns {(*[]|Object)}
      */
     protected _getLastParameterOverride(): any[] | object {
         return this._with.length ? Arr.last(this._with) : [];
@@ -1035,7 +1060,7 @@ class Container implements IContainer {
      * Resolve a non-class hinted primitive dependency.
      *
      * @param {ReflectionParameter} parameter
-     * @returns {mixed|undefined}
+     * @returns {(*|undefined)}
      */
     protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
         const concrete = this._getContextualConcrete(parameter.getName());
@@ -1056,7 +1081,7 @@ class Container implements IContainer {
      * Resolve a class based dependency from the container.
      *
      * @param {ReflectionParameter} parameter
-     * @returns {mixed}
+     * @returns {*}
      *
      * @throws {BindingResolutionError}
      */
@@ -1087,13 +1112,13 @@ class Container implements IContainer {
     /**
      * Throw an exception that the concrete is not instantiable.
      *
-     * @param {string} concrete
+     * @param {*} concrete
      * @returns {void}
      *
-     * @throws {@src/Container/BindingResolutionError}
+     * @throws {BindingResolutionError}
      */
     protected _notInstantiable<T>(concrete: T): void {
-        let message = `Target [${typeof concrete === 'symbol' ? concrete.toString() : (concrete as any).name}] is not instantiable`;
+        let message = `Target [${Container._formatName(concrete)}] is not instantiable`;
 
         if (this._buildStack.length) {
             const previous = this._buildStack
@@ -1118,8 +1143,7 @@ class Container implements IContainer {
      */
     protected _unresolvablePrimitive(parameter: ReflectionParameter): void {
         const message = `
-            Unresolvable dependency resolving [${parameter.getName()}] in class
-            ${(parameter.getDeclaringClass() as any).getName()}
+            Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}
         `;
 
         throw new BindingResolutionError(message);
@@ -1128,8 +1152,8 @@ class Container implements IContainer {
     /**
      * Fire all of the resolving callbacks.
      *
-     * @param {mixed} abstract
-     * @param {mixed} object
+     * @param {Identifier} abstract
+     * @param {Object} object
      * @returns {void}
      */
     protected _fireResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
@@ -1146,8 +1170,8 @@ class Container implements IContainer {
     /**
      * Fire all of the after resolving callbacks.
      *
-     * @param {mixed} abstract
-     * @param {mixed} object
+     * @param {Identifier} abstract
+     * @param {Object} object
      * @returns {void}
      */
     protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
@@ -1162,10 +1186,10 @@ class Container implements IContainer {
     /**
      * Get all callbacks for a given type.
      *
-     * @param {mixed} abstract
-     * @param {mixed} object
+     * @param {Identifier} abstract
+     * @param {Object} object
      * @param {Map} callbacksPerType
-     * @returns {Array}
+     * @returns {Function[]}
      */
     protected _getCallbacksForType<T>(abstract: Identifier<T>, object: object,
         callbacksPerType: Map<string, Function[]>): Function[] {
@@ -1183,8 +1207,8 @@ class Container implements IContainer {
     /**
      * Fire an array of callbacks with an object.
      *
-     * @param {mixed} object
-     * @param {Array} callbacks
+     * @param {Object} object
+     * @param {Function[]} callbacks
      * @returns {void}
      */
     protected _fireCallbackArray(object: object, callbacks: Function[]): void {
@@ -1196,8 +1220,8 @@ class Container implements IContainer {
     /**
      * Get the extender callbacks for a given type.
      *
-     * @param {mixed} abstract
-     * @returns {Array}
+     * @param {Identifier} abstract
+     * @returns {Function[]}
      */
     protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
         abstract = this.getAlias<T>(abstract);

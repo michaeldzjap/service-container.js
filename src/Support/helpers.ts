@@ -4,7 +4,7 @@ import {Instantiable, Instance} from './types';
 /**
  * Determine if the given value is undefined.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isUndefined = (value: unknown): value is undefined => (
@@ -14,7 +14,7 @@ export const isUndefined = (value: unknown): value is undefined => (
 /**
  * Determine if the given value is null.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isNull = (value: unknown): value is null => value === null;
@@ -22,7 +22,7 @@ export const isNull = (value: unknown): value is null => value === null;
 /**
  * Determine if the given value is null or undefined.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isNullOrUndefined = (value: unknown): value is null | undefined => (
@@ -32,7 +32,7 @@ export const isNullOrUndefined = (value: unknown): value is null | undefined => 
 /**
  * Determine if the given value is an object.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isObject = (value: any): value is object => (
@@ -42,7 +42,7 @@ export const isObject = (value: any): value is object => (
 /**
  * Determine if the given value is a string.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isString = (value: any): value is string => (
@@ -52,7 +52,7 @@ export const isString = (value: any): value is string => (
 /**
  * Determine if the given value is a map.
  *
- * @param {mixed} value
+ * @param {*} value
  * @returns {boolean}
  */
 export const isMap = (value: any): value is Map<unknown, unknown> => (
@@ -67,7 +67,7 @@ export const isMap = (value: any): value is Map<unknown, unknown> => (
  * "ordinary" function. This is not completely fail safe, but in light of this
  * project is considered an acceptable compromise.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
 export const isClass = (target: any): target is Function => {
@@ -83,7 +83,7 @@ export const isClass = (target: any): target is Function => {
 /**
  * Determine if the given target is a symbol.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
 export const isSymbol = (target: any): target is Symbol => (
@@ -93,27 +93,27 @@ export const isSymbol = (target: any): target is Symbol => (
 /**
  * Determine if the given target has a prototype.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
-export const hasPrototype = (target: any): boolean => (
+export const hasPrototype = (target: object | Function): target is Function => (
     target.hasOwnProperty('prototype')
 );
 
 /**
  * Determine if the given target has a constructor.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
-export const hasConstructor = (target: any): boolean => (
+export const hasConstructor = (target: object | Function): target is object => (
     target.hasOwnProperty('constructor')
 );
 
 /**
  * Determine if the given target is instantiable.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
 export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
@@ -123,7 +123,7 @@ export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
 /**
  * Determine if the given target is an instance.
  *
- * @param {mixed} target
+ * @param {*} target
  * @returns {boolean}
  */
 export const isInstance = <T>(target: any): target is Instance<T> => (
@@ -131,10 +131,38 @@ export const isInstance = <T>(target: any): target is Instance<T> => (
 );
 
 /**
+ * Attempt to get the name of an object or function.
+ *
+ * @param {(Object|Function)} target
+ * @returns {(string|undefined)}
+ */
+export const getName = (target: object | Function): string | undefined => {
+    if (hasPrototype(target)) return target.name;
+
+    return target.constructor.name;
+};
+
+/**
+ * Strip off the "Symbol()" part of a stringified symbol.
+ *
+ * @param {symbol} target
+ * @returns {string}
+ */
+export const getSymbolName = (target: symbol): string => {
+    const result = /Symbol\(([^)]+)\)/.exec(target.toString());
+
+    if (isNullOrUndefined(result)) {
+        throw new Error('Could not determine interface name.');
+    }
+
+    return result[1];
+};
+
+/**
  * Return the default value of the given value.
  *
- * @param {mixed} value
- * @returns {mixed}
+ * @param {*} value
+ * @returns {*}
  */
 export const value = (value: unknown): unknown => (
     value instanceof Function ? value() : value
@@ -143,12 +171,12 @@ export const value = (value: unknown): unknown => (
 /**
  * Get an item from an array or object using "dot" notation.
  *
- * @param {mixed} target
- * @param {string|Array|null} key
- * @param {mixed} dflt
- * @returns {mixed}
+ * @param {*} target
+ * @param {?(string[]|string)} key
+ * @param {*} dflt
+ * @returns {*}
  */
-export const dataGet = (target: any, key: string | string[] | null, dflt?: unknown): any => {
+export const dataGet = (target: any, key: string[] | string | null, dflt?: unknown): any => {
     if (isNullOrUndefined(key)) return target;
 
     key = Array.isArray(key) ? [...key] : key!.split('.');

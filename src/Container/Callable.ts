@@ -6,14 +6,14 @@ class Callable<T> {
     /**
      * The class definition or instance to target.
      *
-     * @var {Instantiable|Instance}
+     * @var {(Instantiable|Instance)}
      */
     private _target: Instantiable<T> | Instance<T>;
 
     /**
      * The name of the method that is to be called on the class / instance.
      *
-     * @var {string|undefined}
+     * @var {(string|undefined)}
      */
     private _method?: string;
 
@@ -27,9 +27,9 @@ class Callable<T> {
     /**
      * Create a new callable instance.
      *
-     * @param {Instantiable|Instance} target
-     * @param {string|undefined} method
-     * @param {boolean} isStatic
+     * @param {(Instantiable|Instance)} target
+     * @param {(string|undefined)} method
+     * @param {boolean} [isStatic=false]
      */
     public constructor(target: Instantiable<T> | Instance<T>, method?: string, isStatic: boolean = false) {
         this._target = target;
@@ -40,7 +40,7 @@ class Callable<T> {
     /**
      * Get the class definition or instance.
      *
-     * @returns {Instantiable|Instance}
+     * @returns {(Instantiable|Instance)}
      */
     public get target(): Instantiable<T> | Instance<T> {
         return this._target;
@@ -49,7 +49,7 @@ class Callable<T> {
     /**
      * Get the method name.
      *
-     * @returns {string}
+     * @returns {(string|undefined)}
      */
     public get method(): string | undefined {
         return this._method;
@@ -77,8 +77,8 @@ class Callable<T> {
      * Call the specified method on the specified target with the given array of
      * arguments.
      *
-     * @param {Array} args
-     * @returns {mixed}
+     * @param {*[]} args
+     * @returns {*}
      */
     public call(args: any[]): any {
         if (!this._method) {

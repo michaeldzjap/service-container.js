@@ -1,0 +1,18 @@
+{
+      "type": "Program",
+      "sourceType": "script",
+      "body": [
+          {
+              "type": "ClassDeclaration",
+              "id": {
+                  "type": "Identifier",
+                  "name": "ClassWithoutBodyStub"
+              },
+              "superClass": null,
+              "body": {
+                  "type": "ClassBody",
+                  "body": []
+              }
+          }
+      ]
+  }

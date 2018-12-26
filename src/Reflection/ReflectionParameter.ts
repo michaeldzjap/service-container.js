@@ -1,28 +1,28 @@
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionType from './ReflectionType';
-import {isNullOrUndefined, isClass} from '../Support/helpers';
+import {isUndefined, isClass} from '../Support/helpers';
 
 class ReflectionParameter {
 
     /**
      * The target the parameter belongs to.
      *
-     * @var mixed
+     * @var {*}
      */
     private _target: any;
 
     /**
      * The type of the reflected parameter.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _descriptor: ParameterDescriptor;
 
     /**
      * Create a new reflection parameter instance.
      *
-     * @param {mixed} target
+     * @param {*} target
      * @param {ParameterDescriptor} descriptor
      * @param {number} position
      */
@@ -34,7 +34,7 @@ class ReflectionParameter {
     /**
      * Get the class definition for the reflected parameter (if it exists).
      *
-     * @returns {ReflectionClass|undefined}
+     * @returns {(ReflectionClass|undefined)}
      */
     public getDeclaringClass(): ReflectionClass | undefined {
         if (isClass(this._target)) {
@@ -45,7 +45,7 @@ class ReflectionParameter {
     /**
      * Get the class type hinted for the reflected parameter.
      *
-     * @returns {ReflectionClass|undefined}
+     * @returns {(ReflectionClass|undefined)}
      */
     public getClass(): ReflectionClass | undefined {
         if (this.getType().isBuiltin()) return;
@@ -69,7 +69,7 @@ class ReflectionParameter {
     /**
      * Get the type of the reflected parameter.
      *
-     * @returns {mixed}
+     * @returns {ReflectionType}
      */
     public getType(): ReflectionType {
         return new ReflectionType(this._descriptor.type);
@@ -90,13 +90,13 @@ class ReflectionParameter {
      * @returns {boolean}
      */
     public isDefaultValueAvailable(): boolean {
-        return !isNullOrUndefined(this._descriptor.value);
+        return !isUndefined(this._descriptor.value);
     }
 
     /**
      * Get the default value of the reflected parameter.
      *
-     * @returns {mixed}
+     * @returns {*}
      */
     public getDefaultValue(): unknown {
         return this._descriptor.value;

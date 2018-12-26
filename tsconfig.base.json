@@ -3,11 +3,12 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "moduleResolution": "node",
-        "target": "es6",
-        "module": "es6",
+        "target": "es5",
+        "module": "esnext",
         "lib": ["es5", "es6", "es7", "dom"],
         "strict": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "resolveJsonModule": true
     },
     "include": [
         "src/**/*"

@@ -1,6 +1,6 @@
 import ReflectionError from './ReflectionError';
 import ReflectionMethod from './ReflectionMethod';
-import {isSymbol, isString, isNullOrUndefined} from '../Support/helpers';
+import {isSymbol, isString, isNullOrUndefined, getSymbolName} from '../Support/helpers';
 import {Interface} from '../Support/types';
 
 class ReflectionClass {
@@ -8,7 +8,7 @@ class ReflectionClass {
     /**
      * The class that should be reflected.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _target: any;
 
@@ -22,7 +22,7 @@ class ReflectionClass {
     /**
      * Create a new reflection class instance.
      *
-     * @param {mixed} target
+     * @param {*} target
      */
     public constructor(target: any) {
         this._target = target;
@@ -45,7 +45,7 @@ class ReflectionClass {
     /**
      * Get the target of the reflected class.
      *
-     * @returns {mixed}
+     * @returns {*}
      */
     public getTarget(): any {
         return this._target;
@@ -58,13 +58,7 @@ class ReflectionClass {
      */
     public getName(): string {
         if (this._isInterface && isSymbol(this._target.key)) {
-            const result = /Symbol\(([^)]+)\)/.exec(this._target.key.toString());
-
-            if (isNullOrUndefined(result)) {
-                throw new ReflectionError('Could not determine interface name.');
-            }
-
-            return result[1];
+            return getSymbolName(this._target.key);
         }
 
         if (this._isInterface && isString(this._target.key)) {
@@ -103,7 +97,7 @@ class ReflectionClass {
      *
      * @returns {ReflectionMethod}
      *
-     * @throws {Error}
+     * @throws {ReflectionError}
      */
     public getConstructor(): ReflectionMethod {
         if (this.isInterface()) {
@@ -116,8 +110,8 @@ class ReflectionClass {
     /**
      * Create a new instance of the reflected class from the given arguments.
      *
-     * @param {Array} dependencies
-     * @returns {mixed}
+     * @param {*[]} dependencies
+     * @returns {*}
      */
     public newInstanceArgs(dependencies: any[]): any {
         return new this._target(...dependencies);

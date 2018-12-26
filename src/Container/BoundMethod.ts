@@ -12,9 +12,9 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} callback
-     * @param {Array|Object|undefined} parameters
-     * @param {string|undefined} defaultMethod
-     * @returns {mixed}
+     * @param {(*[]|Object|undefined)} parameters
+     * @param {(string|undefined)} defaultMethod
+     * @returns {*}
      */
     public static call<T>(container: Container, callback: Callable<T>,
         parameters?: any[] | object, defaultMethod?: string): any {
@@ -36,9 +36,9 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} target
-     * @param {Array|Object|undefined} parameters
-     * @param {string|undefined} defaultMethod
-     * @returns {mixed}
+     * @param {(*[]|Object|undefined)} parameters
+     * @param {(string|undefined)} defaultMethod
+     * @returns {*}
      *
      * @throws {Error}
      */
@@ -69,7 +69,7 @@ class BoundMethod {
      * @param {Container} container
      * @param {Callable} callback
      * @param {Function} dflt
-     * @returns {mixed}
+     * @returns {*}
      */
     protected static _callBoundMethod<T>(container: Container, callback: Callable<T>, dflt: Function): unknown {
         // Here we need to turn the array callable into a Class@method string we
@@ -104,8 +104,8 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} callback
-     * @param {Array|Object} parameters
-     * @returns {Object}
+     * @param {(*[]|Object)} parameters
+     * @returns {*[]}
      */
     protected static _getMethodDependencies<T>(container: Container, callback: Callable<T>,
         parameters: any[] | object = {}): Array<any> {
@@ -191,7 +191,7 @@ class BoundMethod {
      * Determine if the given callback is a reference to a non-static method of
      * a class definition or an instance.
      *
-     * @param {mixed} callback
+     * @param {Callable} callback
      * @returns {boolean}
      */
     private static _isCallable<T>(callback: Callable<T>): boolean {

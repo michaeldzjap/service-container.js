@@ -3,14 +3,14 @@ class ReflectionType {
     /**
      * The reflected type.
      *
-     * @var {mixed}
+     * @var {*}
      */
     private _type: any;
 
     /**
      * Create a new reflection type instance.
      *
-     * @param {mixed} type
+     * @param {*} type
      */
     public constructor(type: any) {
         this._type = type;
@@ -19,7 +19,7 @@ class ReflectionType {
     /**
      * Return the relevant global object.
      *
-     * @returns {mixed}
+     * @returns {*}
      *
      * @throws {ReferenceError}
      */
