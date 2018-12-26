@@ -17,7 +17,7 @@ Documentation for this project is rather minimal at this point. However, the rel
 Below are some important things to take into account when trying out this project for yourself.
 
 ### Environment requirements
-This project currently only works in environments targeting _ES6_ or higher. Part of its internal dependency resolution mechanism relies on the `class` construct being available at runtime, which is not available in _ES5_ or lower. It should work both in the browser as well as _node_ environments.
+This project should work in both browser and _node_ environments targeting _ES5_ or higher.
 
 ### Binding to an interface
 Since _TypeScript_ interfaces are compiled away and do not exist anymore at runtime, an alternative approach was needed to facilitate binding a certain implementation to a given interface / contract. The approach taken is largely borrowed from [Aurelia](https://aurelia.io), as this was found to be a quite elegant and minimally invasive workaround. See the test suite and examples for more details.
@@ -31,8 +31,12 @@ This is a little bit tricky, because in _JavaScript_ there really is no differen
 ## Short questions & answers
 - Is this project _ES5_ compatible?
 
-No, it isn't. It relies on the _ES6_ `class` construct being available at runtime. No plans to change this at the moment.
+Yes. Both _ESNext_ as well as _ES5_ are supported.
 
 - Can you bind an implementation to an interface?
 
 Yes, this is possible, albeit using a slight workaround (see the examples).
+
+- Do I have to use _TypeScript_?
+
+Yes, at the moment this project only works with _TypeScript_.
