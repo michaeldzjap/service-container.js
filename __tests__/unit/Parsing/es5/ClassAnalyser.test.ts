@@ -36,7 +36,7 @@ describe('ClassAnalyser', (): void => {
         {ast: ES5ClassWithoutBodyStub.body[0], target: ClassWithoutBodyStub, expected: false},
     ].forEach(({ast, target, expected}): void => {
         it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
-            const analyser = new ES5ClassAnalyser(ast, target);
+            const analyser = new ES5ClassAnalyser(ast);
             const result = analyser.hasConstructor();
 
             expect(result).toBe(expected);

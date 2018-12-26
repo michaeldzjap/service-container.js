@@ -34,10 +34,10 @@ describe('ClassAnalyser', (): void => {
         {ast: ESNextClassWithConstructorStub.body[0], target: ClassWithConstructorStub, expected: true},
         {ast: ESNextClassWithoutConstructorStub.body[0], target: ClassWithoutConstructorStub, expected: false},
         {ast: ESNextClassWithoutBodyStub.body[0], target: ClassWithoutBodyStub, expected: false},
-    ].forEach(({ast, target, expected}): void => {
+    ].forEach(({ast, expected}): void => {
         it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
             const analyser = new ESNextClassAnalyser(ast);
-            const result = analyser.hasConstructor(target);
+            const result = analyser.hasConstructor();
 
             expect(result).toBe(expected);
         });

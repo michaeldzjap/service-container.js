@@ -50,7 +50,8 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * @returns {boolean}
      */
     public hasConstructor(): boolean {
-        return !!this._constructorAnalyser;
+        return !!this._ast.body.body.length
+            && this._ast.body.body[0].kind === 'constructor';
     }
 
     /**

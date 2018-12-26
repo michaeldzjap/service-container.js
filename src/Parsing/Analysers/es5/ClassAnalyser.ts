@@ -50,7 +50,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * @returns {boolean}
      */
     public hasConstructor(): boolean {
-        return this._ast.params.length && this._ast.body.body.length;
+        return !!this._ast.params.length && !!this._ast.body.body.length;
     }
 
     /**
