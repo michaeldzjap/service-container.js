@@ -27,7 +27,7 @@ defineMetadata([
     {target: ClassWithConstructorStub},
     {target: ClassWithPublicMethodStub.prototype, propertyKey: 'someMethod'},
     {target: ClassWithPublicStaticMethodStub, propertyKey: 'someMethod'},
-]);
+], EXPECTED);
 
 describe('ClassAnalyser', (): void => {
     [

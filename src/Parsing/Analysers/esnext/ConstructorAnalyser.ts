@@ -1,6 +1,5 @@
 import AbstractMethodAnalyser from './AbstractMethodAnalyser';
 import ParsingError from '../../ParsingError';
-import {isUndefined} from '../../../Support/helpers';
 
 class ConstructorAnalyser extends AbstractMethodAnalyser {
 

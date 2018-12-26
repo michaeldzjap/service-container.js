@@ -107,7 +107,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
         const ast = (new ParserManager).ast(
             this._stringify(descriptor.value)
         );
-        console.log(JSON.stringify(ast, null, 4));
+
         this._methodAnalysers.set(
             name,
             new FunctionAnalyser(ast.body[0].expression.right, this._target, name)
