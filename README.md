@@ -1,3 +1,5 @@
+![NPM Version](https://img.shields.io/npm/v/container.js.svg?branch=master)
+![downloads](https://img.shields.io/npm/dt/container.js.svg)
 [![Build Status](https://travis-ci.org/michaeldzjap/container.js.svg?branch=master)](https://travis-ci.org/michaeldzjap/container.js)
 ![dependencies](https://img.shields.io/david/michaeldzjap/container.js.svg)
 ![dev dependencies](https://img.shields.io/david/dev/michaeldzjap/container.js.svg)
