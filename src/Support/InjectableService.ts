@@ -103,7 +103,8 @@ class InjectableService {
     }
 
     /**
-     * Get the AST for the given target. Use cached version if it exists.
+     * Get the AST for the given target. Use cached version if it exists, else
+     * parse the class definition and store it in cache.
      *
      * @param {*} target
      * @param {(string|symbol|undefined)} propertyKey
