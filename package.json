@@ -1,6 +1,6 @@
 {
   "name": "container.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The Laravel container re-written in TypeScript",
   "main": "dist/container.js",
   "module": "dist/container.es.js",
