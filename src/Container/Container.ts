@@ -259,7 +259,7 @@ class Container implements IContainer {
      * Register a binding with the container.
      *
      * @param {Identifier} abstract
-     * @param {(Identifier|Function|undefined)} concrete
+     * @param {?(Identifier|Function|undefined)} concrete
      * @param {boolean} [shared=false]
      * @returns {void}
      */
