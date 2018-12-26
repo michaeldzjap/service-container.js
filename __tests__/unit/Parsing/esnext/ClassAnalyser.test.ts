@@ -36,8 +36,8 @@ describe('ClassAnalyser', (): void => {
         {ast: ESNextClassWithoutBodyStub.body[0], target: ClassWithoutBodyStub, expected: false},
     ].forEach(({ast, target, expected}): void => {
         it(`verifies that the parsed class does${expected ? '' : ' not'} have a constructor`, (): void => {
-            const analyser = new ESNextClassAnalyser(ast, target);
-            const result = analyser.hasConstructor();
+            const analyser = new ESNextClassAnalyser(ast);
+            const result = analyser.hasConstructor(target);
 
             expect(result).toBe(expected);
         });
@@ -49,8 +49,8 @@ describe('ClassAnalyser', (): void => {
         {ast: ESNextClassWithoutBodyStub.body[0], target: ClassWithoutBodyStub},
     ].forEach(({ast, target, expected}): void => {
         it(`returns the constructor parameters of the parsed [${target.name}] class`, (): void => {
-            const analyser = new ESNextClassAnalyser(ast, target);
-            const result = analyser.getConstructorParameters();
+            const analyser = new ESNextClassAnalyser(ast);
+            const result = analyser.getConstructorParameters(target);
 
             expect(result).toEqual(expected);
         });
@@ -58,20 +58,22 @@ describe('ClassAnalyser', (): void => {
 
     it('returns the method parameters of the parsed [ClassWithPublicMethodStub] class', (): void => {
         const analyser = new ESNextClassAnalyser(
-            ESNextClassWithPublicMethodStub.body[0],
-            ClassWithPublicMethodStub.prototype
+            ESNextClassWithPublicMethodStub.body[0]
         );
-        const result = analyser.getMethodParameters('someMethod');
+        const result = analyser.getMethodParameters(
+            ClassWithPublicMethodStub.prototype, 'someMethod'
+        );
 
         expect(result).toEqual(EXPECTED);
     });
 
     it('returns the method parameters of the parsed [ClassWithPublicStaticMethodStub] class', (): void => {
         const analyser = new ESNextClassAnalyser(
-            ESNextClassWithPublicStaticMethodStub.body[0],
-            ClassWithPublicStaticMethodStub
+            ESNextClassWithPublicStaticMethodStub.body[0]
         );
-        const result = analyser.getMethodParameters('someMethod');
+        const result = analyser.getMethodParameters(
+            ClassWithPublicStaticMethodStub, 'someMethod'
+        );
 
         expect(result).toEqual(EXPECTED);
     });

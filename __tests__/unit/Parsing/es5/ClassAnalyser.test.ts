@@ -49,8 +49,8 @@ describe('ClassAnalyser', (): void => {
         {ast: ES5ClassWithoutBodyStub.body[0], target: ClassWithoutBodyStub},
     ].forEach(({ast, target, expected}): void => {
         it(`returns the constructor parameters of the parsed [${target.name}] class`, (): void => {
-            const analyser = new ES5ClassAnalyser(ast, target);
-            const result = analyser.getConstructorParameters();
+            const analyser = new ES5ClassAnalyser(ast);
+            const result = analyser.getConstructorParameters(target);
 
             expect(result).toEqual(expected);
         });
@@ -58,20 +58,22 @@ describe('ClassAnalyser', (): void => {
 
     it('returns the method parameters of the parsed [ClassWithPublicMethodStub] class', (): void => {
         const analyser = new ES5ClassAnalyser(
-            ES5ClassWithPublicMethodStub.body[0],
-            ClassWithPublicMethodStub.prototype
+            ES5ClassWithPublicMethodStub.body[0]
         );
-        const result = analyser.getMethodParameters('someMethod');
+        const result = analyser.getMethodParameters(
+            ClassWithPublicMethodStub.prototype, 'someMethod'
+        );
 
         expect(result).toEqual(EXPECTED);
     });
 
     it('returns the method parameters of the parsed [ClassWithPublicStaticMethodStub] class', (): void => {
         const analyser = new ES5ClassAnalyser(
-            ES5ClassWithPublicStaticMethodStub.body[0],
-            ClassWithPublicStaticMethodStub
+            ES5ClassWithPublicStaticMethodStub.body[0]
         );
-        const result = analyser.getMethodParameters('someMethod');
+        const result = analyser.getMethodParameters(
+            ClassWithPublicStaticMethodStub, 'someMethod'
+        );
 
         expect(result).toEqual(EXPECTED);
     });

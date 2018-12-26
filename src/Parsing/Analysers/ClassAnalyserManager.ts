@@ -1,9 +1,7 @@
 import ES5ClassAnalyser from './es5/ClassAnalyser';
 import ESNextClassAnalyser from './esnext/ClassAnalyser';
 import IClassAnalyser from '../../Contracts/Parsing/IClassAnalyser';
-import IParser from '../../Contracts/Parsing/IParser';
 import Manager from '../../Support/Manager';
-import ParserManager from '../ParserManager';
 import {TARGET} from '../../Constants/.';
 
 class ClassAnalyserManager extends Manager {
@@ -16,23 +14,14 @@ class ClassAnalyserManager extends Manager {
     private _ast: any;
 
     /**
-     * The class definition.
-     *
-     * @var {*}
-     */
-    private _target: any;
-
-    /**
      * Create a new class analyser manager instance.
      *
      * @param {*} ast
-     * @param {*} target
      */
-    public constructor(ast: any, target: any) {
+    public constructor(ast: any) {
         super();
 
         this._ast = ast;
-        this._target = target;
     }
 
     /**
@@ -66,7 +55,7 @@ class ClassAnalyserManager extends Manager {
      * @returns {ES5ClassAnalyser}
      */
     private _createES5ClassAnalyser(): IClassAnalyser {
-        return new ES5ClassAnalyser(this._ast, this._target);
+        return new ES5ClassAnalyser(this._ast);
     }
 
     /**
@@ -75,7 +64,7 @@ class ClassAnalyserManager extends Manager {
      * @returns {ESNextClassAnalyser}
      */
     private _createESNextClassAnalyser(): IClassAnalyser {
-        return new ESNextClassAnalyser(this._ast, this._target);
+        return new ESNextClassAnalyser(this._ast);
     }
 
 }

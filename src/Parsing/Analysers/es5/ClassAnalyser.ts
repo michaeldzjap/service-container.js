@@ -4,7 +4,7 @@ import IClassAnalyser from '../../../Contracts/Parsing/IClassAnalyser';
 import IFunctionAnalyser from '../../../Contracts/Parsing/IFunctionAnalyser';
 import ParserManager from '../../ParserManager';
 import ParsingError from '../../ParsingError';
-import {isUndefined} from '../../../Support/helpers';
+import {isUndefined, getName} from '../../../Support/helpers';
 
 class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
 
@@ -16,18 +16,11 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     private _ast: any;
 
     /**
-     * The class definition.
-     *
-     * @var {mixed}
-     */
-    private _target: any;
-
-    /**
      * The constructor analyser instance.
      *
-     * @var {IFunctionAnalyser}
+     * @var {(IFunctionAnalyser|undefined)}
      */
-    private _constructorAnalyser: IFunctionAnalyser;
+    private _constructorAnalyser?: IFunctionAnalyser;
 
     /**
      * The method analyser instances.
@@ -40,9 +33,8 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * Create a new class parser instance.
      *
      * @param {Object} ast
-     * @param {*} target
      */
-    public constructor(ast: any, target: any) {
+    public constructor(ast: any) {
         super();
 
         if (ast.type !== 'FunctionDeclaration') {
@@ -50,8 +42,6 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
         }
 
         this._ast = ast;
-        this._target = target;
-        this._constructorAnalyser = new FunctionAnalyser(this._ast, this._target);
     }
 
     /**
@@ -60,17 +50,19 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * @returns {boolean}
      */
     public hasConstructor(): boolean {
-        return this._constructorAnalyser.hasBody()
-            && this._constructorAnalyser.hasParameters();
+        return this._ast.params.length && this._ast.body.body.length;
     }
 
     /**
      * Get the constructor analyser.
      *
+     * @param {*} target
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public getConstructorAnalyser(): IFunctionAnalyser | undefined {
+    public getConstructorAnalyser(target: any): IFunctionAnalyser | undefined {
         if (this.hasConstructor()) {
+            this._constructorAnalyser = new FunctionAnalyser(this._ast, target);
+
             return this._constructorAnalyser;
         }
     }
@@ -78,12 +70,13 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Get the method analyser
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public getMethodAnalyser(name: string): IFunctionAnalyser | undefined {
+    public getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined {
         if (!this._methodAnalysers.has(name)) {
-            this._addMethodAnalyser(name);
+            this._addMethodAnalyser(target, name);
         }
 
         return this._methodAnalysers.get(name);
@@ -92,16 +85,17 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Add a method analyser instance for the given method.
      *
+     * @param {*} target
      * @param {string} name
      * @returns {void}
      */
-    private _addMethodAnalyser(name: string): void {
-        const descriptor = Reflect.has(this._target, name)
-            ? Reflect.getOwnPropertyDescriptor(this._target, name)
-            : Reflect.getOwnPropertyDescriptor(this._target.prototype, name);
+    private _addMethodAnalyser(target: any, name: string): void {
+        const descriptor = Reflect.has(target, name)
+            ? Reflect.getOwnPropertyDescriptor(target, name)
+            : Reflect.getOwnPropertyDescriptor(target.prototype, name);
 
         if (isUndefined(descriptor)) {
-            throw new Error(`Method does not exist on [${this._target.name}]`);
+            throw new Error(`Method does not exist on [${getName(target)}]`);
         }
 
         const ast = (new ParserManager).ast(
@@ -110,7 +104,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
 
         this._methodAnalysers.set(
             name,
-            new FunctionAnalyser(ast.body[0].expression.right, this._target, name)
+            new FunctionAnalyser(ast.body[0].expression.right, target, name)
         );
     }
 

@@ -13,32 +13,36 @@ interface IClassAnalyser {
     /**
      * Get the constructor analyser.
      *
+     * @param {*} target
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    getConstructorAnalyser(): IFunctionAnalyser | undefined;
+    getConstructorAnalyser(target: any): IFunctionAnalyser | undefined;
 
     /**
      * Get the method analyser
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    getMethodAnalyser(name: string): IFunctionAnalyser | undefined;
+    getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined;
 
     /**
      * Get the constructor parameter.
      *
+     * @param {*} target
      * @returns {(ParameterDescriptor[]|undefined)}
      */
-    getConstructorParameters(): ParameterDescriptor[] | undefined;
+    getConstructorParameters(target: any): ParameterDescriptor[] | undefined;
 
     /**
      * Get the given method parameters.
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(ParameterDescriptor[]|undefined)}
      */
-    getMethodParameters(name: string): ParameterDescriptor[] | undefined;
+    getMethodParameters(target: any, name: string): ParameterDescriptor[] | undefined;
 
 }
 

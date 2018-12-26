@@ -1,4 +1,4 @@
-import {isClass} from '@src/Support/helpers';
+import {isClass, getName} from '@src/Support/helpers';
 
 describe('helpers', (): void => {
     class ClassStub {}
@@ -17,6 +17,17 @@ describe('helpers', (): void => {
             const result = isClass(target);
 
             expect(result).toBe(expected);
+        });
+    });
+
+    [
+        {target: ClassStub},
+        {target: ClassStub.prototype},
+    ].forEach(({target}): void => {
+        it('returns the name of the class', (): void => {
+            const name = getName(target);
+
+            expect(name).toBe('ClassStub');
         });
     });
 });

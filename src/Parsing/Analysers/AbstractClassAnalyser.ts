@@ -7,25 +7,28 @@ abstract class AbstractClassAnalyser {
     /**
      * Get the constructor analyser.
      *
+     * @param {*} target
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public abstract getConstructorAnalyser(): IFunctionAnalyser | undefined;
+    public abstract getConstructorAnalyser(target: any): IFunctionAnalyser | undefined;
 
     /**
      * Get the method analyser
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public abstract getMethodAnalyser(name: string): IFunctionAnalyser | undefined;
+    public abstract getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined;
 
     /**
      * Get the constructor parameter.
      *
+     * @param {*} target
      * @returns {(ParameterDescriptor[]|undefined)}
      */
-    public getConstructorParameters(): ParameterDescriptor[] | undefined {
-        const constructorAnalyser = this.getConstructorAnalyser();
+    public getConstructorParameters(target: any): ParameterDescriptor[] | undefined {
+        const constructorAnalyser = this.getConstructorAnalyser(target);
 
         if (isUndefined(constructorAnalyser)) return;
 
@@ -39,11 +42,12 @@ abstract class AbstractClassAnalyser {
     /**
      * Get the given method parameters.
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(ParameterDescriptor[]|undefined)}
      */
-    public getMethodParameters(name: string): ParameterDescriptor[] | undefined {
-        const methodAnalyser = this.getMethodAnalyser(name);
+    public getMethodParameters(target: any, name: string): ParameterDescriptor[] | undefined {
+        const methodAnalyser = this.getMethodAnalyser(target, name);
 
         if (isUndefined(methodAnalyser)) return;
 

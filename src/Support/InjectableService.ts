@@ -7,6 +7,13 @@ import {PARAM_TYPES} from '../Constants/metadata';
 class InjectableService {
 
     /**
+     * The ast cache.
+     *
+     * @var {Map}
+     */
+    private static _ast: Map<any, any> = new Map;
+
+    /**
      * Define our custom meta data for dependency injection purposes in class
      * constructors.
      *
@@ -85,16 +92,33 @@ class InjectableService {
      */
     private static _getParameters(target: any, propertyKey?: string | symbol):
         ParameterDescriptor[] | undefined {
-        const ast = (new ParserManager).ast(
-            this._getConstructor(target, propertyKey)
-        );
-        const analyser = (new ClassAnalyserManager(ast.body[0], target)).driver();
+        const ast = InjectableService._getAst(target, propertyKey);
+        const analyser = (new ClassAnalyserManager(ast.body[0])).driver();
 
-        if (propertyKey) {
-            return analyser.getMethodParameters(propertyKey);
+        if (isUndefined(propertyKey)) {
+            return analyser.getConstructorParameters(target);
         }
 
-        return analyser.getConstructorParameters();
+        return analyser.getMethodParameters(target, propertyKey);
+    }
+
+    /**
+     * Get the AST for the given target. Use cached version if it exists.
+     *
+     * @param {*} target
+     * @param {(string|symbol|undefined)} propertyKey
+     * @returns {Object}
+     */
+    private static _getAst(target: any, propertyKey?: string | symbol): any {
+        const definition = InjectableService._getClassDefinition(target, propertyKey);
+
+        if (!InjectableService._ast.has(definition)) {
+            InjectableService._ast.set(
+                definition, (new ParserManager).ast(definition)
+            );
+        }
+
+        return InjectableService._ast.get(definition);
     }
 
     /**
@@ -104,7 +128,7 @@ class InjectableService {
      * @param {(string|symbol|undefined)} propertyKey
      * @returns {mixed}
      */
-    private static _getConstructor(target: any, propertyKey?: string | symbol): any {
+    private static _getClassDefinition(target: any, propertyKey?: string | symbol): any {
         if (!isUndefined(propertyKey)
             && Reflect.getOwnPropertyDescriptor(target.constructor.prototype, propertyKey)) {
             return target.constructor;

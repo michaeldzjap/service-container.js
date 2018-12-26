@@ -16,13 +16,6 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     private _ast: any;
 
     /**
-     * The class definition.
-     *
-     * @var {*}
-     */
-    private _target: any;
-
-    /**
      * The constructor analyser instance.
      *
      * @var {(IFunctionAnalyser|undefined)}
@@ -40,9 +33,8 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * Create a new class analyser instance.
      *
      * @param {Object} ast
-     * @param {*} target
      */
-    public constructor(ast: any, target: any) {
+    public constructor(ast: any) {
         super();
 
         if (ast.type !== 'ClassDeclaration') {
@@ -50,10 +42,6 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
         }
 
         this._ast = ast;
-        this._target = target;
-
-        this._initialiseConstructorAnalyser();
-        this._initialiseMethodAnalysers();
     }
 
     /**
@@ -68,33 +56,40 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Get the constructor analyser.
      *
+     * @param {*} target
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public getConstructorAnalyser(): IFunctionAnalyser | undefined {
+    public getConstructorAnalyser(target: any): IFunctionAnalyser | undefined {
+        this._initialiseConstructorAnalyser(target);
+
         return this._constructorAnalyser;
     }
 
     /**
      * Get the method analyser
      *
+     * @param {*} target
      * @param {string} name
      * @returns {(IFunctionAnalyser|undefined)}
      */
-    public getMethodAnalyser(name: string): IFunctionAnalyser | undefined {
+    public getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined {
+        this._initialiseMethodAnalyser(target, name);
+
         return this._methodAnalysers.get(name);
     }
 
     /**
      * Initialise the constructor analyser.
      *
+     * @param {*} target
      * @returns {void}
      */
-    private _initialiseConstructorAnalyser(): void {
+    private _initialiseConstructorAnalyser(target: any): void {
         const constructor = this._findConstructor();
 
         if (!isUndefined(constructor)) {
             this._constructorAnalyser = new ConstructorAnalyser(
-                constructor, this._target
+                constructor, target
             );
         }
     }
@@ -113,16 +108,19 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Initialise the method analysers.
      *
+     * @param {*} target
+     * @param {string} name
      * @returns {void}
      */
-    private _initialiseMethodAnalysers(): void {
-        for (const definition of this._ast.body.body) {
-            if (definition.type === 'MethodDefinition') {
-                this._methodAnalysers.set(
-                    definition.key.name,
-                    new MethodAnalyser(definition, this._target)
-                );
-            }
+    private _initialiseMethodAnalyser(target: any, name: string): void {
+        const definition = this._ast.body.body.find((definition: any): boolean => (
+            definition.key.name === name && definition.type === 'MethodDefinition'
+        ));
+
+        if (!isUndefined(definition)) {
+            this._methodAnalysers.set(
+                name, new MethodAnalyser(definition, target)
+            );
         }
     }
 
