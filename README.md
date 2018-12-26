@@ -1,11 +1,11 @@
-![NPM Version](https://img.shields.io/npm/v/container.js.svg?branch=master)
-![downloads](https://img.shields.io/npm/dt/container.js.svg)
-[![Build Status](https://travis-ci.org/michaeldzjap/container.js.svg?branch=master)](https://travis-ci.org/michaeldzjap/container.js)
-![dependencies](https://img.shields.io/david/michaeldzjap/container.js.svg)
-![dev dependencies](https://img.shields.io/david/dev/michaeldzjap/container.js.svg)
-[![License](https://img.shields.io/npm/l/container.js.svg)](https://github.com/michaeldzjap/container.js/blob/master/LICENSE)
+![NPM Version](https://img.shields.io/npm/v/service-container.js.svg?branch=master)
+![downloads](https://img.shields.io/npm/dt/service-container.js.svg)
+[![Build Status](https://travis-ci.org/michaeldzjap/service-container.js.svg?branch=master)](https://travis-ci.org/michaeldzjap/service-container.js)
+![dependencies](https://img.shields.io/david/michaeldzjap/service-container.js.svg)
+![dev dependencies](https://img.shields.io/david/dev/michaeldzjap/service-container.js.svg)
+[![License](https://img.shields.io/npm/l/service-container.js.svg)](https://github.com/michaeldzjap/service-container.js/blob/master/LICENSE)
 
-# container.js
+# service-container.js
 The Laravel service container re-written in TypeScript
 
 ## About
