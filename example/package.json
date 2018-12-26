@@ -1,7 +1,7 @@
 {
   "name": "example",
   "version": "0.0.1",
-  "description": "container.js examples",
+  "description": "service-container.js examples",
   "main": "index.js",
   "scripts": {
     "build": "./node_modules/.bin/webpack --progress --hide-modules",
@@ -9,7 +9,7 @@
     "clean": "rm -rf ./dist"
   },
   "keywords": [
-    "container.js"
+    "service-container.js"
   ],
   "author": "Michael Dzjaparidze",
   "license": "ISC",
