@@ -2,6 +2,7 @@ import Arr from '../Support/Arr';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
+import ClassBindingBuilder from './ClassBindingBuilder';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
 import IContainer from '../Contracts/Container/IContainer';
@@ -11,8 +12,8 @@ import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
-    isClass, isString, isNullOrUndefined, getSymbolName, isInstance,
-    isInstantiable
+    isClass, isString, isUndefined, isNullOrUndefined, getSymbolName,
+    isInstance, isInstantiable
 } from '../Support/helpers';
 
 class Container implements IContainer {
@@ -279,8 +280,9 @@ class Container implements IContainer {
         // which is bound into this container to the abstract type and we will
         // just wrap it up inside its own Closure to give us more convenience
         // when extending.
-        if (isClass(concrete) /* || typeof concrete === 'symbol' */) {
-            concrete = this._getClosure<U, V>(abstract, concrete as Identifier<V>);
+        if (isClass(concrete)) {
+            const builder = new ClassBindingBuilder(this);
+            concrete = builder.getClosure(abstract, concrete);
         }
 
         this._bindings.set(abstract, {concrete: concrete as Function, shared});
@@ -775,23 +777,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Get the Closure to be used when building a type.
-     *
-     * @param {Identifier} abstract
-     * @param {Identifier} concrete
-     * @returns {Function}
-     */
-    protected _getClosure<U, V>(abstract: Identifier<U>, concrete: Identifier<V>): Function {
-        return (container: Container, parameters: Map<string, any> = new Map): unknown => {
-            if (abstract === concrete) {
-                return container.build<V>(concrete as Instantiable<V>);
-            }
-
-            return container.make(concrete, parameters);
-        };
-    }
-
-    /**
      * Get the method to be bound in class@method format.
      *
      * @param {(Array|string)} method
@@ -920,9 +905,7 @@ class Container implements IContainer {
      */
     protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
         const concrete = this._getContextualConcrete<T>(abstract);
-        if (!isNullOrUndefined(concrete)) {
-            return concrete;
-        }
+        if (!isUndefined(concrete)) return concrete;
 
         // If we don't have a registered resolver or concrete for the type,
         // we'll just assume each type is a concrete name and will attempt to
@@ -943,9 +926,7 @@ class Container implements IContainer {
      */
     protected _getContextualConcrete<T>(abstract: Identifier<T>): any {
         const binding = this._findInContextualBindings(abstract);
-        if (!isNullOrUndefined(binding)) {
-            return binding;
-        }
+        if (!isUndefined(binding)) return binding;
 
         // Next we need to see if a contextual binding might be bound under an
         // alias of the given abstract type. So, we will need to check if any
@@ -959,9 +940,7 @@ class Container implements IContainer {
 
         for (const alias of this._abstractAliases.get(abstract) as any[]) {
             const binding = this._findInContextualBindings<any>(alias);
-            if (!isNullOrUndefined(binding)) {
-                return binding;
-            }
+            if (!isUndefined(binding)) return binding;
         }
     }
 
@@ -1089,7 +1068,7 @@ class Container implements IContainer {
     protected _resolveClass(parameter: ReflectionParameter): any {
         const reflector = parameter.getClass();
 
-        if (isNullOrUndefined(reflector)) {
+        if (isUndefined(reflector)) {
             throw new BindingResolutionError('Cannot get parameter type.');
         }
 

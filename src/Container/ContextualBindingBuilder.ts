@@ -1,7 +1,7 @@
 import Arr from '../Support/Arr';
 import Container from './Container';
 import IContextualBindingBuilder from '../Contracts/Container/IContextualBindingBuilder';
-import {isNullOrUndefined} from '../Support/helpers';
+import {isUndefined} from '../Support/helpers';
 
 class ContextualBindingBuilder implements IContextualBindingBuilder {
 
@@ -52,11 +52,11 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param {*} implementation
+     * @param {(*|Function)} implementation
      * @returns {void}
      */
     public give<T>(implementation: T | Function): void {
-        if (isNullOrUndefined(this._needs)) {
+        if (isUndefined(this._needs)) {
             throw new Error('The abstract target is undefined.');
         }
 
