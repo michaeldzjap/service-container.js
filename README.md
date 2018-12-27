@@ -13,7 +13,7 @@ This project is still in its early stages and hasn't been extensively tested for
 
 This project offers almost completely the same functionality as the original _Laravel_ service container. It has been implemented with in mind the aim to be as close to the original version as possible. There are some differences, mainly due to the fact that _TypeScript_ and _PHP_ have key differences in their architectural design. Most noticeably, _PHP_ has a quite extensive and mature reflection system, which _TypeScript_ lacks (currently). In order to provide (almost exactly) the same dependency injection flexibility as the original _Laravel_ service container, this project uses an approach which combines the analysis of decorator metadata using [reflect-metadata](https://github.com/rbuckton/reflect-metadata) and script parsing using [cherow](https://github.com/cherow/cherow).
 
-Documentation for this project is rather minimal at this point. However, the almost all tests from the rather extensive test suite of the original _Laravel_ version have been ported. This should give a good indication of what is possible. There is also an _example_ folder with some preliminary, basic examples.
+Documentation for this project is rather minimal at this point. However, almost all tests from the rather extensive test suite of the original _Laravel_ version have been ported. This should give a good indication of what is possible. There is also an _example_ folder with some preliminary, basic examples.
 
 ## Considerations
 Below are some important things to consider when trying out this project for yourself.
