@@ -1157,12 +1157,15 @@ class Container implements IContainer {
      * @returns {void}
      */
     protected _fireResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
-        this._fireCallbackArray(object, this._globalResolvingCallbacks);
+        if (this._globalResolvingCallbacks.length) {
+            this._fireCallbackArray(object, this._globalResolvingCallbacks);
+        }
 
-        this._fireCallbackArray(
-            object,
-            this._getCallbacksForType<T>(abstract, object, this._resolvingCallbacks)
-        );
+        this._resolvingCallbacks.forEach((callbacks: Function[], type: any): void => {
+            if (type === abstract || object instanceof type) {
+                this._fireCallbackArray(object, callbacks);
+            }
+        });
 
         this._fireAfterResolvingCallbacks<T>(abstract, object);
     }
@@ -1175,33 +1178,15 @@ class Container implements IContainer {
      * @returns {void}
      */
     protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
-        this._fireCallbackArray(object, this._globalAfterResolvingCallbacks);
+        if (this._globalAfterResolvingCallbacks.length) {
+            this._fireCallbackArray(object, this._globalAfterResolvingCallbacks);
+        }
 
-        this._fireCallbackArray(
-            object,
-            this._getCallbacksForType<T>(abstract, object, this._afterResolvingCallbacks)
-        );
-    }
-
-    /**
-     * Get all callbacks for a given type.
-     *
-     * @param {Identifier} abstract
-     * @param {Object} object
-     * @param {Map} callbacksPerType
-     * @returns {Function[]}
-     */
-    protected _getCallbacksForType<T>(abstract: Identifier<T>, object: object,
-        callbacksPerType: Map<string, Function[]>): Function[] {
-        const results: Function[] = [];
-
-        callbacksPerType.forEach((callbacks: Function[], type: any): void => {
+        this._afterResolvingCallbacks.forEach((callbacks: Function[], type: any): void => {
             if (type === abstract || object instanceof type) {
-                results.push(...callbacks);
+                this._fireCallbackArray(object, callbacks);
             }
         });
-
-        return results;
     }
 
     /**
