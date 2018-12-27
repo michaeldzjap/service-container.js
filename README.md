@@ -62,3 +62,12 @@ Yes, this is possible, albeit using a slight workaround (see the examples).
 - Do I have to use _TypeScript_?
 
 Yes, at the moment this project only works with _TypeScript_.
+
+## Examples
+To run the examples you'll have to perform the following steps:
+
+1. Clone this repository
+2. **Build the project**: from the root directory execute `npm run build`
+3. **Build the examples**: from the _/example_ folder execute `npm run build`
+
+The built examples now are available in the _/example/dist_ folder. Note that running the built examples doesn't really do much. It is more meant to illustrate how you would go about building your own projects on top of _service-container.js_. The source code for the examples should give you an idea about some use cases for _service-container.js_.
