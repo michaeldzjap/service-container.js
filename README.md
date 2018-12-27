@@ -21,6 +21,26 @@ Below are some important things to consider when trying out this project for you
 ### Environment requirements
 This project should work in both browser and _node_ environments targeting _ES5_ or higher.
 
+### Dependency injection
+In order to be able to inject any dependencies defined in a class constructor you need to decorate the relevant class definition like so:
+
+```ts
+import {injectable} from 'service-container';
+
+@injectable()
+class MyClass {
+
+    private _dependency: MyDependency;
+
+    public constructor(dependency: MyDependency) {
+        this._dependency = dependency;
+    }
+
+}
+```
+
+This will cause _reflect-metadata_ to emit its type metadata and also will trigger all the necessary class definition parsing behind the scenes.
+
 ### Binding to an interface
 Since _TypeScript_ interfaces are compiled away and do not exist anymore at runtime, an alternative approach was needed to facilitate binding a certain implementation to a given interface / contract. The approach taken is largely borrowed from [Aurelia](https://aurelia.io), as this was found to be a quite elegant and minimally invasive workaround. See the test suite and examples for more details.
 
