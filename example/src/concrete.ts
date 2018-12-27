@@ -1,4 +1,4 @@
-import {Container, injectable} from '../../dist/container';
+import {Container, injectable} from '../../dist/service-container';
 
 class B {}
 

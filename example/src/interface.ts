@@ -1,4 +1,4 @@
-import {Container, InterfaceFactory, injectable} from '../../dist/container';
+import {Container, InterfaceFactory, injectable} from '../../dist/service-container';
 
 const IContract = InterfaceFactory.make('IContract');
 
