@@ -985,7 +985,8 @@ class Container implements IContainer {
      * @param {Identifier} abstract
      * @returns {boolean}
      */
-    protected _isBuildable<U, V>(concrete: Identifier<U> | U, abstract: Identifier<V>): boolean {
+    protected _isBuildable<U, V>(concrete: Identifier<U> | U,
+        abstract: Identifier<V>): boolean {
         return concrete === abstract
             || (!isClass(concrete) && concrete instanceof Function);
     }
@@ -1101,7 +1102,8 @@ class Container implements IContainer {
             // the value is optional, and if it is we will return the optional
             // parameter value as the value of the dependency, similarly to how
             // we do this with scalars.
-            if (e instanceof BindingResolutionError && parameter.isDefaultValueAvailable()) {
+            if (e instanceof BindingResolutionError
+                && parameter.isDefaultValueAvailable()) {
                 return parameter.getDefaultValue();
             }
 
@@ -1142,9 +1144,7 @@ class Container implements IContainer {
      * @throws {BindingResolutionError}
      */
     protected _unresolvablePrimitive(parameter: ReflectionParameter): void {
-        const message = `
-            Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}
-        `;
+        const message = `Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}`;
 
         throw new BindingResolutionError(message);
     }
@@ -1156,16 +1156,19 @@ class Container implements IContainer {
      * @param {Object} object
      * @returns {void}
      */
-    protected _fireResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
+    protected _fireResolvingCallbacks<T>(abstract: Identifier<T>,
+        object: object): void {
         if (this._globalResolvingCallbacks.length) {
             this._fireCallbackArray(object, this._globalResolvingCallbacks);
         }
 
-        this._resolvingCallbacks.forEach((callbacks: Function[], type: any): void => {
-            if (type === abstract || object instanceof type) {
-                this._fireCallbackArray(object, callbacks);
+        this._resolvingCallbacks.forEach(
+            (callbacks: Function[], type: any): void => {
+                if (type === abstract || object instanceof type) {
+                    this._fireCallbackArray(object, callbacks);
+                }
             }
-        });
+        );
 
         this._fireAfterResolvingCallbacks<T>(abstract, object);
     }
@@ -1177,16 +1180,21 @@ class Container implements IContainer {
      * @param {Object} object
      * @returns {void}
      */
-    protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>, object: object): void {
+    protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>,
+        object: object): void {
         if (this._globalAfterResolvingCallbacks.length) {
-            this._fireCallbackArray(object, this._globalAfterResolvingCallbacks);
+            this._fireCallbackArray(
+                object, this._globalAfterResolvingCallbacks
+            );
         }
 
-        this._afterResolvingCallbacks.forEach((callbacks: Function[], type: any): void => {
-            if (type === abstract || object instanceof type) {
-                this._fireCallbackArray(object, callbacks);
+        this._afterResolvingCallbacks.forEach(
+            (callbacks: Function[], type: any): void => {
+                if (type === abstract || object instanceof type) {
+                    this._fireCallbackArray(object, callbacks);
+                }
             }
-        });
+        );
     }
 
     /**
