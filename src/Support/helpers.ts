@@ -70,8 +70,8 @@ export const isMap = (value: any): value is Map<unknown, unknown> => (
  * @param {*} target
  * @returns {boolean}
  */
-export const isClass = (target: any): target is Function => {
-    if (typeof target !== 'function' || isNullOrUndefined(target.prototype)
+export const isInstantiable = <T>(target: any): target is Instantiable<T> => {
+    if (typeof target !== 'function' || isUndefined(target.prototype)
         || target.prototype.constructor.name === '') {
         return false;
     }
@@ -111,16 +111,6 @@ export const hasConstructor = (target: object | Function): target is object => (
 );
 
 /**
- * Determine if the given target is instantiable.
- *
- * @param {*} target
- * @returns {boolean}
- */
-export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
-    hasPrototype(target)
-);
-
-/**
  * Determine if the given target is an instance.
  *
  * @param {*} target
@@ -129,6 +119,15 @@ export const isInstantiable = <T>(target: any): target is Instantiable<T> => (
 export const isInstance = <T>(target: any): target is Instance<T> => (
     !hasPrototype(target) && hasConstructor(target)
 );
+
+/**
+ * Check if two inputs are identically equal.
+ *
+ * @param {*} a
+ * @param {*} b
+ * @returns {boolean}
+ */
+export const equals = (a: any, b: any): boolean => a === b;
 
 /**
  * Attempt to get the name of an object or function.
