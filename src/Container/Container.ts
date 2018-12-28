@@ -2,7 +2,7 @@ import Arr from '../Support/Arr';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
-import ClassBindingBuilder from './ClassBindingBuilder';
+import ClassBinding from './ClassBinding';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
 import IContainer from '../Contracts/Container/IContainer';
@@ -281,7 +281,7 @@ class Container implements IContainer {
         // just wrap it up inside its own Closure to give us more convenience
         // when extending.
         if (isClass(concrete)) {
-            const builder = new ClassBindingBuilder(this);
+            const builder = new ClassBinding(this);
             concrete = builder.getClosure(abstract, concrete);
         }
 

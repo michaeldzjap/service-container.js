@@ -1,7 +1,7 @@
 import Container from './Container';
 import {Identifier, Instantiable} from '../Support/types';
 
-class ClassBindingBuilder<U, V> {
+class ClassBinding<U, V> {
 
     /**
      * The underlying container instance.
@@ -38,4 +38,4 @@ class ClassBindingBuilder<U, V> {
 
 }
 
-export default ClassBindingBuilder;
+export default ClassBinding;
