@@ -1,4 +1,5 @@
 import Container from './Container';
+import {equals} from '../Support/helpers';
 import {Identifier, Instantiable} from '../Support/types';
 
 class ClassBinding<U, V> {
@@ -26,10 +27,10 @@ class ClassBinding<U, V> {
      * @param {Identifier} concrete
      * @returns {Function}
      */
-    public getClosure<U, V>(abstract: Identifier<U>, concrete: Identifier<V>): Function {
+    public getClosure<U, V>(abstract: Identifier<U>, concrete: Instantiable<V>): Function {
         return (container: Container, parameters: Map<string, any> = new Map): unknown => {
-            if (abstract === concrete) {
-                return this._container.build<V>(concrete as Instantiable<V>);
+            if (equals(abstract, concrete)) {
+                return this._container.build<V>(concrete);
             }
 
             return this._container.make(concrete, parameters);

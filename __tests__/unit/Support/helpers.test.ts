@@ -1,4 +1,4 @@
-import {isClass, getName} from '@src/Support/helpers';
+import {isInstantiable, getName} from '@src/Support/helpers';
 
 describe('helpers', (): void => {
     class ClassStub {}
@@ -14,7 +14,7 @@ describe('helpers', (): void => {
         {target: 1, name: 'number', expected: false},
     ].forEach(({target, name, expected}): void => {
         it(`determines if the target [${name}] is a class definition`, (): void => {
-            const result = isClass(target);
+            const result = isInstantiable(target);
 
             expect(result).toBe(expected);
         });

@@ -1,4 +1,5 @@
 import Arr from '../Support/Arr';
+import BindingError from './BindingError';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
@@ -12,8 +13,8 @@ import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
-    isClass, isString, isUndefined, isNullOrUndefined, getSymbolName,
-    isInstance, isInstantiable
+    isString, isNullOrUndefined, isUndefined, getSymbolName, isInstance,
+    isInstantiable, equals
 } from '../Support/helpers';
 
 class Container implements IContainer {
@@ -264,7 +265,7 @@ class Container implements IContainer {
      * @param {boolean} [shared=false]
      * @returns {void}
      */
-    public bind<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function,
+    public bind<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
         // If no concrete type was given, we will simply set the concrete type
         // to the abstract type. After that, the concrete type to be registered
@@ -272,20 +273,22 @@ class Container implements IContainer {
         // parameters.
         this._dropStaleInstances<U>(abstract);
 
-        if (isNullOrUndefined(concrete)) {
-            concrete = abstract as Identifier<V>;
+        if (isNullOrUndefined(concrete) && isInstantiable(abstract)) {
+            concrete = abstract as unknown as Instantiable<V>;
+        } else if (isNullOrUndefined(concrete)) {
+            throw new BindingError('Cannot bind a non-instantiable to itself.');
         }
 
         // If the factory is not a Closure, it means it is just a class name
         // which is bound into this container to the abstract type and we will
         // just wrap it up inside its own Closure to give us more convenience
         // when extending.
-        if (isClass(concrete)) {
+        if (isInstantiable(concrete)) {
             const builder = new ClassBinding(this);
             concrete = builder.getClosure(abstract, concrete);
         }
 
-        this._bindings.set(abstract, {concrete: concrete as Function, shared});
+        this._bindings.set(abstract, {concrete, shared});
 
         // If the abstract type was already resolved in this container we'll
         // fire the rebound listener so that any objects which have already
@@ -358,11 +361,11 @@ class Container implements IContainer {
      * Register a binding if it hasn't already been registered.
      *
      * @param {Identifier} abstract
-     * @param {(Identifier|Function|undefined)} concrete
+     * @param {(Instantiable|Function|undefined)} concrete
      * @param {boolean} [shared=false]
      * @returns {void}
      */
-    public bindIf<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function,
+    public bindIf<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
         if (!this.bound<U>(abstract)) {
             this.bind<U, V>(abstract, concrete, shared);
@@ -373,10 +376,10 @@ class Container implements IContainer {
      * Register a shared binding in the container.
      *
      * @param {Identifier} abstract
-     * @param {(Identifier|Function|undefined)} concrete
+     * @param {(Instantiable|Function|undefined)} concrete
      * @returns {void}
      */
-    public singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void {
+    public singleton<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function): void {
         this.bind<U, V>(abstract, concrete, true);
     }
 
@@ -398,15 +401,10 @@ class Container implements IContainer {
             this._rebound<T>(abstract);
         } else {
             this._extenders.has(abstract)
-                ? this._extenders.set(
-                    abstract,
-                    [...this._extenders.get(abstract) as Function[], closure]
-                )
+                ? this._extenders.get(abstract)!.push(closure)
                 : this._extenders.set(abstract, [closure]);
 
-            if (this.resolved<T>(abstract)) {
-                this._rebound<T>(abstract);
-            }
+            if (this.resolved<T>(abstract)) this._rebound<T>(abstract);
         }
     }
 
@@ -446,12 +444,10 @@ class Container implements IContainer {
      */
     public tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void {
         for (const tag of tags) {
-            if (!this._tags.has(tag)) {
-                this._tags.set(tag, []);
-            }
+            if (!this._tags.has(tag)) this._tags.set(tag, []);
 
             for (const abstract of Arr.wrap(abstracts)) {
-                this._tags.set(tag, [...(this._tags as any).get(tag), abstract]);
+                this._tags.get(tag)!.push(abstract);
             }
         }
     }
@@ -487,7 +483,7 @@ class Container implements IContainer {
         const arr = this._abstractAliases.get(abstract);
         this._abstractAliases.set(
             abstract,
-            arr ? [...arr as Identifier<U>[], alias] : [alias]
+            arr ? [...arr, alias] : [alias]
         );
     }
 
@@ -507,9 +503,7 @@ class Container implements IContainer {
                 : [callback]
         );
 
-        if (this.bound<T>(abstract)) {
-            return this.make<T>(abstract);
-        }
+        if (this.bound<T>(abstract)) return this.make<T>(abstract);
     }
 
     /**
@@ -546,7 +540,8 @@ class Container implements IContainer {
      * @param {(string|undefined)} defaultMethod
      * @returns {*}
      */
-    public call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any {
+    public call<T>(callback: Callable<T>, parameters?: any[] | object,
+        defaultMethod?: string): any {
         return BoundMethod.call<T>(this, callback, parameters, defaultMethod);
     }
 
@@ -599,7 +594,7 @@ class Container implements IContainer {
     public set<U, V>(id: Identifier<U>, value: V): void {
         this.bind(
             id,
-            value instanceof Function && !isClass(value)
+            value instanceof Function && !isInstantiable(value)
                 ? value
                 : (): any => value
         );
@@ -616,7 +611,7 @@ class Container implements IContainer {
         // and hand back the results of the functions, which allows functions
         // to be used as resolvers for more fine-tuned resolution of these
         // objects.
-        if (!isClass(concrete) && concrete instanceof Function) {
+        if (!isInstantiable(concrete) && concrete instanceof Function) {
             return concrete(this, this._getLastParameterOverride());
         }
 
@@ -665,19 +660,17 @@ class Container implements IContainer {
      * @returns {void}
      */
     public resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void {
-        if (isString(abstract) || isClass(abstract)) {
+        if (isString(abstract) || isInstantiable(abstract)) {
             abstract = this.getAlias<T>(abstract);
         }
 
-        if (!callback && !isClass(abstract) && abstract instanceof Function) {
+        if (isUndefined(callback) && !isInstantiable(abstract)
+            && abstract instanceof Function) {
             this._globalResolvingCallbacks.push(abstract);
-        } else {
+        } else if (!isUndefined(callback)) {
             this._resolvingCallbacks.has(abstract)
-                ? this._resolvingCallbacks.set(
-                    abstract,
-                    [...this._resolvingCallbacks.get(abstract) as any, callback]
-                )
-                : this._resolvingCallbacks.set(abstract, [callback as Function]);
+                ? this._resolvingCallbacks.get(abstract)!.push(callback)
+                : this._resolvingCallbacks.set(abstract, [callback]);
         }
     }
 
@@ -685,22 +678,20 @@ class Container implements IContainer {
      * Register a new after resolving callback for all types.
      *
      * @param {(Identifier|Function)} abstract
-     * @param {Function} callback
+     * @param {(Function|undefined)} callback
      * @returns {void}
      */
-    public afterResolving<T>(abstract: Identifier<T>| Function, callback: Function): void {
-        if (isString(abstract) || isClass(abstract)) {
+    public afterResolving<T>(abstract: Identifier<T>| Function, callback?: Function): void {
+        if (isString(abstract) || isInstantiable(abstract)) {
             abstract = this.getAlias<T>(abstract);
         }
 
-        if (!callback && !isClass(abstract) && abstract instanceof Function) {
+        if (isUndefined(callback) && !isInstantiable(abstract)
+            && abstract instanceof Function) {
             this._globalAfterResolvingCallbacks.push(abstract);
-        } else {
+        } else if (!isUndefined(callback)) {
             this._afterResolvingCallbacks.has(abstract)
-                ? this._afterResolvingCallbacks.set(
-                    abstract,
-                    [...this._afterResolvingCallbacks.get(abstract) as any, callback]
-                )
+                ? this._afterResolvingCallbacks.get(abstract)!.push(callback)
                 : this._afterResolvingCallbacks.set(abstract, [callback]);
         }
     }
@@ -782,9 +773,9 @@ class Container implements IContainer {
      * @param {(Array|string)} method
      * @returns {string}
      */
-    protected _parseBindMethod<T>(method: [T, string] | string): string {
+    protected _parseBindMethod<T>(method: [Instantiable<T>, string] | string): string {
         if (Array.isArray(method)) {
-            return `${(method[0] as any).name}@${method[1]}`;
+            return `${method[0].name}@${method[1]}`;
         }
 
         return method;
@@ -964,10 +955,10 @@ class Container implements IContainer {
      * @param {Identifier} abstract
      * @returns {boolean}
      */
-    protected _isBuildable<U, V>(concrete: Identifier<U> | U,
+    protected _isBuildable<U, V>(concrete: Identifier<U> | Function,
         abstract: Identifier<V>): boolean {
-        return concrete === abstract
-            || (!isClass(concrete) && concrete instanceof Function);
+        return equals(concrete, abstract)
+            || (!isInstantiable(concrete) && concrete instanceof Function);
     }
 
     /**
@@ -1046,7 +1037,7 @@ class Container implements IContainer {
         const concrete = this._getContextualConcrete(parameter.getName());
         if (concrete) {
             return concrete instanceof Function
-                ? (concrete as Function)(this)
+                ? concrete(this)
                 : concrete;
         }
 
@@ -1103,7 +1094,7 @@ class Container implements IContainer {
 
         if (this._buildStack.length) {
             const previous = this._buildStack
-                .map((_: string): string => (_ as any).name)
+                .map((_: any): string => _.name)
                 .join(', ');
 
             message += ` while building [${previous}].`;
@@ -1162,9 +1153,7 @@ class Container implements IContainer {
     protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>,
         object: object): void {
         if (this._globalAfterResolvingCallbacks.length) {
-            this._fireCallbackArray(
-                object, this._globalAfterResolvingCallbacks
-            );
+            this._fireCallbackArray(object, this._globalAfterResolvingCallbacks);
         }
 
         this._afterResolvingCallbacks.forEach(
