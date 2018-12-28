@@ -1,5 +1,6 @@
 import Arr from '../Support/Arr';
 import Container from './Container';
+import ExtenderManager from './ExtenderManager';
 import {equals, isUndefined, isInstantiable, isString} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
@@ -48,12 +49,21 @@ class Resolver {
     protected _afterResolvingCallbacks: Map<any, Function[]> = new Map;
 
     /**
+     * The extender instance.
+     *
+     * @var {ExtenderManager}
+     */
+    protected _extenderManager: ExtenderManager;
+
+    /**
      * Create a new class binding builder.
      *
      * @param {Container} container
+     * @param {ExtenderManager} extenderManager
      */
-    public constructor(container: Container) {
+    public constructor(container: Container, extenderManager: ExtenderManager) {
         this._container = container;
+        this._extenderManager = extenderManager;
     }
 
     /**
@@ -73,11 +83,11 @@ class Resolver {
         // we'll just return an existing instance instead of instantiating new
         // instances so the developer can keep using the same objects instance
         // every time.
-        if (this._container.getInstances().has(abstract) && !needsContextualBuild) {
-            return this._container.getInstances().get(abstract);
+        if (this._container.hasSharedInstance<T>(abstract) && !needsContextualBuild) {
+            return this._container.getSharedInstance<T>(abstract);
         }
 
-        this._container.getParameterOverrideStack().push(parameters);
+        this._container.pushParameterOverride(parameters);
 
         const concrete = this._getConcrete<T>(abstract);
 
@@ -102,7 +112,7 @@ class Resolver {
         // creating an entirely new instance of an object on each subsequent
         // request for it.
         if (this._container.isShared<T>(abstract) && !needsContextualBuild) {
-            this._container.getInstances().set(abstract, object);
+            this._container.addSharedInstance<T>(abstract, object);
         }
 
         this._fireResolvingCallbacks<T>(abstract, object);
@@ -113,7 +123,7 @@ class Resolver {
         // class instance.
         this._resolved.set(abstract, true);
 
-        this._container.getParameterOverrideStack().pop();
+        this._container.popParameterOverride();
 
         return object;
     }
@@ -130,7 +140,7 @@ class Resolver {
         }
 
         return this._resolved.has(abstract)
-            || this._container.getInstances().has(abstract);
+            || this._container.hasSharedInstance<T>(abstract);
     }
 
     /**
@@ -210,13 +220,13 @@ class Resolver {
         // alias of the given abstract type. So, we will need to check if any
         // aliases exist with this type and then spin through them and check for
         // contextual bindings on these.
-        if (!this._container.getAbstractAliases().has(abstract)
-            || (this._container.getAbstractAliases().has(abstract)
-                && !this._container.getAbstractAliases().get(abstract)!.length)) {
+        if (!this._container.hasAbstractAlias(abstract)
+            || (this._container.hasAbstractAlias(abstract)
+                && !this._container.getAbstractAlias(abstract)!.length)) {
             return;
         }
 
-        for (const alias of this._container.getAbstractAliases().get(abstract) as any[]) {
+        for (const alias of this._container.getAbstractAlias(abstract) as any[]) {
             const binding = this._findInContextualBindings<any>(alias);
             if (!isUndefined(binding)) return binding;
         }
@@ -236,8 +246,8 @@ class Resolver {
         // we'll just assume each type is a concrete name and will attempt to
         // resolve it as is since the container should be able to resolve
         // concretes automatically.
-        if (this._container.getBindings().has(abstract)) {
-            return this._container.getBindings().get(abstract)!.concrete;
+        if (this._container.hasBinding(abstract)) {
+            return this._container.getBinding(abstract)!.concrete;
         }
 
         return abstract;
@@ -251,10 +261,10 @@ class Resolver {
      * @returns {*}
      */
     protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
-        if (this._container.getContextual().has([Arr.last(this._container.getBuildStack()), abstract])) {
-            return this._container.getContextual().get([
-                Arr.last(this._container.getBuildStack()), abstract
-            ]);
+        if (this._container.hasContextualBinding(this._container.getLatestBuild(), abstract)) {
+            return this._container.getContextualBinding(
+                this._container.getLatestBuild(), abstract
+            );
         }
     }
 
@@ -339,10 +349,8 @@ class Resolver {
     protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
         abstract = this._container.getAlias<T>(abstract);
 
-        const extenders = this._container.getExtenderManager().getExtenders();
-
-        if (extenders.has(abstract)) {
-            return extenders.get(abstract) as Function[];
+        if (this._extenderManager.hasExtenders(abstract)) {
+            return this._extenderManager.getExtenders(abstract) as Function[];
         }
 
         return [];

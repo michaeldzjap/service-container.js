@@ -116,8 +116,8 @@ class Container implements IContainer {
      * Create a new container instance.
      */
     public constructor() {
-        this._resolver = new Resolver(this);
         this._extenderManager = new ExtenderManager(this);
+        this._resolver = new Resolver(this, this._extenderManager);
     }
 
     /**
@@ -320,6 +320,28 @@ class Container implements IContainer {
     }
 
     /**
+     * Determine if the container contains the given contextual binding.
+     *
+     * @param {*} concrete
+     * @param {Identifier} abstract
+     * @returns {boolean}
+     */
+    public hasContextualBinding<T>(concrete: any, abstract: Identifier<T>): boolean {
+        return this._contextual.has([concrete, abstract]);
+    }
+
+    /**
+     * Get a contextual binding from the container.
+     *
+     * @param {*} concrete
+     * @param {Identifier} abstract
+     * @returns {*}
+     */
+    public getContextualBinding<T>(concrete: any, abstract: Identifier<T>): any {
+        return this._contextual.get([concrete, abstract]);
+    }
+
+    /**
      * Add a contextual binding to the container.
      *
      * @param {*} concrete
@@ -330,9 +352,99 @@ class Container implements IContainer {
     public addContextualBinding<T>(concrete: any, abstract: Identifier<T>,
         implementation: any): void {
         this._contextual.set(
-            [concrete, this.getAlias<T>(abstract)],
-            implementation
+            [concrete, this.getAlias<T>(abstract)], implementation
         );
+    }
+
+    /**
+     * Determine if the container contains the given shared instance.
+     *
+     * @param {Identifier} abstract
+     * @returns {boolean}
+     */
+    public hasSharedInstance<T>(abstract: Identifier<T>): boolean {
+        return this._instances.has(abstract);
+    }
+
+    /**
+     * Get a shared instance from the container.
+     *
+     * @param {Identifier} abstract
+     * @returns {*}
+     */
+    public getSharedInstance<T>(abstract: Identifier<T>): any {
+        return this._instances.get(abstract);
+    }
+
+    /**
+     * Add a shared instance to the container.
+     *
+     * @param {Identifier} abstract
+     * @param {*} implementation
+     * @returns {void}
+     */
+    public addSharedInstance<T>(abstract: Identifier<T>, implementation: any): void {
+        this._instances.set(abstract, implementation);
+    }
+
+    /**
+     * Push a parameter override on the stack.
+     *
+     * @param {Array|Object} parameters
+     * @returns {void}
+     */
+    public pushParameterOverride(parameters: any[] | object): void {
+        this._with.push(parameters);
+    }
+
+    /**
+     * Pop a parameter override off the stack.
+     *
+     * @returns {void}
+     */
+    public popParameterOverride(): void {
+        this._with.pop();
+    }
+
+    /**
+     * Determine if the registered alias keyed by the given abstract name
+     * exists.
+     *
+     * @param {Identifier} abstract
+     * @returns {boolean}
+     */
+    public hasAbstractAlias<T>(abstract: Identifier<T>): boolean {
+        return this._abstractAliases.has(abstract);
+    }
+
+    /**
+     * Get the registered alias keyed by the given abstract name.
+     *
+     * @param {Identifier} abstract
+     * @returns {(Array|undefined)}
+     */
+    public getAbstractAlias<T>(abstract: Identifier<T>): any[] | undefined {
+        return this._abstractAliases.get(abstract);
+    }
+
+    /**
+     * Determine if the container contains the given binding.
+     *
+     * @param {Identifier} abstract
+     * @returns {boolean}
+     */
+    public hasBinding<T>(abstract: Identifier<T>): boolean {
+        return this._bindings.has(abstract);
+    }
+
+    /**
+     * Get a binding from the container.
+     *
+     * @param {Identifier} abstract
+     * @returns {(Binding|undefined)}
+     */
+    public getBinding<T>(abstract: Identifier<T>): Binding | undefined {
+        return this._bindings.get(abstract);
     }
 
     /**
@@ -642,48 +754,12 @@ class Container implements IContainer {
     }
 
     /**
-     * Get the container's instances.
-     *
-     * @returns {Map}
-     */
-    public getInstances(): Map<any, any> {
-        return this._instances;
-    }
-
-    /**
-     * Get the container's parameter override stack.
-     *
-     * @returns {Array}
-     */
-    public getParameterOverrideStack(): Array<any[] | object> {
-        return this._with;
-    }
-
-    /**
-     * Get the registered aliases keyed by the abstract name.
-     *
-     * @returns {Map}
-     */
-    public getAbstractAliases(): Map<any, any[]> {
-        return this._abstractAliases;
-    }
-
-    /**
-     * Get the contextual binding map.
-     *
-     * @returns {NestedMap}
-     */
-    public getContextual(): any {
-        return this._contextual;
-    }
-
-    /**
      * Get the stack of concretions currently being built.
      *
      * @returns {Array}
      */
-    public getBuildStack(): any[] {
-        return this._buildStack;
+    public getLatestBuild(): any[] {
+        return Arr.last(this._buildStack);
     }
 
     /**

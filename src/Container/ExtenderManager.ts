@@ -36,10 +36,10 @@ class ExtenderManager {
     public extend<T>(abstract: Identifier<T>, closure: Function): void {
         abstract = this._container.getAlias<T>(abstract);
 
-        if (this._container.getInstances().has(abstract)) {
-            this._container.getInstances().set(
+        if (this._container.hasSharedInstance(abstract)) {
+            this._container.addSharedInstance(
                 abstract,
-                closure(this._container.getInstances().get(abstract), this)
+                closure(this._container.getSharedInstance(abstract), this)
             );
 
             this._container.rebound<T>(abstract);
@@ -65,12 +65,23 @@ class ExtenderManager {
     }
 
     /**
-     * Get the extension closures for services.
+     * Determine if the container contains the given extension closure.
      *
-     * @returns {Map}
+     * @param {Identifier} abstract
+     * @returns {boolean}
      */
-    public getExtenders(): Map<any, Function[]> {
-        return this._extenders;
+    public hasExtenders<T>(abstract: Identifier<T>): boolean {
+        return this._extenders.has(abstract);
+    }
+
+    /**
+     * Get the extension closure for services keyed by the given abstract name.
+     *
+     * @param {Identifier} abstract
+     * @returns {(Function[]|undefined)}
+     */
+    public getExtenders<T>(abstract: Identifier<T>): Function[] | undefined {
+        return this._extenders.get(abstract);
     }
 
 }
