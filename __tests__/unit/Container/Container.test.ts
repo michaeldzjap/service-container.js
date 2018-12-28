@@ -1,8 +1,5 @@
-import BindingResolutionError from '@src/Container/BindingResolutionError';
 import Callable from '@src/Container/Callable';
 import Container from '@src/Container/Container';
-import EntryNotFoundError from '@src/Container/EntryNotFoundError';
-import LogicError from '@src/Container/LogicError';
 import {IContainerContractStub} from '@helpers/Contracts/IContainerContractStub';
 import {
     ContainerConcreteStub,

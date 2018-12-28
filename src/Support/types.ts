@@ -1,17 +1,10 @@
-export interface Newable<T> {
+export interface Instantiable<T> {
     new (...args: any[]): T;
 }
 
-export interface Abstract<T> {
-    prototype: T;
-    name: string;
-}
-
 export interface Instance<T extends {}> {
-    constructor: Abstract<T>;
+    constructor: Instantiable<T>;
 }
-
-export type Instantiable<T> = Newable<T> | Abstract<T>;
 
 export type Identifier<T> = string | symbol | Instantiable<T>;
 

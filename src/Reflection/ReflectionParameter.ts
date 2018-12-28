@@ -1,7 +1,7 @@
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionType from './ReflectionType';
-import {isUndefined, isClass} from '../Support/helpers';
+import {isUndefined, isInstantiable} from '../Support/helpers';
 
 class ReflectionParameter {
 
@@ -37,7 +37,7 @@ class ReflectionParameter {
      * @returns {(ReflectionClass|undefined)}
      */
     public getDeclaringClass(): ReflectionClass | undefined {
-        if (isClass(this._target)) {
+        if (isInstantiable(this._target)) {
             return new ReflectionClass(this._target);
         }
     }
