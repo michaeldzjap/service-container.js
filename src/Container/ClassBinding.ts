@@ -2,7 +2,7 @@ import Container from './Container';
 import {equals} from '../Support/helpers';
 import {Identifier, Instantiable} from '../Support/types';
 
-class ClassBinding<U, V> {
+class ClassBinding {
 
     /**
      * The underlying container instance.
