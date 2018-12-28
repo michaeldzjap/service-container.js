@@ -6,15 +6,17 @@ import Callable from './Callable';
 import ClassBinding from './ClassBinding';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import EntryNotFoundError from './EntryNotFoundError';
+import ExtenderManager from './ExtenderManager';
 import IContainer from '../Contracts/Container/IContainer';
 import LogicError from './LogicError';
 import NestedMap from '../Support/NestedMap/.';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
+import Resolver from './Resolver';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
     isString, isNullOrUndefined, isUndefined, getSymbolName, isInstance,
-    isInstantiable, equals
+    isInstantiable
 } from '../Support/helpers';
 
 class Container implements IContainer {
@@ -29,16 +31,9 @@ class Container implements IContainer {
     /**
      * The contextual binding map.
      *
-     * @var {Map}
+     * @var {NestedMap}
      */
     public _contextual: any = new NestedMap;
-
-    /**
-     * An array of the types that have been resolved.
-     *
-     * @var {Map}
-     */
-    protected _resolved: Map<any, boolean> = new Map;
 
     /**
      * The container's bindings.
@@ -76,13 +71,6 @@ class Container implements IContainer {
     protected _abstractAliases: Map<any, any[]> = new Map;
 
     /**
-     * The extension closures for services.
-     *
-     * @var {Map}
-     */
-    protected _extenders: Map<any, Function[]> = new Map;
-
-    /**
      * All of the registered tags.
      *
      * @var {Map}
@@ -92,7 +80,7 @@ class Container implements IContainer {
     /**
      * The stack of concretions currently being built.
      *
-     * @var {*[]}
+     * @var {Array}
      */
     protected _buildStack: any[] = [];
 
@@ -111,32 +99,26 @@ class Container implements IContainer {
     protected _reboundCallbacks: Map<any, Function[]> = new Map;
 
     /**
-     * All of the global resolving callbacks.
+     * The resolver instance.
      *
-     * @var {Function[]}
+     * @var {Resolver}
      */
-    protected _globalResolvingCallbacks: Function[] = [];
+    protected _resolver: Resolver;
 
     /**
-     * All of the global after resolving callbacks.
+     * The extender instance.
      *
-     * @var {Function[]}
+     * @var {ExtenderManager}
      */
-    protected _globalAfterResolvingCallbacks: Function[] = [];
+    protected _extenderManager: ExtenderManager;
 
     /**
-     * All of the resolving callbacks by class type.
-     *
-     * @var {Map}
+     * Create a new container instance.
      */
-    protected _resolvingCallbacks: Map<any, Function[]> = new Map;
-
-    /**
-     * All of the after resolving callbacks by class type.
-     *
-     * @var {Map}
-     */
-    protected _afterResolvingCallbacks: Map<any, Function[]> = new Map;
+    public constructor() {
+        this._resolver = new Resolver(this);
+        this._extenderManager = new ExtenderManager(this);
+    }
 
     /**
      * Set the globally available instance of the container.
@@ -228,11 +210,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public resolved<T>(abstract: Identifier<T>): boolean {
-        if (this.isAlias<T>(abstract)) {
-            abstract = this.getAlias<T>(abstract);
-        }
-
-        return this._resolved.has(abstract) || this._instances.has(abstract);
+        return this._resolver.resolved<T>(abstract);
     }
 
     /**
@@ -294,7 +272,7 @@ class Container implements IContainer {
         // fire the rebound listener so that any objects which have already
         // gotten resolved can have their copy of the object updated via the
         // listener callbacks.
-        if (this.resolved<U>(abstract)) this._rebound<U>(abstract);
+        if (this.resolved<U>(abstract)) this.rebound<U>(abstract);
     }
 
     /**
@@ -306,7 +284,7 @@ class Container implements IContainer {
     public unbind<T>(abstract: Identifier<T>): void {
         this._bindings.delete(abstract);
         this._instances.delete(abstract);
-        this._resolved.delete(abstract);
+        this._resolver.deleteResolved(abstract);
     }
 
     /**
@@ -391,21 +369,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public extend<T>(abstract: Identifier<T>, closure: Function): void {
-        abstract = this.getAlias<T>(abstract);
-
-        if (this._instances.has(abstract)) {
-            this._instances.set(
-                abstract, closure(this._instances.get(abstract), this)
-            );
-
-            this._rebound<T>(abstract);
-        } else {
-            this._extenders.has(abstract)
-                ? this._extenders.get(abstract)!.push(closure)
-                : this._extenders.set(abstract, [closure]);
-
-            if (this.resolved<T>(abstract)) this._rebound<T>(abstract);
-        }
+        this._extenderManager.extend<T>(abstract, closure);
     }
 
     /**
@@ -428,9 +392,7 @@ class Container implements IContainer {
         // gotten resolved here.
         this._instances.set(abstract, instance);
 
-        if (isBound) {
-            this._rebound<U>(abstract);
-        }
+        if (isBound) this.rebound<U>(abstract);
 
         return instance;
     }
@@ -480,11 +442,9 @@ class Container implements IContainer {
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
         this._aliases.set(alias, abstract);
 
-        const arr = this._abstractAliases.get(abstract);
-        this._abstractAliases.set(
-            abstract,
-            arr ? [...arr, alias] : [alias]
-        );
+        this._abstractAliases.has(abstract)
+            ? this._abstractAliases.get(abstract)!.push(alias)
+            : this._abstractAliases.set(abstract, [alias]);
     }
 
     /**
@@ -496,12 +456,10 @@ class Container implements IContainer {
      */
     public rebinding<T>(abstract: Identifier<T>, callback: Function): unknown | undefined {
         abstract = this.getAlias<T>(abstract);
-        this._reboundCallbacks.set(
-            abstract,
-            this._reboundCallbacks.has(abstract)
-                ? [...this._reboundCallbacks.get(abstract) as Function[], callback]
-                : [callback]
-        );
+
+        this._reboundCallbacks.has(abstract)
+            ? this._reboundCallbacks.get(abstract)!.push(callback)
+            : this._reboundCallbacks.set(abstract, [callback]);
 
         if (this.bound<T>(abstract)) return this.make<T>(abstract);
     }
@@ -563,7 +521,7 @@ class Container implements IContainer {
      * @returns {*}
      */
     public make<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
-        return this._resolve<T>(abstract, parameters);
+        return this._resolver.resolve<T>(abstract, parameters);
     }
 
     /**
@@ -576,7 +534,7 @@ class Container implements IContainer {
      */
     public get<T>(id: Identifier<T>): any {
         try {
-            return this._resolve<T>(id);
+            return this._resolver.resolve<T>(id);
         } catch (e) {
             if (this.has(id)) throw e;
 
@@ -660,18 +618,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void {
-        if (isString(abstract) || isInstantiable(abstract)) {
-            abstract = this.getAlias<T>(abstract);
-        }
-
-        if (isUndefined(callback) && !isInstantiable(abstract)
-            && abstract instanceof Function) {
-            this._globalResolvingCallbacks.push(abstract);
-        } else if (!isUndefined(callback)) {
-            this._resolvingCallbacks.has(abstract)
-                ? this._resolvingCallbacks.get(abstract)!.push(callback)
-                : this._resolvingCallbacks.set(abstract, [callback]);
-        }
+        this._resolver.resolving<T>(abstract, callback);
     }
 
     /**
@@ -682,18 +629,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public afterResolving<T>(abstract: Identifier<T>| Function, callback?: Function): void {
-        if (isString(abstract) || isInstantiable(abstract)) {
-            abstract = this.getAlias<T>(abstract);
-        }
-
-        if (isUndefined(callback) && !isInstantiable(abstract)
-            && abstract instanceof Function) {
-            this._globalAfterResolvingCallbacks.push(abstract);
-        } else if (!isUndefined(callback)) {
-            this._afterResolvingCallbacks.has(abstract)
-                ? this._afterResolvingCallbacks.get(abstract)!.push(callback)
-                : this._afterResolvingCallbacks.set(abstract, [callback]);
-        }
+        this._resolver.afterResolving<T>(abstract, callback);
     }
 
     /**
@@ -703,6 +639,60 @@ class Container implements IContainer {
      */
     public getBindings(): Map<any, Binding> {
         return this._bindings;
+    }
+
+    /**
+     * Get the container's instances.
+     *
+     * @returns {Map}
+     */
+    public getInstances(): Map<any, any> {
+        return this._instances;
+    }
+
+    /**
+     * Get the container's parameter override stack.
+     *
+     * @returns {Array}
+     */
+    public getParameterOverrideStack(): Array<any[] | object> {
+        return this._with;
+    }
+
+    /**
+     * Get the registered aliases keyed by the abstract name.
+     *
+     * @returns {Map}
+     */
+    public getAbstractAliases(): Map<any, any[]> {
+        return this._abstractAliases;
+    }
+
+    /**
+     * Get the contextual binding map.
+     *
+     * @returns {NestedMap}
+     */
+    public getContextual(): any {
+        return this._contextual;
+    }
+
+    /**
+     * Get the stack of concretions currently being built.
+     *
+     * @returns {Array}
+     */
+    public getBuildStack(): any[] {
+        return this._buildStack;
+    }
+
+    /**
+     * Get the extender manager instance.
+     *
+     * @returns {ExtenderManager}
+     */
+    public getExtenderManager(): ExtenderManager {
+        return this._extenderManager;
     }
 
     /**
@@ -732,7 +722,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public forgetExtenders<T>(abstract: Identifier<T>): void {
-        this._extenders.delete(this.getAlias(abstract));
+        this._extenderManager.forgetExtenders(abstract);
     }
 
     /**
@@ -761,10 +751,24 @@ class Container implements IContainer {
      */
     public flush(): void {
         this._aliases.clear();
-        this._resolved.clear();
+        this._resolver.clearResolved();
         this._bindings.clear();
         this._instances.clear();
         this._abstractAliases.clear();
+    }
+
+    /**
+     * Fire the "rebound" callbacks for the given abstract type.
+     *
+     * @param {Identifier} abstract
+     * @returns {void}
+     */
+    public rebound<T>(abstract: Identifier<T>): void {
+        const instance = this.make<T>(abstract);
+
+        for (const callback of this._getReboundCallbacks<T>(abstract)) {
+            callback(this, instance);
+        }
     }
 
     /**
@@ -799,20 +803,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Fire the "rebound" callbacks for the given abstract type.
-     *
-     * @param {Identifier} abstract
-     * @returns {void}
-     */
-    protected _rebound<T>(abstract: Identifier<T>): void {
-        const instance = this.make<T>(abstract);
-
-        for (const callback of this._getReboundCallbacks<T>(abstract)) {
-            callback(this, instance);
-        }
-    }
-
-    /**
      * Get the rebound callbacks for a given type.
      *
      * @param {Identifier} abstract
@@ -824,141 +814,6 @@ class Container implements IContainer {
         }
 
         return [];
-    }
-
-    /**
-     * Resolve the given type from the container.
-     *
-     * @param {Identifier} abstract
-     * @param {(*[]|Object)} [parameters=[]]
-     * @returns {*}
-     */
-    protected _resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
-        abstract = this.getAlias<T>(abstract);
-
-        const needsContextualBuild = !Arr.empty(parameters)
-            || !!this._getContextualConcrete<T>(abstract);
-
-        // If an instance of the type is currently being managed as a singleton
-        // we'll just return an existing instance instead of instantiating new
-        // instances so the developer can keep using the same objects instance
-        // every time.
-        if (this._instances.has(abstract) && !needsContextualBuild) {
-            return this._instances.get(abstract);
-        }
-
-        this._with.push(parameters);
-
-        const concrete = this._getConcrete<T>(abstract);
-
-        // We're ready to instantiate an instance of the concrete type
-        // registered for the binding. This will instantiate the types, as well
-        // as resolve any of its "nested" dependencies recursively until all
-        // have gotten resolved.
-        let object = this._isBuildable<any, T>(concrete, abstract)
-            ? this.build<any>(concrete)
-            : this.make<any>(concrete);
-
-        // If we defined any extenders for this type, we'll need to spin through
-        // them and apply them to the object being built. This allows for the
-        // extension of services, such as changing configuration or decorating
-        // the object.
-        for (const extender of this._getExtenders<T>(abstract)) {
-            object = extender(object, this);
-        }
-
-        // If the requested type is registered as a singleton we'll want to
-        // cache off the instances in "memory" so we can return it later without
-        // creating an entirely new instance of an object on each subsequent
-        // request for it.
-        if (this.isShared<T>(abstract) && !needsContextualBuild) {
-            this._instances.set(abstract, object);
-        }
-
-        this._fireResolvingCallbacks<T>(abstract, object);
-
-        // Before returning, we will also set the resolved flag to "true" and
-        // pop off the parameter overrides for this build. After those two
-        // things are done we will be ready to return back the fully constructed
-        // class instance.
-        this._resolved.set(abstract, true);
-
-        this._with.pop();
-
-        return object;
-    }
-
-    /**
-     * Get the concrete type for a given abstract.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
-        const concrete = this._getContextualConcrete<T>(abstract);
-        if (!isUndefined(concrete)) return concrete;
-
-        // If we don't have a registered resolver or concrete for the type,
-        // we'll just assume each type is a concrete name and will attempt to
-        // resolve it as is since the container should be able to resolve
-        // concretes automatically.
-        if (this._bindings.has(abstract)) {
-            return this._bindings.get(abstract)!.concrete;
-        }
-
-        return abstract;
-    }
-
-    /**
-     * Get the contextual concrete binding for the given abstract.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    protected _getContextualConcrete<T>(abstract: Identifier<T>): any {
-        const binding = this._findInContextualBindings(abstract);
-        if (!isUndefined(binding)) return binding;
-
-        // Next we need to see if a contextual binding might be bound under an
-        // alias of the given abstract type. So, we will need to check if any
-        // aliases exist with this type and then spin through them and check for
-        // contextual bindings on these.
-        if (!this._abstractAliases.has(abstract)
-            || (this._abstractAliases.has(abstract)
-                && !this._abstractAliases.get(abstract)!.length)) {
-            return;
-        }
-
-        for (const alias of this._abstractAliases.get(abstract) as any[]) {
-            const binding = this._findInContextualBindings<any>(alias);
-            if (!isUndefined(binding)) return binding;
-        }
-    }
-
-    /**
-     * Find the concrete binding for the given abstract in the contextual
-     * binding array.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
-        if (this._contextual.has([Arr.last(this._buildStack), abstract])) {
-            return this._contextual.get([Arr.last(this._buildStack), abstract]);
-        }
-    }
-
-    /**
-     * Determine if the given concrete is buildable.
-     *
-     * @param {(Identifier|*)} concrete
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    protected _isBuildable<U, V>(concrete: Identifier<U> | Function,
-        abstract: Identifier<V>): boolean {
-        return equals(concrete, abstract)
-            || (!isInstantiable(concrete) && concrete instanceof Function);
     }
 
     /**
@@ -1034,7 +889,7 @@ class Container implements IContainer {
      * @returns {(*|undefined)}
      */
     protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
-        const concrete = this._getContextualConcrete(parameter.getName());
+        const concrete = this._resolver.getContextualConcrete(parameter.getName());
         if (concrete) {
             return concrete instanceof Function
                 ? concrete(this)
@@ -1117,81 +972,6 @@ class Container implements IContainer {
         const message = `Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}`;
 
         throw new BindingResolutionError(message);
-    }
-
-    /**
-     * Fire all of the resolving callbacks.
-     *
-     * @param {Identifier} abstract
-     * @param {Object} object
-     * @returns {void}
-     */
-    protected _fireResolvingCallbacks<T>(abstract: Identifier<T>,
-        object: object): void {
-        if (this._globalResolvingCallbacks.length) {
-            this._fireCallbackArray(object, this._globalResolvingCallbacks);
-        }
-
-        this._resolvingCallbacks.forEach(
-            (callbacks: Function[], type: any): void => {
-                if (type === abstract || object instanceof type) {
-                    this._fireCallbackArray(object, callbacks);
-                }
-            }
-        );
-
-        this._fireAfterResolvingCallbacks<T>(abstract, object);
-    }
-
-    /**
-     * Fire all of the after resolving callbacks.
-     *
-     * @param {Identifier} abstract
-     * @param {Object} object
-     * @returns {void}
-     */
-    protected _fireAfterResolvingCallbacks<T>(abstract: Identifier<T>,
-        object: object): void {
-        if (this._globalAfterResolvingCallbacks.length) {
-            this._fireCallbackArray(object, this._globalAfterResolvingCallbacks);
-        }
-
-        this._afterResolvingCallbacks.forEach(
-            (callbacks: Function[], type: any): void => {
-                if (type === abstract || object instanceof type) {
-                    this._fireCallbackArray(object, callbacks);
-                }
-            }
-        );
-    }
-
-    /**
-     * Fire an array of callbacks with an object.
-     *
-     * @param {Object} object
-     * @param {Function[]} callbacks
-     * @returns {void}
-     */
-    protected _fireCallbackArray(object: object, callbacks: Function[]): void {
-        for (const callback of callbacks) {
-            callback(object, this);
-        }
-    }
-
-    /**
-     * Get the extender callbacks for a given type.
-     *
-     * @param {Identifier} abstract
-     * @returns {Function[]}
-     */
-    protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
-        abstract = this.getAlias<T>(abstract);
-
-        if (this._extenders.has(abstract)) {
-            return this._extenders.get(abstract) as Function[];
-        }
-
-        return [];
     }
 
     /**
