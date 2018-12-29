@@ -1,6 +1,5 @@
 import Arr from '../Support/Arr';
 import Container from './Container';
-import ExtenderManager from './ExtenderManager';
 import {equals, isUndefined, isInstantiable, isString} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
@@ -49,21 +48,12 @@ class Resolver {
     protected _afterResolvingCallbacks: Map<any, Function[]> = new Map;
 
     /**
-     * The extender instance.
-     *
-     * @var {ExtenderManager}
-     */
-    protected _extenderManager: ExtenderManager;
-
-    /**
      * Create a new class binding builder.
      *
      * @param {Container} container
-     * @param {ExtenderManager} extenderManager
      */
-    public constructor(container: Container, extenderManager: ExtenderManager) {
+    public constructor(container: Container) {
         this._container = container;
-        this._extenderManager = extenderManager;
     }
 
     /**
@@ -77,7 +67,7 @@ class Resolver {
         abstract = this._container.getAlias<T>(abstract);
 
         const needsContextualBuild = !Arr.empty(parameters)
-            || !!this.getContextualConcrete<T>(abstract);
+            || !!this._container.getContextualBindingManager().getContextualConcrete<T>(abstract);
 
         // If an instance of the type is currently being managed as a singleton
         // we'll just return an existing instance instead of instantiating new
@@ -207,39 +197,16 @@ class Resolver {
     }
 
     /**
-     * Get the contextual concrete binding for the given abstract.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    public getContextualConcrete<T>(abstract: Identifier<T>): any {
-        const binding = this._findInContextualBindings(abstract);
-        if (!isUndefined(binding)) return binding;
-
-        // Next we need to see if a contextual binding might be bound under an
-        // alias of the given abstract type. So, we will need to check if any
-        // aliases exist with this type and then spin through them and check for
-        // contextual bindings on these.
-        if (!this._container.hasAbstractAlias(abstract)
-            || (this._container.hasAbstractAlias(abstract)
-                && !this._container.getAbstractAlias(abstract)!.length)) {
-            return;
-        }
-
-        for (const alias of this._container.getAbstractAlias(abstract) as any[]) {
-            const binding = this._findInContextualBindings<any>(alias);
-            if (!isUndefined(binding)) return binding;
-        }
-    }
-
-    /**
      * Get the concrete type for a given abstract.
      *
      * @param {Identifier} abstract
      * @returns {*}
      */
     protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
-        const concrete = this.getContextualConcrete<T>(abstract);
+        const concrete = this._container
+            .getContextualBindingManager()
+            .getContextualConcrete<T>(abstract);
+
         if (!isUndefined(concrete)) return concrete;
 
         // If we don't have a registered resolver or concrete for the type,
@@ -251,21 +218,6 @@ class Resolver {
         }
 
         return abstract;
-    }
-
-    /**
-     * Find the concrete binding for the given abstract in the contextual
-     * binding array.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
-        if (this._container.hasContextualBinding(this._container.getLatestBuild(), abstract)) {
-            return this._container.getContextualBinding(
-                this._container.getLatestBuild(), abstract
-            );
-        }
     }
 
     /**
@@ -349,8 +301,10 @@ class Resolver {
     protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
         abstract = this._container.getAlias<T>(abstract);
 
-        if (this._extenderManager.hasExtenders(abstract)) {
-            return this._extenderManager.getExtenders(abstract) as Function[];
+        const manager = this._container.getExtenderManager();
+
+        if (manager.hasExtenders(abstract)) {
+            return manager.getExtenders(abstract) as Function[];
         }
 
         return [];

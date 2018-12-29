@@ -5,18 +5,17 @@ import BoundMethod from './BoundMethod';
 import Callable from './Callable';
 import ClassBinding from './ClassBinding';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
+import ContextualBindingManager from './ContextualBindingManager';
 import EntryNotFoundError from './EntryNotFoundError';
 import ExtenderManager from './ExtenderManager';
 import IContainer from '../Contracts/Container/IContainer';
 import LogicError from './LogicError';
-import NestedMap from '../Support/NestedMap/.';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
-    isString, isNullOrUndefined, isUndefined, getSymbolName, isInstance,
-    isInstantiable
+    isNullOrUndefined, isUndefined, getSymbolName, isInstance, isInstantiable
 } from '../Support/helpers';
 
 class Container implements IContainer {
@@ -27,13 +26,6 @@ class Container implements IContainer {
      * @var {Container}
      */
     protected static _instance?: Container;
-
-    /**
-     * The contextual binding map.
-     *
-     * @var {NestedMap}
-     */
-    public _contextual: any = new NestedMap;
 
     /**
      * The container's bindings.
@@ -99,6 +91,13 @@ class Container implements IContainer {
     protected _reboundCallbacks: Map<any, Function[]> = new Map;
 
     /**
+     * The contextual binding manager.
+     *
+     * @var {ContextualBindingManager}
+     */
+    protected _contextualManager: ContextualBindingManager;
+
+    /**
      * The resolver instance.
      *
      * @var {Resolver}
@@ -106,7 +105,7 @@ class Container implements IContainer {
     protected _resolver: Resolver;
 
     /**
-     * The extender instance.
+     * The extender manager instance.
      *
      * @var {ExtenderManager}
      */
@@ -116,8 +115,9 @@ class Container implements IContainer {
      * Create a new container instance.
      */
     public constructor() {
+        this._contextualManager = new ContextualBindingManager(this);
         this._extenderManager = new ExtenderManager(this);
-        this._resolver = new Resolver(this, this._extenderManager);
+        this._resolver = new Resolver(this);
     }
 
     /**
@@ -317,43 +317,6 @@ class Container implements IContainer {
      */
     public callMethodBinding(method: string, instance: any): any {
         return (this._methodBindings as any).get(method)(instance, this);
-    }
-
-    /**
-     * Determine if the container contains the given contextual binding.
-     *
-     * @param {*} concrete
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    public hasContextualBinding<T>(concrete: any, abstract: Identifier<T>): boolean {
-        return this._contextual.has([concrete, abstract]);
-    }
-
-    /**
-     * Get a contextual binding from the container.
-     *
-     * @param {*} concrete
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    public getContextualBinding<T>(concrete: any, abstract: Identifier<T>): any {
-        return this._contextual.get([concrete, abstract]);
-    }
-
-    /**
-     * Add a contextual binding to the container.
-     *
-     * @param {*} concrete
-     * @param {Identifier} abstract
-     * @param {*} implementation
-     * @returns {void}
-     */
-    public addContextualBinding<T>(concrete: any, abstract: Identifier<T>,
-        implementation: any): void {
-        this._contextual.set(
-            [concrete, this.getAlias<T>(abstract)], implementation
-        );
     }
 
     /**
@@ -763,6 +726,15 @@ class Container implements IContainer {
     }
 
     /**
+     * Get the contextual binding manager.
+     *
+     * @returns {ContextualBindingManager}
+     */
+    public getContextualBindingManager(): ContextualBindingManager {
+        return this._contextualManager;
+    }
+
+    /**
      * Get the extender manager instance.
      *
      * @returns {ExtenderManager}
@@ -965,7 +937,9 @@ class Container implements IContainer {
      * @returns {(*|undefined)}
      */
     protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
-        const concrete = this._resolver.getContextualConcrete(parameter.getName());
+        const concrete = this._contextualManager
+            .getContextualConcrete(parameter.getName());
+
         if (concrete) {
             return concrete instanceof Function
                 ? concrete(this)
