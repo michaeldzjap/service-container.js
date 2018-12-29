@@ -28,13 +28,6 @@ class Container implements IContainer {
      */
     protected static _instance?: Container;
 
-    // /**
-    //  * The container's method bindings.
-    //  *
-    //  * @var {Map}
-    //  */
-    // protected _methodBindings: Map<string, Function> = new Map;
-
     /**
      * The container's shared instances.
      *
@@ -257,16 +250,6 @@ class Container implements IContainer {
         this._resolver.forgetResolved(abstract);
     }
 
-    // /**
-    //  * Determine if the container has a method binding.
-    //  *
-    //  * @param {string} method
-    //  * @returns {boolean}
-    //  */
-    // public hasMethodBinding(method: string): boolean {
-    //     return !!this._methodBindings.has(method);
-    // }
-
     /**
      * Determine if the container has a method binding.
      *
@@ -276,17 +259,6 @@ class Container implements IContainer {
     public hasMethodBinding(method: string): boolean {
         return this._methodBinder.hasMethodBinding(method);
     }
-
-    // /**
-    //  * Bind a callback to resolve with Container::call.
-    //  *
-    //  * @param {(Array|string)} method
-    //  * @param {Function} callback
-    //  * @returns {void}
-    //  */
-    // public bindMethod<T>(method: [Instantiable<T>, string] | string, callback: Function): void {
-    //     this._methodBindings.set(this._parseBindMethod(method), callback);
-    // }
 
     /**
      * Bind a callback to resolve with Container::call.
@@ -298,17 +270,6 @@ class Container implements IContainer {
     public bindMethod<T>(method: [Instantiable<T>, string] | string, callback: Function): void {
         this._methodBinder.bindMethod(method, callback);
     }
-
-    // /**
-    //  * Get the method binding for the given method.
-    //  *
-    //  * @param {string} method
-    //  * @param {*} instance
-    //  * @returns {*}
-    //  */
-    // public callMethodBinding(method: string, instance: any): any {
-    //     return (this._methodBindings as any).get(method)(instance, this);
-    // }
 
     /**
      * Get the method binding for the given method.
