@@ -68,7 +68,7 @@ class Resolver implements IResolver {
         abstract = this._container.getAlias<T>(abstract);
 
         const needsContextualBuild = !Arr.empty(parameters)
-            || !!this._container.getContextualBindingManager().getContextualConcrete<T>(abstract);
+            || !!this._container.getContextualBinder().getContextualConcrete<T>(abstract);
 
         // If an instance of the type is currently being managed as a singleton
         // we'll just return an existing instance instead of instantiating new
@@ -205,7 +205,7 @@ class Resolver implements IResolver {
      */
     protected _getConcrete<T>(abstract: Identifier<T>): Identifier<T> | any {
         const concrete = this._container
-            .getContextualBindingManager()
+            .getContextualBinder()
             .getContextualConcrete<T>(abstract);
 
         if (!isUndefined(concrete)) return concrete;
@@ -302,7 +302,7 @@ class Resolver implements IResolver {
     protected _getExtenders<T>(abstract: Identifier<T>): Function[] {
         abstract = this._container.getAlias<T>(abstract);
 
-        const manager = this._container.getExtenderManager();
+        const manager = this._container.getExtender();
 
         if (manager.hasExtenders(abstract)) {
             return manager.getExtenders(abstract) as Function[];

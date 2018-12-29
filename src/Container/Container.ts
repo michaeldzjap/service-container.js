@@ -1,13 +1,13 @@
-import AliasManager from './AliasManager';
+import Aliaser from './Aliaser';
 import Arr from '../Support/Arr';
 import Binder from './Binder';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
-import ContextualBindingManager from './ContextualBindingManager';
+import ContextualBinder from './ContextualBinder';
 import EntryNotFoundError from './EntryNotFoundError';
-import ExtenderManager from './ExtenderManager';
+import Extender from './Extender';
 import IContainer from '../Contracts/Container/IContainer';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
@@ -64,16 +64,16 @@ class Container implements IContainer {
     /**
      * The contextual binding manager.
      *
-     * @var {ContextualBindingManager}
+     * @var {ContextualBinder}
      */
-    protected _contextualManager: ContextualBindingManager;
+    protected _contextualBinder: ContextualBinder;
 
     /**
-     * The type alias manager.
+     * The type aliaser instance.
      *
-     * @var {AliasManager}
+     * @var {Aliaser}
      */
-    protected _aliasManager: AliasManager;
+    protected _aliaser: Aliaser;
 
     /**
      * The binder instance.
@@ -92,17 +92,17 @@ class Container implements IContainer {
     /**
      * The extender manager instance.
      *
-     * @var {ExtenderManager}
+     * @var {Extender}
      */
-    protected _extenderManager: ExtenderManager;
+    protected _extender: Extender;
 
     /**
      * Create a new container instance.
      */
     public constructor() {
-        this._contextualManager = new ContextualBindingManager(this);
-        this._aliasManager = new AliasManager(this);
-        this._extenderManager = new ExtenderManager(this);
+        this._contextualBinder = new ContextualBinder(this);
+        this._aliaser = new Aliaser(this);
+        this._extender = new Extender(this);
         this._binder = new Binder(this);
         this._resolver = new Resolver(this);
     }
@@ -218,7 +218,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public isAlias<T>(name: Identifier<T>): boolean {
-        return this._aliasManager.isAlias(name);
+        return this._aliaser.isAlias(name);
     }
 
     /**
@@ -360,7 +360,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public extend<T>(abstract: Identifier<T>, closure: Function): void {
-        this._extenderManager.extend<T>(abstract, closure);
+        this._extender.extend<T>(abstract, closure);
     }
 
     /**
@@ -371,11 +371,11 @@ class Container implements IContainer {
      * @returns {*}
      */
     public instance<U, V>(abstract: Identifier<U>, instance: V): V {
-        this._aliasManager.removeAbstractAlias<U>(abstract);
+        this._aliaser.removeAbstractAlias<U>(abstract);
 
         const isBound = this.bound<U>(abstract);
 
-        this._aliasManager.forgetAlias(abstract);
+        this._aliaser.forgetAlias(abstract);
 
         // We'll check to determine if this type has been bound before, and if
         // it has we will fire the rebound callbacks registered with the
@@ -431,7 +431,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
-        this._aliasManager.alias(abstract, alias);
+        this._aliaser.alias(abstract, alias);
     }
 
     /**
@@ -650,30 +650,30 @@ class Container implements IContainer {
     }
 
     /**
-     * Get the alias manager.
+     * Get the aliaser.
      *
-     * @returns {AliasManager}
+     * @returns {Aliaser}
      */
-    public getAliasManager(): AliasManager {
-        return this._aliasManager;
+    public getAliaser(): Aliaser {
+        return this._aliaser;
     }
 
     /**
-     * Get the contextual binding manager.
+     * Get the contextual binder instance.
      *
-     * @returns {ContextualBindingManager}
+     * @returns {ContextualBinder}
      */
-    public getContextualBindingManager(): ContextualBindingManager {
-        return this._contextualManager;
+    public getContextualBinder(): ContextualBinder {
+        return this._contextualBinder;
     }
 
     /**
      * Get the extender manager instance.
      *
-     * @returns {ExtenderManager}
+     * @returns {Extender}
      */
-    public getExtenderManager(): ExtenderManager {
-        return this._extenderManager;
+    public getExtender(): Extender {
+        return this._extender;
     }
 
     /**
@@ -685,7 +685,7 @@ class Container implements IContainer {
      * @throws {LogicError}
      */
     public getAlias<T>(abstract: Identifier<T>): Identifier<any> {
-        return this._aliasManager.getAlias<T>(abstract);
+        return this._aliaser.getAlias<T>(abstract);
     }
 
     /**
@@ -695,7 +695,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public forgetExtenders<T>(abstract: Identifier<T>): void {
-        this._extenderManager.forgetExtenders(abstract);
+        this._extender.forgetExtenders(abstract);
     }
 
     /**
@@ -723,11 +723,11 @@ class Container implements IContainer {
      * @returns {void}
      */
     public flush(): void {
-        this._aliasManager.forgetAliases();
+        this._aliaser.forgetAliases();
         this._resolver.forgetAllResolved();
         this._binder.forgetBindings();
         this._instances.clear();
-        this._aliasManager.forgetAbstractAliases();
+        this._aliaser.forgetAbstractAliases();
     }
 
     /**
@@ -827,7 +827,7 @@ class Container implements IContainer {
      * @returns {(*|undefined)}
      */
     protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
-        const concrete = this._contextualManager
+        const concrete = this._contextualBinder
             .getContextualConcrete(parameter.getName());
 
         if (concrete) {

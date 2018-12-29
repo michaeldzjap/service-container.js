@@ -1,9 +1,9 @@
 import Container from './Container';
-import IAliasManager from '../Contracts/Container/IAliasManager';
+import IAliaser from '../Contracts/Container/IAliaser';
 import LogicError from './LogicError';
 import {Identifier} from '../Support/types';
 
-class AliasManager implements IAliasManager {
+class Aliaser implements IAliaser {
 
     /**
      * The underlying container instance.
@@ -148,4 +148,4 @@ class AliasManager implements IAliasManager {
 
 }
 
-export default AliasManager;
+export default Aliaser;

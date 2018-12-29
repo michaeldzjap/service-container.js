@@ -206,7 +206,7 @@ class Binder implements IBinder {
      */
     protected _dropStaleInstances<T>(abstract: Identifier<T>): void {
         this._container.forgetInstance(abstract);
-        this._container.getAliasManager().forgetAlias(abstract);
+        this._container.getAliaser().forgetAlias(abstract);
     }
 
 }

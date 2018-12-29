@@ -1,6 +1,6 @@
 import {Identifier} from '../../Support/types';
 
-interface IContextualBindingManager {
+interface IContextualBinder {
 
     /**
      * Add a contextual binding to the container.
@@ -22,4 +22,4 @@ interface IContextualBindingManager {
 
 }
 
-export default IContextualBindingManager;
+export default IContextualBinder;

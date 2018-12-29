@@ -1,10 +1,10 @@
 import Container from './Container';
-import IContextualBindingManager from '../Contracts/Container/IContextualBindingManager';
+import IContextualBinder from '../Contracts/Container/IContextualBinder';
 import NestedMap from '../Support/NestedMap/.';
 import {isUndefined} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
-class ContextualBindingManager implements IContextualBindingManager {
+class ContextualBinder implements IContextualBinder {
 
     /**
      * The underlying container instance.
@@ -54,7 +54,7 @@ class ContextualBindingManager implements IContextualBindingManager {
         const binding = this._findInContextualBindings(abstract);
         if (!isUndefined(binding)) return binding;
 
-        const manager = this._container.getAliasManager();
+        const manager = this._container.getAliaser();
 
         // Next we need to see if a contextual binding might be bound under an
         // alias of the given abstract type. So, we will need to check if any
@@ -89,4 +89,4 @@ class ContextualBindingManager implements IContextualBindingManager {
 
 }
 
-export default ContextualBindingManager;
+export default ContextualBinder;

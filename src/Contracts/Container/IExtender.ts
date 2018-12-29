@@ -1,6 +1,6 @@
 import {Identifier} from '../../Support/types';
 
-interface IExtenderManager {
+interface IExtender {
 
     /**
      * "Extend" an abstract type in the container.
@@ -37,4 +37,4 @@ interface IExtenderManager {
 
 }
 
-export default IExtenderManager;
+export default IExtender;

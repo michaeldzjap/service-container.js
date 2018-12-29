@@ -1,6 +1,6 @@
 import {Identifier} from '../../Support/types';
 
-interface IAliasManager {
+interface IAliaser {
 
     /**
      * Determine if a given string is an alias.
@@ -78,4 +78,4 @@ interface IAliasManager {
 
 }
 
-export default IAliasManager;
+export default IAliaser;
