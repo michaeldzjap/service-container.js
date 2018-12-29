@@ -62,7 +62,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
 
         for (const concrete of Arr.wrap(this._concrete)) {
             this._container
-                .getContextualBindingManager()
+                .getContextualBinder()
                 .addContextualBinding(
                     concrete,
                     this._needs,

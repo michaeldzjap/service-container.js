@@ -49,7 +49,7 @@ class Resolver implements IResolver {
     protected _afterResolvingCallbacks: Map<any, Function[]> = new Map;
 
     /**
-     * Create a new class binding builder.
+     * Create a new resolver.
      *
      * @param {Container} container
      */

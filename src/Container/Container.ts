@@ -12,6 +12,7 @@ import IContainer from '../Contracts/Container/IContainer';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
+import Tagger from './Tagger';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
     isUndefined, getSymbolName, isInstance, isInstantiable
@@ -40,12 +41,12 @@ class Container implements IContainer {
      */
     protected _instances: Map<any, any> = new Map;
 
-    /**
-     * All of the registered tags.
-     *
-     * @var {Map}
-     */
-    protected _tags: Map<string, any[]> = new Map;
+    // /**
+    //  * All of the registered tags.
+    //  *
+    //  * @var {Map}
+    //  */
+    // protected _tags: Map<string, any[]> = new Map;
 
     /**
      * The stack of concretions currently being built.
@@ -90,11 +91,18 @@ class Container implements IContainer {
     protected _resolver: Resolver;
 
     /**
-     * The extender manager instance.
+     * The extender instance.
      *
      * @var {Extender}
      */
     protected _extender: Extender;
+
+    /**
+     * The tagger instance.
+     *
+     * @var {Tagger}
+     */
+    protected _tagger: Tagger;
 
     /**
      * Create a new container instance.
@@ -105,6 +113,7 @@ class Container implements IContainer {
         this._extender = new Extender(this);
         this._binder = new Binder(this);
         this._resolver = new Resolver(this);
+        this._tagger = new Tagger(this);
     }
 
     /**
@@ -396,13 +405,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void {
-        for (const tag of tags) {
-            if (!this._tags.has(tag)) this._tags.set(tag, []);
-
-            for (const abstract of Arr.wrap(abstracts)) {
-                this._tags.get(tag)!.push(abstract);
-            }
-        }
+        this._tagger.tag(abstracts, tags);
     }
 
     /**
@@ -412,15 +415,7 @@ class Container implements IContainer {
      * @returns {Array}
      */
     public tagged(tag: string): any[] {
-        const results: any[] = [];
-
-        if (this._tags.has(tag)) {
-            for (const abstract of (this._tags as any).get(tag)) {
-                results.push(this.make(abstract));
-            }
-        }
-
-        return results;
+        return this._tagger.tagged(tag);
     }
 
     /**
