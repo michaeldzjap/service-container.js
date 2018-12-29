@@ -1,8 +1,8 @@
 import Aliaser from './Aliaser';
 import Arr from '../Support/Arr';
 import Binder from './Binder';
-import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
+import Builder from './Builder';
 import Callable from './Callable';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import ContextualBinder from './ContextualBinder';
@@ -10,14 +10,10 @@ import EntryNotFoundError from './EntryNotFoundError';
 import Extender from './Extender';
 import IContainer from '../Contracts/Container/IContainer';
 import MethodBinder from './MethodBinder';
-import ReflectionClass from '../Reflection/ReflectionClass';
-import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
 import Tagger from './Tagger';
 import {Binding, Identifier, Instantiable} from '../Support/types';
-import {
-    isUndefined, getSymbolName, isInstance, isInstantiable
-} from '../Support/helpers';
+import {isInstantiable} from '../Support/helpers';
 
 class Container implements IContainer {
 
@@ -36,20 +32,6 @@ class Container implements IContainer {
     protected _instances: Map<any, any> = new Map;
 
     /**
-     * The stack of concretions currently being built.
-     *
-     * @var {Array}
-     */
-    protected _buildStack: any[] = [];
-
-    /**
-     * The parameter override stack.
-     *
-     * @var {(*|Object)[]}
-     */
-    protected _with: Array<any[] | object> = [];
-
-    /**
      * The contextual binding manager.
      *
      * @var {ContextualBinder}
@@ -62,6 +44,13 @@ class Container implements IContainer {
      * @var {Aliaser}
      */
     protected _aliaser: Aliaser;
+
+    /**
+     * The builder instance.
+     *
+     * @var {Builder}
+     */
+    protected _builder: Builder;
 
     /**
      * The method binder instance.
@@ -104,6 +93,7 @@ class Container implements IContainer {
     public constructor() {
         this._contextualBinder = new ContextualBinder(this);
         this._aliaser = new Aliaser(this);
+        this._builder = new Builder(this);
         this._extender = new Extender(this);
         this._methodBinder = new MethodBinder(this);
         this._binder = new Binder(this);
@@ -132,28 +122,6 @@ class Container implements IContainer {
      */
     public static setInstance(container?: Container): Container | undefined {
         return (Container._instance = container);
-    }
-
-    /**
-     * Format the name of the given concrete.
-     *
-     * @param {*} concrete
-     * @returns {string}
-     */
-    private static _formatName<T>(concrete: T): string {
-        if (typeof concrete === 'symbol') {
-            return getSymbolName(concrete);
-        }
-
-        if (isInstantiable(concrete)) {
-            return concrete.name;
-        }
-
-        if (isInstance(concrete)) {
-            return concrete.constructor.name;
-        }
-
-        return 'undefined';
     }
 
     /**
@@ -314,25 +282,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Push a parameter override on the stack.
-     *
-     * @param {Array|Object} parameters
-     * @returns {void}
-     */
-    public pushParameterOverride(parameters: any[] | object): void {
-        this._with.push(parameters);
-    }
-
-    /**
-     * Pop a parameter override off the stack.
-     *
-     * @returns {void}
-     */
-    public popParameterOverride(): void {
-        this._with.pop();
-    }
-
-    /**
      * Register a binding if it hasn't already been registered.
      *
      * @param {Identifier} abstract
@@ -421,7 +370,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
-        this._aliaser.alias(abstract, alias);
+        this._aliaser.alias<U, V>(abstract, alias);
     }
 
     /**
@@ -432,7 +381,7 @@ class Container implements IContainer {
      * @returns {(*|undefined)}
      */
     public rebinding<T>(abstract: Identifier<T>, callback: Function): unknown | undefined {
-        return this._binder.rebinding(abstract, callback);
+        return this._binder.rebinding<T>(abstract, callback);
     }
 
     /**
@@ -536,49 +485,7 @@ class Container implements IContainer {
      * @returns {*}
      */
     public build<T>(concrete: Instantiable<T> | Function): any {
-        // If the concrete type is actually a Closure, we will just execute it
-        // and hand back the results of the functions, which allows functions
-        // to be used as resolvers for more fine-tuned resolution of these
-        // objects.
-        if (!isInstantiable(concrete) && concrete instanceof Function) {
-            return concrete(this, this._getLastParameterOverride());
-        }
-
-        const reflector = typeof concrete === 'symbol'
-            ? ReflectionClass.createFromInterface(concrete)
-            : new ReflectionClass(concrete);
-
-        // If the type is not instantiable, the developer is attempting to
-        // resolve an abstract type such as an Interface of Abstract Class and
-        // there is no binding registered for the abstractions so we need to
-        // bail out.
-        if (!reflector.isInstantiable()) {
-            this._notInstantiable(concrete);
-        }
-
-        this._buildStack.push(concrete);
-
-        const dependencies = reflector.getConstructor().getParameters();
-
-        // If there are no constructor parameters, that means there are no
-        // dependencies then we can just resolve the instances of the objects
-        // right away, without resolving any other types or dependencies out of
-        // these containers.
-        if (!dependencies.length) {
-            this._buildStack.pop();
-
-            return new (concrete as any);
-        }
-
-        // Once we have all the constructor's parameters we can create each of
-        // the dependency instances and then use the reflection instances to
-        // make a new instance of this class, injecting the created dependencies
-        // in.
-        const instances = this._resolveDependencies(dependencies);
-
-        this._buildStack.pop();
-
-        return reflector.newInstanceArgs(instances);
+        return this._builder.build<T>(concrete);
     }
 
     /**
@@ -613,21 +520,21 @@ class Container implements IContainer {
     }
 
     /**
-     * Get the stack of concretions currently being built.
-     *
-     * @returns {Array}
-     */
-    public getLatestBuild(): any[] {
-        return Arr.last(this._buildStack);
-    }
-
-    /**
      * Get the binder.
      *
      * @returns {Binder}
      */
     public getBinder(): Binder {
         return this._binder;
+    }
+
+    /**
+     * Get the builder.
+     *
+     * @returns {Builder}
+     */
+    public getBuilder(): Builder {
+        return this._builder;
     }
 
     /**
@@ -728,180 +635,6 @@ class Container implements IContainer {
      */
     public rebound<T>(abstract: Identifier<T>): void {
         this._binder.rebound(abstract);
-    }
-
-    // /**
-    //  * Get the method to be bound in class@method format.
-    //  *
-    //  * @param {(Array|string)} method
-    //  * @returns {string}
-    //  */
-    // protected _parseBindMethod<T>(method: [Instantiable<T>, string] | string): string {
-    //     if (Array.isArray(method)) {
-    //         return `${method[0].name}@${method[1]}`;
-    //     }
-    //
-    //     return method;
-    // }
-
-    /**
-     * Resolve all of the dependencies from the ReflectionParameters.
-     *
-     * @param {ReflectionParameter[]} dependencies
-     * @returns {*[]}
-     */
-    protected _resolveDependencies(dependencies: ReflectionParameter[]): any[] {
-        const results = [];
-
-        for (const dependency of dependencies) {
-            // If this dependency has a override for this particular build we
-            // will use that instead as the value. Otherwise, we will continue
-            // with this run of resolutions and let reflection attempt to
-            // determine the result.
-            if (this._hasParameterOverride(dependency)) {
-                results.push(this._getParameterOverride(dependency));
-
-                continue;
-            }
-
-            // If the class is null, it means the dependency is a string or some
-            // class and we will just bomb out with an error since we have
-            // no-where to go.
-            results.push(
-                dependency.getType().isBuiltin()
-                    ? this._resolvePrimitive(dependency)
-                    : this._resolveClass(dependency)
-            );
-        }
-
-        return results;
-    }
-
-    /**
-     * Determine if the given dependency has a parameter override.
-     *
-     * @param {ReflectionParameter} dependency
-     * @returns {boolean}
-     */
-    protected _hasParameterOverride(dependency: ReflectionParameter): boolean {
-        const override = this._getLastParameterOverride();
-
-        return Array.isArray(override)
-            ? false
-            : override.hasOwnProperty(dependency.getName());
-    }
-
-    /**
-     * Get a parameter override for a dependency.
-     *
-     * @param {ReflectionParameter} dependency
-     * @returns {*}
-     */
-    protected _getParameterOverride(dependency: ReflectionParameter): any {
-        return this._getLastParameterOverride()[dependency.getName()];
-    }
-
-    /**
-     * Get the last parameter override.
-     *
-     * @returns {(*[]|Object)}
-     */
-    protected _getLastParameterOverride(): any[] | object {
-        return this._with.length ? Arr.last(this._with) : [];
-    }
-
-    /**
-     * Resolve a non-class hinted primitive dependency.
-     *
-     * @param {ReflectionParameter} parameter
-     * @returns {(*|undefined)}
-     */
-    protected _resolvePrimitive(parameter: ReflectionParameter): any | undefined {
-        const concrete = this._contextualBinder
-            .getContextualConcrete(parameter.getName());
-
-        if (concrete) {
-            return concrete instanceof Function
-                ? concrete(this)
-                : concrete;
-        }
-
-        if (parameter.isDefaultValueAvailable()) {
-            return parameter.getDefaultValue();
-        }
-
-        this._unresolvablePrimitive(parameter);
-    }
-
-    /**
-     * Resolve a class based dependency from the container.
-     *
-     * @param {ReflectionParameter} parameter
-     * @returns {*}
-     *
-     * @throws {BindingResolutionError}
-     */
-    protected _resolveClass(parameter: ReflectionParameter): any {
-        const reflector = parameter.getClass();
-
-        if (isUndefined(reflector)) {
-            throw new BindingResolutionError('Cannot get parameter type.');
-        }
-
-        try {
-            const target = reflector.getTarget();
-
-            return this.make(reflector.isInterface() ? target.key : target);
-        } catch (e) {
-            // If we can not resolve the class instance, we will check to see if
-            // the value is optional, and if it is we will return the optional
-            // parameter value as the value of the dependency, similarly to how
-            // we do this with scalars.
-            if (e instanceof BindingResolutionError
-                && parameter.isDefaultValueAvailable()) {
-                return parameter.getDefaultValue();
-            }
-
-            throw e;
-        }
-    }
-
-    /**
-     * Throw an exception that the concrete is not instantiable.
-     *
-     * @param {*} concrete
-     * @returns {void}
-     *
-     * @throws {BindingResolutionError}
-     */
-    protected _notInstantiable<T>(concrete: T): void {
-        let message = `Target [${Container._formatName(concrete)}] is not instantiable`;
-
-        if (this._buildStack.length) {
-            const previous = this._buildStack
-                .map((_: any): string => _.name)
-                .join(', ');
-
-            message += ` while building [${previous}].`;
-        } else {
-            message += '.';
-        }
-
-        throw new BindingResolutionError(message);
-    }
-
-    /**
-     * Throw an exception for an unresolvable primitive.
-     *
-     * @param {ReflectionParameter} parameter
-     * @returns {void}
-     *
-     * @throws {BindingResolutionError}
-     */
-    protected _unresolvablePrimitive(parameter: ReflectionParameter): void {
-        const message = `Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}`;
-
-        throw new BindingResolutionError(message);
     }
 
 }

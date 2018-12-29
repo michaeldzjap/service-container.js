@@ -80,10 +80,10 @@ class ContextualBinder implements IContextualBinder {
      * @returns {*}
      */
     protected _findInContextualBindings<T>(abstract: Identifier<T>): any {
-        if (this._contextual.has([this._container.getLatestBuild(), abstract])) {
-            return this._contextual.get([
-                this._container.getLatestBuild(), abstract
-            ]);
+        const builder = this._container.getBuilder();
+
+        if (this._contextual.has([builder.getLatestBuild(), abstract])) {
+            return this._contextual.get([builder.getLatestBuild(), abstract]);
         }
     }
 

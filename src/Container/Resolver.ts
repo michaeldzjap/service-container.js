@@ -78,7 +78,7 @@ class Resolver implements IResolver {
             return this._container.getSharedInstance<T>(abstract);
         }
 
-        this._container.pushParameterOverride(parameters);
+        this._container.getBuilder().pushParameterOverride(parameters);
 
         const concrete = this._getConcrete<T>(abstract);
 
@@ -114,7 +114,7 @@ class Resolver implements IResolver {
         // class instance.
         this._resolved.set(abstract, true);
 
-        this._container.popParameterOverride();
+        this._container.getBuilder().popParameterOverride();
 
         return object;
     }
