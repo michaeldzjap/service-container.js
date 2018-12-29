@@ -1,10 +1,9 @@
 import AliasManager from './AliasManager';
 import Arr from '../Support/Arr';
-import BindingError from './BindingError';
+import Binder from './Binder';
 import BindingResolutionError from './BindingResolutionError';
 import BoundMethod from './BoundMethod';
 import Callable from './Callable';
-import ClassBinding from './ClassBinding';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import ContextualBindingManager from './ContextualBindingManager';
 import EntryNotFoundError from './EntryNotFoundError';
@@ -15,7 +14,7 @@ import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {
-    isNullOrUndefined, isUndefined, getSymbolName, isInstance, isInstantiable
+    isUndefined, getSymbolName, isInstance, isInstantiable
 } from '../Support/helpers';
 
 class Container implements IContainer {
@@ -26,13 +25,6 @@ class Container implements IContainer {
      * @var {Container}
      */
     protected static _instance?: Container;
-
-    /**
-     * The container's bindings.
-     *
-     * @var {Map}
-     */
-    protected _bindings: Map<any, Binding> = new Map;
 
     /**
      * The container's method bindings.
@@ -70,13 +62,6 @@ class Container implements IContainer {
     protected _with: Array<any[] | object> = [];
 
     /**
-     * All of the registered rebound callbacks.
-     *
-     * @var {Map}
-     */
-    protected _reboundCallbacks: Map<any, Function[]> = new Map;
-
-    /**
      * The contextual binding manager.
      *
      * @var {ContextualBindingManager}
@@ -89,6 +74,13 @@ class Container implements IContainer {
      * @var {AliasManager}
      */
     protected _aliasManager: AliasManager;
+
+    /**
+     * The binder instance.
+     *
+     * @var {Binder}
+     */
+    protected _binder: Binder;
 
     /**
      * The resolver instance.
@@ -111,6 +103,7 @@ class Container implements IContainer {
         this._contextualManager = new ContextualBindingManager(this);
         this._aliasManager = new AliasManager(this);
         this._extenderManager = new ExtenderManager(this);
+        this._binder = new Binder(this);
         this._resolver = new Resolver(this);
     }
 
@@ -182,8 +175,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public bound<T>(abstract: Identifier<T>): boolean {
-        return this._bindings.has(abstract) || this._instances.has(abstract)
-            || this.isAlias<T>(abstract);
+        return this._binder.bound(abstract);
     }
 
     /**
@@ -215,8 +207,8 @@ class Container implements IContainer {
      */
     public isShared<T>(abstract: Identifier<T>): boolean {
         return this._instances.has(abstract)
-            || (this._bindings.has(abstract)
-                && this._bindings.get(abstract)!.shared);
+            || (this._binder.hasBinding(abstract)
+                && this._binder.getBinding(abstract)!.shared);
     }
 
     /**
@@ -239,34 +231,7 @@ class Container implements IContainer {
      */
     public bind<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
-        // If no concrete type was given, we will simply set the concrete type
-        // to the abstract type. After that, the concrete type to be registered
-        // as shared without being forced to state their classes in both of the
-        // parameters.
-        this._dropStaleInstances<U>(abstract);
-
-        if (isNullOrUndefined(concrete) && isInstantiable(abstract)) {
-            concrete = abstract as unknown as Instantiable<V>;
-        } else if (isNullOrUndefined(concrete)) {
-            throw new BindingError('Cannot bind a non-instantiable to itself.');
-        }
-
-        // If the factory is not a Closure, it means it is just a class name
-        // which is bound into this container to the abstract type and we will
-        // just wrap it up inside its own Closure to give us more convenience
-        // when extending.
-        if (isInstantiable(concrete)) {
-            const builder = new ClassBinding(this);
-            concrete = builder.getClosure(abstract, concrete);
-        }
-
-        this._bindings.set(abstract, {concrete, shared});
-
-        // If the abstract type was already resolved in this container we'll
-        // fire the rebound listener so that any objects which have already
-        // gotten resolved can have their copy of the object updated via the
-        // listener callbacks.
-        if (this.resolved<U>(abstract)) this.rebound<U>(abstract);
+        this._binder.bind(abstract, concrete, shared);
     }
 
     /**
@@ -276,7 +241,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public unbind<T>(abstract: Identifier<T>): void {
-        this._bindings.delete(abstract);
+        this._binder.deleteResolved(abstract);
         this._instances.delete(abstract);
         this._resolver.deleteResolved(abstract);
     }
@@ -364,26 +329,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Determine if the container contains the given binding.
-     *
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    public hasBinding<T>(abstract: Identifier<T>): boolean {
-        return this._bindings.has(abstract);
-    }
-
-    /**
-     * Get a binding from the container.
-     *
-     * @param {Identifier} abstract
-     * @returns {(Binding|undefined)}
-     */
-    public getBinding<T>(abstract: Identifier<T>): Binding | undefined {
-        return this._bindings.get(abstract);
-    }
-
-    /**
      * Register a binding if it hasn't already been registered.
      *
      * @param {Identifier} abstract
@@ -393,9 +338,7 @@ class Container implements IContainer {
      */
     public bindIf<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
-        if (!this.bound<U>(abstract)) {
-            this.bind<U, V>(abstract, concrete, shared);
-        }
+        this._binder.bindIf(abstract, concrete, shared);
     }
 
     /**
@@ -499,13 +442,7 @@ class Container implements IContainer {
      * @returns {(*|undefined)}
      */
     public rebinding<T>(abstract: Identifier<T>, callback: Function): unknown | undefined {
-        abstract = this.getAlias<T>(abstract);
-
-        this._reboundCallbacks.has(abstract)
-            ? this._reboundCallbacks.get(abstract)!.push(callback)
-            : this._reboundCallbacks.set(abstract, [callback]);
-
-        if (this.bound<T>(abstract)) return this.make<T>(abstract);
+        return this._binder.rebinding(abstract, callback);
     }
 
     /**
@@ -682,7 +619,7 @@ class Container implements IContainer {
      * @returns {Map}
      */
     public getBindings(): Map<any, Binding> {
-        return this._bindings;
+        return this._binder.getBindings();
     }
 
     /**
@@ -692,6 +629,24 @@ class Container implements IContainer {
      */
     public getLatestBuild(): any[] {
         return Arr.last(this._buildStack);
+    }
+
+    /**
+     * Get the binder.
+     *
+     * @returns {Binder}
+     */
+    public getBinder(): Binder {
+        return this._binder;
+    }
+
+    /**
+     * Get the resolver.
+     *
+     * @returns {Resolver}
+     */
+    public getResolver(): Resolver {
+        return this._resolver;
     }
 
     /**
@@ -770,7 +725,7 @@ class Container implements IContainer {
     public flush(): void {
         this._aliasManager.clearAliases();
         this._resolver.clearResolved();
-        this._bindings.clear();
+        this._binder.clearBindings();
         this._instances.clear();
         this._aliasManager.clearAbstractAliases();
     }
@@ -782,11 +737,18 @@ class Container implements IContainer {
      * @returns {void}
      */
     public rebound<T>(abstract: Identifier<T>): void {
-        const instance = this.make<T>(abstract);
+        this._binder.rebound(abstract);
+    }
 
-        for (const callback of this._getReboundCallbacks<T>(abstract)) {
-            callback(this, instance);
-        }
+    /**
+     * Drop all of the stale instances and aliases.
+     *
+     * @param {Identifier} abstract
+     * @returns {void}
+     */
+    public dropStaleInstances<T>(abstract: Identifier<T>): void {
+        this._instances.delete(abstract);
+        this._aliasManager.deleteAlias(abstract);
     }
 
     /**
@@ -801,20 +763,6 @@ class Container implements IContainer {
         }
 
         return method;
-    }
-
-    /**
-     * Get the rebound callbacks for a given type.
-     *
-     * @param {Identifier} abstract
-     * @returns {Function[]}
-     */
-    protected _getReboundCallbacks<T>(abstract: Identifier<T>): Function[] {
-        if (this._reboundCallbacks.has(abstract)) {
-            return this._reboundCallbacks.get(abstract) as Function[];
-        }
-
-        return [];
     }
 
     /**
@@ -975,17 +923,6 @@ class Container implements IContainer {
         const message = `Unresolvable dependency resolving [${parameter.getName()}] in class ${(parameter.getDeclaringClass() as any).getName()}`;
 
         throw new BindingResolutionError(message);
-    }
-
-    /**
-     * Drop all of the stale instances and aliases.
-     *
-     * @param {Identifier} abstract
-     * @returns {void}
-     */
-    protected _dropStaleInstances<T>(abstract: Identifier<T>): void {
-        this._instances.delete(abstract);
-        this._aliasManager.deleteAlias(abstract);
     }
 
 }

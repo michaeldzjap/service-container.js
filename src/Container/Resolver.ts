@@ -214,8 +214,8 @@ class Resolver implements IResolver {
         // we'll just assume each type is a concrete name and will attempt to
         // resolve it as is since the container should be able to resolve
         // concretes automatically.
-        if (this._container.hasBinding(abstract)) {
-            return this._container.getBinding(abstract)!.concrete;
+        if (this._container.getBinder().hasBinding(abstract)) {
+            return this._container.getBinder().getBinding(abstract)!.concrete;
         }
 
         return abstract;
