@@ -9,6 +9,7 @@ import ContextualBinder from './ContextualBinder';
 import EntryNotFoundError from './EntryNotFoundError';
 import Extender from './Extender';
 import IContainer from '../Contracts/Container/IContainer';
+import MethodBinder from './MethodBinder';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
@@ -27,12 +28,12 @@ class Container implements IContainer {
      */
     protected static _instance?: Container;
 
-    /**
-     * The container's method bindings.
-     *
-     * @var {Map}
-     */
-    protected _methodBindings: Map<string, Function> = new Map;
+    // /**
+    //  * The container's method bindings.
+    //  *
+    //  * @var {Map}
+    //  */
+    // protected _methodBindings: Map<string, Function> = new Map;
 
     /**
      * The container's shared instances.
@@ -40,13 +41,6 @@ class Container implements IContainer {
      * @var {Map}
      */
     protected _instances: Map<any, any> = new Map;
-
-    // /**
-    //  * All of the registered tags.
-    //  *
-    //  * @var {Map}
-    //  */
-    // protected _tags: Map<string, any[]> = new Map;
 
     /**
      * The stack of concretions currently being built.
@@ -75,6 +69,13 @@ class Container implements IContainer {
      * @var {Aliaser}
      */
     protected _aliaser: Aliaser;
+
+    /**
+     * The method binder instance.
+     *
+     * @var {MethodBinder}
+     */
+    protected _methodBinder: MethodBinder;
 
     /**
      * The binder instance.
@@ -111,6 +112,7 @@ class Container implements IContainer {
         this._contextualBinder = new ContextualBinder(this);
         this._aliaser = new Aliaser(this);
         this._extender = new Extender(this);
+        this._methodBinder = new MethodBinder(this);
         this._binder = new Binder(this);
         this._resolver = new Resolver(this);
         this._tagger = new Tagger(this);
@@ -255,6 +257,16 @@ class Container implements IContainer {
         this._resolver.forgetResolved(abstract);
     }
 
+    // /**
+    //  * Determine if the container has a method binding.
+    //  *
+    //  * @param {string} method
+    //  * @returns {boolean}
+    //  */
+    // public hasMethodBinding(method: string): boolean {
+    //     return !!this._methodBindings.has(method);
+    // }
+
     /**
      * Determine if the container has a method binding.
      *
@@ -262,8 +274,19 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public hasMethodBinding(method: string): boolean {
-        return !!this._methodBindings.has(method);
+        return this._methodBinder.hasMethodBinding(method);
     }
+
+    // /**
+    //  * Bind a callback to resolve with Container::call.
+    //  *
+    //  * @param {(Array|string)} method
+    //  * @param {Function} callback
+    //  * @returns {void}
+    //  */
+    // public bindMethod<T>(method: [Instantiable<T>, string] | string, callback: Function): void {
+    //     this._methodBindings.set(this._parseBindMethod(method), callback);
+    // }
 
     /**
      * Bind a callback to resolve with Container::call.
@@ -273,8 +296,19 @@ class Container implements IContainer {
      * @returns {void}
      */
     public bindMethod<T>(method: [Instantiable<T>, string] | string, callback: Function): void {
-        this._methodBindings.set(this._parseBindMethod(method), callback);
+        this._methodBinder.bindMethod(method, callback);
     }
+
+    // /**
+    //  * Get the method binding for the given method.
+    //  *
+    //  * @param {string} method
+    //  * @param {*} instance
+    //  * @returns {*}
+    //  */
+    // public callMethodBinding(method: string, instance: any): any {
+    //     return (this._methodBindings as any).get(method)(instance, this);
+    // }
 
     /**
      * Get the method binding for the given method.
@@ -284,7 +318,7 @@ class Container implements IContainer {
      * @returns {*}
      */
     public callMethodBinding(method: string, instance: any): any {
-        return (this._methodBindings as any).get(method)(instance, this);
+        return this._methodBinder.callMethodBinding(method, instance);
     }
 
     /**
@@ -735,19 +769,19 @@ class Container implements IContainer {
         this._binder.rebound(abstract);
     }
 
-    /**
-     * Get the method to be bound in class@method format.
-     *
-     * @param {(Array|string)} method
-     * @returns {string}
-     */
-    protected _parseBindMethod<T>(method: [Instantiable<T>, string] | string): string {
-        if (Array.isArray(method)) {
-            return `${method[0].name}@${method[1]}`;
-        }
-
-        return method;
-    }
+    // /**
+    //  * Get the method to be bound in class@method format.
+    //  *
+    //  * @param {(Array|string)} method
+    //  * @returns {string}
+    //  */
+    // protected _parseBindMethod<T>(method: [Instantiable<T>, string] | string): string {
+    //     if (Array.isArray(method)) {
+    //         return `${method[0].name}@${method[1]}`;
+    //     }
+    //
+    //     return method;
+    // }
 
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
