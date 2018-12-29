@@ -1,4 +1,4 @@
-import Arr from '../Arr';
+import {last, wrap} from '../Arr';
 import {isString} from '../helpers';
 
 class ESNextNestedMap<U, V> extends Map<U, V> {
@@ -13,7 +13,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
      * @returns {void}
      */
     public set(keys: any, value: any): this {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'set' method handle things
@@ -26,7 +26,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
 
         let target = this;
         for (const key of keys) {
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 target.set(key, value);
             } else {
                 // eslint-disable-next-line max-depth
@@ -49,7 +49,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
      * @returns {*}
      */
     public get(keys: any): any {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'get' method handle things
@@ -62,7 +62,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return target.get(key);
             }
 
@@ -79,7 +79,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
      * @returns {boolean}
      */
     public has(keys: any): boolean {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'has' method handle things
@@ -92,7 +92,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return true;
             }
 
@@ -111,7 +111,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
      * @returns {boolean}
      */
     public delete(keys: any): boolean {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'delete' method handle things
@@ -124,7 +124,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return target.delete(key);
             }
 

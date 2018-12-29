@@ -1,6 +1,6 @@
-import Arr from '../Support/Arr';
 import Container from './Container';
 import IResolver from '../Contracts/Container/IResolver';
+import {empty} from '../Support/Arr';
 import {equals, isUndefined, isInstantiable, isString} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
@@ -67,7 +67,7 @@ class Resolver implements IResolver {
     public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
         abstract = this._container.getAlias<T>(abstract);
 
-        const needsContextualBuild = !Arr.empty(parameters)
+        const needsContextualBuild = !empty(parameters)
             || !!this._container.getContextualBinder().getContextualConcrete<T>(abstract);
 
         // If an instance of the type is currently being managed as a singleton

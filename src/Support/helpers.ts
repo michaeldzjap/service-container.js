@@ -1,4 +1,4 @@
-import Arr from './Arr';
+import {accessible, collapse, exists} from './Arr';
 import {Instantiable, Instance} from './types';
 
 /**
@@ -193,10 +193,10 @@ export const dataGet = (target: any, key: string[] | string | null, dflt?: unkno
                 result = {...result, ...dataGet(item, key)};
             }
 
-            return key.includes('*') ? Arr.collapse(result) : result;
+            return key.includes('*') ? collapse(result) : result;
         }
 
-        if (Arr.accessible(target) && Arr.exists(target, segment as string)) {
+        if (accessible(target) && exists(target, segment as string)) {
             target = target[segment as string];
         } else {
             return value(dflt);

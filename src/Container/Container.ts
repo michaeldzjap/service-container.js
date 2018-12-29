@@ -1,5 +1,4 @@
 import Aliaser from './Aliaser';
-import Arr from '../Support/Arr';
 import Binder from './Binder';
 import BoundMethod from './BoundMethod';
 import Builder from './Builder';
@@ -13,6 +12,7 @@ import InstanceSharer from './InstanceSharer';
 import MethodBinder from './MethodBinder';
 import Resolver from './Resolver';
 import Tagger from './Tagger';
+import {wrap} from '../Support/Arr';
 import {Binding, Identifier, Instantiable} from '../Support/types';
 import {isInstantiable} from '../Support/helpers';
 
@@ -135,7 +135,7 @@ class Container implements IContainer {
     public when<T>(concrete: Instantiable<T>[] | Instantiable<T>): ContextualBindingBuilder {
         const aliases = [];
 
-        for (const c of Arr.wrap(concrete)) {
+        for (const c of wrap(concrete)) {
             aliases.push(this.getAlias<T>(c));
         }
 

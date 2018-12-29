@@ -1,4 +1,4 @@
-import Arr from '../Arr';
+import {last, wrap} from '../Arr';
 import {isString} from '../helpers';
 
 class ES5NestedMap<U, V> {
@@ -20,7 +20,7 @@ class ES5NestedMap<U, V> {
      * @returns {void}
      */
     public set(keys: any, value: any): this {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'set' method handle things
@@ -33,7 +33,7 @@ class ES5NestedMap<U, V> {
 
         let target = this;
         for (const key of keys) {
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 target.set(key, value);
             } else {
                 // eslint-disable-next-line max-depth
@@ -56,7 +56,7 @@ class ES5NestedMap<U, V> {
      * @returns {*}
      */
     public get(keys: any): any {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'get' method handle things
@@ -69,7 +69,7 @@ class ES5NestedMap<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return target.get(key);
             }
 
@@ -86,7 +86,7 @@ class ES5NestedMap<U, V> {
      * @returns {boolean}
      */
     public has(keys: any): boolean {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'has' method handle things
@@ -99,7 +99,7 @@ class ES5NestedMap<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return true;
             }
 
@@ -118,7 +118,7 @@ class ES5NestedMap<U, V> {
      * @returns {boolean}
      */
     public delete(keys: any): boolean {
-        keys = isString(keys) ? keys.split('.') : Arr.wrap(keys);
+        keys = isString(keys) ? keys.split('.') : wrap(keys);
 
         if (keys.length === 1) {
             // Let the native 'delete' method handle things
@@ -131,7 +131,7 @@ class ES5NestedMap<U, V> {
         for (const key of keys) {
             if (!target.has(key)) return false;
 
-            if (key === Arr.last(keys)) {
+            if (key === last(keys)) {
                 return target.delete(key);
             }
 

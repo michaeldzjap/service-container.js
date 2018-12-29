@@ -1,6 +1,6 @@
-import Arr from '../Support/Arr';
 import Container from './Container';
 import IContextualBindingBuilder from '../Contracts/Container/IContextualBindingBuilder';
+import {wrap} from '../Support/Arr';
 import {isUndefined} from '../Support/helpers';
 
 class ContextualBindingBuilder implements IContextualBindingBuilder {
@@ -60,7 +60,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
             throw new Error('The abstract target is undefined.');
         }
 
-        for (const concrete of Arr.wrap(this._concrete)) {
+        for (const concrete of wrap(this._concrete)) {
             this._container
                 .getContextualBinder()
                 .addContextualBinding(

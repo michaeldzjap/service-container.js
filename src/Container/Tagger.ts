@@ -1,6 +1,6 @@
-import Arr from '../Support/Arr';
 import Container from './Container';
 import ITagger from '../Contracts/Container/ITagger';
+import {wrap} from '../Support/Arr';
 import {Identifier} from '../Support/types';
 
 class Tagger implements ITagger {
@@ -39,7 +39,7 @@ class Tagger implements ITagger {
         for (const tag of tags) {
             if (!this._tags.has(tag)) this._tags.set(tag, []);
 
-            for (const abstract of Arr.wrap(abstracts)) {
+            for (const abstract of wrap(abstracts)) {
                 this._tags.get(tag)!.push(abstract);
             }
         }

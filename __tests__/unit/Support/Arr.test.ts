@@ -1,4 +1,4 @@
-import Arr from '@src/Support/Arr';
+import * as Arr from '@src/Support/Arr';
 
 describe('Arr', (): void => {
     test('accesible', (): void => {

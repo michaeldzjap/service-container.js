@@ -1,9 +1,9 @@
-import Arr from '../Support/Arr';
 import BindingResolutionError from './BindingResolutionError';
 import Container from './Container';
 import IBuilder from '../Contracts/Container/IBuilder';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
+import {last} from '../Support/Arr';
 import {
     isUndefined, isInstantiable, isInstance, getSymbolName
 } from '../Support/helpers';
@@ -140,7 +140,7 @@ class Builder implements IBuilder {
      * @returns {Array}
      */
     public getLatestBuild(): any[] {
-        return Arr.last(this._buildStack);
+        return last(this._buildStack);
     }
 
     /**
@@ -206,7 +206,7 @@ class Builder implements IBuilder {
      * @returns {(Array|Object)}
      */
     protected _getLastParameterOverride(): any[] | object {
-        return this._with.length ? Arr.last(this._with) : [];
+        return this._with.length ? last(this._with) : [];
     }
 
     /**
