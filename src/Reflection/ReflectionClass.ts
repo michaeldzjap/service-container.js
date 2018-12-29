@@ -110,7 +110,7 @@ class ReflectionClass {
     /**
      * Create a new instance of the reflected class from the given arguments.
      *
-     * @param {*[]} dependencies
+     * @param {Array} dependencies
      * @returns {*}
      */
     public newInstanceArgs(dependencies: any[]): any {

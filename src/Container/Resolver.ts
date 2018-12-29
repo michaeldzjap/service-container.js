@@ -61,7 +61,7 @@ class Resolver implements IResolver {
      * Resolve the given type from the container.
      *
      * @param {Identifier} abstract
-     * @param {(*[]|Object)} [parameters=[]]
+     * @param {(Array|Object)} [parameters=[]]
      * @returns {*}
      */
     public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {

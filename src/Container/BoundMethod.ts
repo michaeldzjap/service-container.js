@@ -12,7 +12,7 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} callback
-     * @param {(*[]|Object|undefined)} parameters
+     * @param {(Array|Object|undefined)} parameters
      * @param {(string|undefined)} defaultMethod
      * @returns {*}
      */
@@ -36,7 +36,7 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} target
-     * @param {(*[]|Object|undefined)} parameters
+     * @param {(Array|Object|undefined)} parameters
      * @param {(string|undefined)} defaultMethod
      * @returns {*}
      *
@@ -104,8 +104,8 @@ class BoundMethod {
      *
      * @param {Container} container
      * @param {Callable} callback
-     * @param {(*[]|Object)} parameters
-     * @returns {*[]}
+     * @param {(Array|Object)} parameters
+     * @returns {Array}
      */
     protected static _getMethodDependencies<T>(container: Container, callback: Callable<T>,
         parameters: any[] | object = {}): Array<any> {

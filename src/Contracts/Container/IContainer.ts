@@ -47,7 +47,7 @@ interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IRes
      * Resolve the given type from the container.
      *
      * @param {Identifier} abstract
-     * @param {(*[]|Object)} parameters
+     * @param {(Array|Object)} parameters
      * @returns {*}
      */
     make<T>(abstract: Identifier<T>, parameters: any[] | object): any;
@@ -56,7 +56,7 @@ interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IRes
      * Call the given Closure / class method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {(*[]|Object|undefined)} parameters
+     * @param {(Array|Object|undefined)} parameters
      * @param {(string|undefined)} defaultMethod
      * @returns {*}
      */

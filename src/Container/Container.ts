@@ -360,7 +360,7 @@ class Container implements IContainer {
      * executed.
      *
      * @param {Callable} callback
-     * @param {(*[]|Object)} parameters
+     * @param {(Array|Object)} parameters
      * @returns {Function}
      */
     public wrap<T>(callback: Callable<T>, parameters?: any[] | object): Function {
@@ -371,7 +371,7 @@ class Container implements IContainer {
      * Call the given Closure / class@method and inject its dependencies.
      *
      * @param {Callable} callback
-     * @param {(*[]|Object|undefined)} parameters
+     * @param {(Array|Object|undefined)} parameters
      * @param {(string|undefined)} defaultMethod
      * @returns {*}
      */
@@ -394,7 +394,7 @@ class Container implements IContainer {
      * Resolve the given type from the container.
      *
      * @param {Identifier} abstract
-     * @param {(*[]|Object)} [parameters=[]]
+     * @param {(Array|Object)} [parameters=[]]
      * @returns {*}
      */
     public make<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {

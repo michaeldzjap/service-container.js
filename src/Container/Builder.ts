@@ -147,7 +147,7 @@ class Builder implements IBuilder {
      * Resolve all of the dependencies from the ReflectionParameters.
      *
      * @param {ReflectionParameter[]} dependencies
-     * @returns {*[]}
+     * @returns {Array}
      */
     protected _resolveDependencies(dependencies: ReflectionParameter[]): any[] {
         const results = [];
@@ -203,7 +203,7 @@ class Builder implements IBuilder {
     /**
      * Get the last parameter override.
      *
-     * @returns {(*[]|Object)}
+     * @returns {(Array|Object)}
      */
     protected _getLastParameterOverride(): any[] | object {
         return this._with.length ? Arr.last(this._with) : [];
