@@ -1,7 +1,8 @@
 import Container from './Container';
+import IExtenderManager from '../Contracts/Container/IExtenderManager';
 import {Identifier} from '../Support/types';
 
-class ExtenderManager {
+class ExtenderManager implements IExtenderManager {
 
     /**
      * The underlying container instance.

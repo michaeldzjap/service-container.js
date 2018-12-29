@@ -1,9 +1,10 @@
 import Arr from '../Support/Arr';
 import Container from './Container';
+import IResolver from '../Contracts/Container/IResolver';
 import {equals, isUndefined, isInstantiable, isString} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
-class Resolver {
+class Resolver implements IResolver {
 
     /**
      * The underlying container instance.

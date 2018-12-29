@@ -1,9 +1,10 @@
 import Container from './Container';
+import IContextualBindingManager from '../Contracts/Container/IContextualBindingManager';
 import NestedMap from '../Support/NestedMap/.';
 import {isUndefined} from '../Support/helpers';
 import {Identifier} from '../Support/types';
 
-class ContextualBindingManager {
+class ContextualBindingManager implements IContextualBindingManager {
 
     /**
      * The underlying container instance.
@@ -27,28 +28,6 @@ class ContextualBindingManager {
     public constructor(container: Container) {
         this._container = container;
     }
-
-    // /**
-    //  * Determine if the container contains the given contextual binding.
-    //  *
-    //  * @param {*} concrete
-    //  * @param {Identifier} abstract
-    //  * @returns {boolean}
-    //  */
-    // public hasContextualBinding<T>(concrete: any, abstract: Identifier<T>): boolean {
-    //     return this._contextual.has([concrete, abstract]);
-    // }
-    //
-    // /**
-    //  * Get a contextual binding from the container.
-    //  *
-    //  * @param {*} concrete
-    //  * @param {Identifier} abstract
-    //  * @returns {*}
-    //  */
-    // public getContextualBinding<T>(concrete: any, abstract: Identifier<T>): any {
-    //     return this._contextual.get([concrete, abstract]);
-    // }
 
     /**
      * Add a contextual binding to the container.
