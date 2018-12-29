@@ -1,52 +1,13 @@
 import Callable from '../../Container/Callable';
 import ContextualBindingBuilder from '../../Container/ContextualBindingBuilder';
+import IAliaser from './IAliaser';
+import IBinder from './IBinder';
+import IExtender from './IExtender';
+import IResolver from './IResolver';
+import ITagger from './ITagger';
 import {Identifier, Instantiable} from '../../Support/types';
 
-interface IContainer {
-
-    /**
-     * Determine of the given abstract type has been bound.
-     *
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    bound<T>(abstract: Identifier<T>): boolean;
-
-    /**
-     * Alias a type to a different name.
-     *
-     * @param {Identifier} abstract
-     * @param {Identifier} alias
-     * @returns {void}
-     */
-    alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void;
-
-    /**
-     * Assign a set of tags to a given binding.
-     *
-     * @param {(Identifier[]|Identifier)} abstracts
-     * @param {string[]} tags
-     * @returns {void}
-     */
-    tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void;
-
-    /**
-     * Resolve all of the bindings for a given tag.
-     *
-     * @param {string} tag
-     * @returns {*[]}
-     */
-    tagged(tag: string): unknown[];
-
-    /**
-     * Register a binding with the container.
-     *
-     * @param {Identifier} abstract
-     * @param {(Identifier|Function|undefined)} concrete
-     * @param {(boolean|undefined)} shared
-     * @returns {void}
-     */
-    bind<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function, shared?: boolean): void;
+interface IContainer extends IAliaser, IBinder, IExtender, IResolver, ITagger {
 
     /**
      * Unregister a binding with the container.
@@ -57,16 +18,6 @@ interface IContainer {
     unbind<U>(abstract: Identifier<U>): void;
 
     /**
-     * Register a binding if it hasn't already been registered.
-     *
-     * @param {Identifier} abstract
-     * @param {(Identifier|Function|undefined)} concrete
-     * @param {(boolean|undefined)} shared
-     * @returns {void}
-     */
-    bindIf<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function, shared?: boolean): void;
-
-    /**
      * Register a shared binding in the container.
      *
      * @param {Identifier} abstract
@@ -74,15 +25,6 @@ interface IContainer {
      * @returns {void}
      */
     singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void;
-
-    /**
-     * "Extend" an abstract type in the container.
-     *
-     * @param {Identifier} abstract
-     * @param {Function} closure
-     * @returns {void}
-     */
-    extend<T>(abstract: Identifier<T>, closure: Function): void;
 
     /**
      * Register an existing instance as shared in the container.
@@ -127,32 +69,6 @@ interface IContainer {
      * @returns {*}
      */
     call<T>(callback: Callable<T>, parameters?: any[] | object, defaultMethod?: string): any;
-
-    /**
-     * Determine if the given abstract type has been resolved.
-     *
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    resolved<T>(abstract: Identifier<T>): boolean;
-
-    /**
-     * Register a new resolving callback.
-     *
-     * @param {(Identifier|Function)} abstract
-     * @param {(Function|undefined)} callback
-     * @returns {void}
-     */
-    resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;
-
-    /**
-     * Register a new after resolving callback.
-     *
-     * @param {(Identifier|Function)} abstract
-     * @param {(Function|undefined)} callback
-     * @returns {void}
-     */
-    afterResolving<T>(abstract: Identifier<T> | Function, callback?: Function): void;
 
     /**
      * Finds an entry of the container by its identifier and returns it.
