@@ -171,7 +171,7 @@ class Binder implements IBinder {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    public deleteResolved<T>(abstract: Identifier<T>): void {
+    public forgetBinding<T>(abstract: Identifier<T>): void {
         this._bindings.delete(abstract);
     }
 
@@ -180,7 +180,7 @@ class Binder implements IBinder {
      *
      * @returns {void}
      */
-    public clearBindings(): void {
+    public forgetBindings(): void {
         this._bindings.clear();
     }
 
@@ -206,7 +206,7 @@ class Binder implements IBinder {
      */
     protected _dropStaleInstances<T>(abstract: Identifier<T>): void {
         this._container.forgetInstance(abstract);
-        this._container.getAliasManager().deleteAlias(abstract);
+        this._container.getAliasManager().forgetAlias(abstract);
     }
 
 }

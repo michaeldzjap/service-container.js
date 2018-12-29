@@ -86,7 +86,7 @@ class AliasManager implements IAliasManager {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    public deleteAlias<T>(abstract: Identifier<T>): void {
+    public forgetAlias<T>(abstract: Identifier<T>): void {
         this._aliases.delete(abstract);
     }
 
@@ -95,7 +95,7 @@ class AliasManager implements IAliasManager {
      *
      * @returns {void}
      */
-    public clearAliases(): void {
+    public forgetAliases(): void {
         this._aliases.clear();
     }
 
@@ -104,7 +104,7 @@ class AliasManager implements IAliasManager {
      *
      * @returns {void}
      */
-    public clearAbstractAliases(): void {
+    public forgetAbstractAliases(): void {
         this._abstractAliases.clear();
     }
 

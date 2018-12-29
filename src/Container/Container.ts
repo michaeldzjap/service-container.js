@@ -241,9 +241,9 @@ class Container implements IContainer {
      * @returns {void}
      */
     public unbind<T>(abstract: Identifier<T>): void {
-        this._binder.deleteResolved(abstract);
+        this._binder.forgetBinding(abstract);
         this._instances.delete(abstract);
-        this._resolver.deleteResolved(abstract);
+        this._resolver.forgetResolved(abstract);
     }
 
     /**
@@ -375,7 +375,7 @@ class Container implements IContainer {
 
         const isBound = this.bound<U>(abstract);
 
-        this._aliasManager.deleteAlias(abstract);
+        this._aliasManager.forgetAlias(abstract);
 
         // We'll check to determine if this type has been bound before, and if
         // it has we will fire the rebound callbacks registered with the
@@ -723,11 +723,11 @@ class Container implements IContainer {
      * @returns {void}
      */
     public flush(): void {
-        this._aliasManager.clearAliases();
-        this._resolver.clearResolved();
-        this._binder.clearBindings();
+        this._aliasManager.forgetAliases();
+        this._resolver.forgetAllResolved();
+        this._binder.forgetBindings();
         this._instances.clear();
-        this._aliasManager.clearAbstractAliases();
+        this._aliasManager.forgetAbstractAliases();
     }
 
     /**

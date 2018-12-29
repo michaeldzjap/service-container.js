@@ -25,14 +25,14 @@ interface IResolver {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    deleteResolved<T>(abstract: Identifier<T>): void;
+    forgetResolved<T>(abstract: Identifier<T>): void;
 
     /**
      * Clear all the resolved types.
      *
      * @returns {void}
      */
-    clearResolved(): void;
+    forgetAllResolved(): void;
 
     /**
      * Register a new resolving callback.

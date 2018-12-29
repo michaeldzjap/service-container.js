@@ -35,21 +35,21 @@ interface IAliasManager {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    deleteAlias<T>(abstract: Identifier<T>): void;
+    forgetAlias<T>(abstract: Identifier<T>): void;
 
     /**
      * Clear all the type aliases.
      *
      * @returns {void}
      */
-    clearAliases(): void;
+    forgetAliases(): void;
 
     /**
      * Clear all the aliases keyed by the abstract name.
      *
      * @returns {void}
      */
-    clearAbstractAliases(): void;
+    forgetAbstractAliases(): void;
 
     /**
      * Remove an alias from the contextual binding alias cache.

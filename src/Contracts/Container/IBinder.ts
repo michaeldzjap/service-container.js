@@ -78,14 +78,14 @@ interface IBinder {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    deleteResolved<T>(abstract: Identifier<T>): void;
+    forgetBinding<T>(abstract: Identifier<T>): void;
 
     /**
      * Clear all the bindings.
      *
      * @returns {void}
      */
-    clearBindings(): void;
+    forgetBindings(): void;
 
 }
 

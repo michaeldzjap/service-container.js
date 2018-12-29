@@ -140,7 +140,7 @@ class Resolver implements IResolver {
      * @param {Identifier} abstract
      * @returns {void}
      */
-    public deleteResolved<T>(abstract: Identifier<T>): void {
+    public forgetResolved<T>(abstract: Identifier<T>): void {
         this._resolved.delete(abstract);
     }
 
@@ -149,7 +149,7 @@ class Resolver implements IResolver {
      *
      * @returns {void}
      */
-    public clearResolved(): void {
+    public forgetAllResolved(): void {
         this._resolved.clear();
     }
 
