@@ -97,7 +97,7 @@ class Binder implements IBinder {
         // to the abstract type. After that, the concrete type to be registered
         // as shared without being forced to state their classes in both of the
         // parameters.
-        this._container.dropStaleInstances<U>(abstract);
+        this._dropStaleInstances<U>(abstract);
 
         if (isNullOrUndefined(concrete) && isInstantiable(abstract)) {
             concrete = abstract as unknown as Instantiable<V>;
@@ -196,6 +196,17 @@ class Binder implements IBinder {
         }
 
         return [];
+    }
+
+    /**
+     * Drop all of the stale instances and aliases.
+     *
+     * @param {Identifier} abstract
+     * @returns {void}
+     */
+    protected _dropStaleInstances<T>(abstract: Identifier<T>): void {
+        this._container.forgetInstance(abstract);
+        this._container.getAliasManager().deleteAlias(abstract);
     }
 
 }

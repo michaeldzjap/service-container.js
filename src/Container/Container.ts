@@ -741,17 +741,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Drop all of the stale instances and aliases.
-     *
-     * @param {Identifier} abstract
-     * @returns {void}
-     */
-    public dropStaleInstances<T>(abstract: Identifier<T>): void {
-        this._instances.delete(abstract);
-        this._aliasManager.deleteAlias(abstract);
-    }
-
-    /**
      * Get the method to be bound in class@method format.
      *
      * @param {(Array|string)} method
