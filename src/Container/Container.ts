@@ -1,3 +1,4 @@
+import AliasManager from './AliasManager';
 import Arr from '../Support/Arr';
 import BindingError from './BindingError';
 import BindingResolutionError from './BindingResolutionError';
@@ -9,7 +10,6 @@ import ContextualBindingManager from './ContextualBindingManager';
 import EntryNotFoundError from './EntryNotFoundError';
 import ExtenderManager from './ExtenderManager';
 import IContainer from '../Contracts/Container/IContainer';
-import LogicError from './LogicError';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import Resolver from './Resolver';
@@ -49,20 +49,6 @@ class Container implements IContainer {
     protected _instances: Map<any, any> = new Map;
 
     /**
-     * The registered type aliases.
-     *
-     * @var {Map}
-     */
-    protected _aliases: Map<any, any> = new Map;
-
-    /**
-     * The registered aliases keyed by the abstract name.
-     *
-     * @var {Map}
-     */
-    protected _abstractAliases: Map<any, any[]> = new Map;
-
-    /**
      * All of the registered tags.
      *
      * @var {Map}
@@ -98,6 +84,13 @@ class Container implements IContainer {
     protected _contextualManager: ContextualBindingManager;
 
     /**
+     * The type alias manager.
+     *
+     * @var {AliasManager}
+     */
+    protected _aliasManager: AliasManager;
+
+    /**
      * The resolver instance.
      *
      * @var {Resolver}
@@ -116,6 +109,7 @@ class Container implements IContainer {
      */
     public constructor() {
         this._contextualManager = new ContextualBindingManager(this);
+        this._aliasManager = new AliasManager(this);
         this._extenderManager = new ExtenderManager(this);
         this._resolver = new Resolver(this);
     }
@@ -232,7 +226,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public isAlias<T>(name: Identifier<T>): boolean {
-        return this._aliases.has(name);
+        return this._aliasManager.isAlias(name);
     }
 
     /**
@@ -370,27 +364,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Determine if the registered alias keyed by the given abstract name
-     * exists.
-     *
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    public hasAbstractAlias<T>(abstract: Identifier<T>): boolean {
-        return this._abstractAliases.has(abstract);
-    }
-
-    /**
-     * Get the registered alias keyed by the given abstract name.
-     *
-     * @param {Identifier} abstract
-     * @returns {(Array|undefined)}
-     */
-    public getAbstractAlias<T>(abstract: Identifier<T>): any[] | undefined {
-        return this._abstractAliases.get(abstract);
-    }
-
-    /**
      * Determine if the container contains the given binding.
      *
      * @param {Identifier} abstract
@@ -455,11 +428,11 @@ class Container implements IContainer {
      * @returns {*}
      */
     public instance<U, V>(abstract: Identifier<U>, instance: V): V {
-        this._removeAbstractAlias<U>(abstract);
+        this._aliasManager.removeAbstractAlias<U>(abstract);
 
         const isBound = this.bound<U>(abstract);
 
-        this._aliases.delete(abstract);
+        this._aliasManager.deleteAlias(abstract);
 
         // We'll check to determine if this type has been bound before, and if
         // it has we will fire the rebound callbacks registered with the
@@ -493,7 +466,7 @@ class Container implements IContainer {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {*[]}
+     * @returns {Array}
      */
     public tagged(tag: string): any[] {
         const results: any[] = [];
@@ -515,11 +488,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
-        this._aliases.set(alias, abstract);
-
-        this._abstractAliases.has(abstract)
-            ? this._abstractAliases.get(abstract)!.push(alias)
-            : this._abstractAliases.set(abstract, [alias]);
+        this._aliasManager.alias(abstract, alias);
     }
 
     /**
@@ -726,6 +695,15 @@ class Container implements IContainer {
     }
 
     /**
+     * Get the alias manager.
+     *
+     * @returns {AliasManager}
+     */
+    public getAliasManager(): AliasManager {
+        return this._aliasManager;
+    }
+
+    /**
      * Get the contextual binding manager.
      *
      * @returns {ContextualBindingManager}
@@ -752,15 +730,7 @@ class Container implements IContainer {
      * @throws {LogicError}
      */
     public getAlias<T>(abstract: Identifier<T>): Identifier<any> {
-        if (!this._aliases.has(abstract)) {
-            return abstract;
-        }
-
-        if (this._aliases.get(abstract) === abstract) {
-            throw new LogicError(`[${String(abstract)}] is aliased to itself.`);
-        }
-
-        return this.getAlias<T>(this._aliases.get(abstract));
+        return this._aliasManager.getAlias<T>(abstract);
     }
 
     /**
@@ -798,11 +768,11 @@ class Container implements IContainer {
      * @returns {void}
      */
     public flush(): void {
-        this._aliases.clear();
+        this._aliasManager.clearAliases();
         this._resolver.clearResolved();
         this._bindings.clear();
         this._instances.clear();
-        this._abstractAliases.clear();
+        this._aliasManager.clearAbstractAliases();
     }
 
     /**
@@ -831,23 +801,6 @@ class Container implements IContainer {
         }
 
         return method;
-    }
-
-    /**
-     * Remove an alias from the contextual binding alias cache.
-     *
-     * @param {Identifier} searched
-     * @returns {void}
-     */
-    protected _removeAbstractAlias<T>(searched: Identifier<T>): void {
-        if (!this._aliases.has(searched)) return;
-
-        this._abstractAliases.forEach((aliases: any[], abstract: any): void => {
-            this._abstractAliases.set(
-                abstract,
-                aliases.filter((alias: any): boolean => alias !== searched)
-            );
-        });
     }
 
     /**
@@ -1032,7 +985,7 @@ class Container implements IContainer {
      */
     protected _dropStaleInstances<T>(abstract: Identifier<T>): void {
         this._instances.delete(abstract);
-        this._aliases.delete(abstract);
+        this._aliasManager.deleteAlias(abstract);
     }
 
 }

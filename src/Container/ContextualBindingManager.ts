@@ -54,17 +54,19 @@ class ContextualBindingManager implements IContextualBindingManager {
         const binding = this._findInContextualBindings(abstract);
         if (!isUndefined(binding)) return binding;
 
+        const manager = this._container.getAliasManager();
+
         // Next we need to see if a contextual binding might be bound under an
         // alias of the given abstract type. So, we will need to check if any
         // aliases exist with this type and then spin through them and check for
         // contextual bindings on these.
-        if (!this._container.hasAbstractAlias(abstract)
-            || (this._container.hasAbstractAlias(abstract)
-                && !this._container.getAbstractAlias(abstract)!.length)) {
+        if (!manager.hasAbstractAlias(abstract)
+            || (manager.hasAbstractAlias(abstract)
+                && !manager.getAbstractAlias(abstract)!.length)) {
             return;
         }
 
-        for (const alias of this._container.getAbstractAlias(abstract) as any[]) {
+        for (const alias of manager.getAbstractAlias(abstract) as any[]) {
             const binding = this._findInContextualBindings<any>(alias);
             if (!isUndefined(binding)) return binding;
         }
