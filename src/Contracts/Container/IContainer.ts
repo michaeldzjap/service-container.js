@@ -3,11 +3,12 @@ import ContextualBindingBuilder from '../../Container/ContextualBindingBuilder';
 import IAliaser from './IAliaser';
 import IBinder from './IBinder';
 import IExtender from './IExtender';
+import IInstanceSharer from './IInstanceSharer';
 import IResolver from './IResolver';
 import ITagger from './ITagger';
 import {Identifier, Instantiable} from '../../Support/types';
 
-interface IContainer extends IAliaser, IBinder, IExtender, IResolver, ITagger {
+interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IResolver, ITagger {
 
     /**
      * Unregister a binding with the container.
@@ -25,15 +26,6 @@ interface IContainer extends IAliaser, IBinder, IExtender, IResolver, ITagger {
      * @returns {void}
      */
     singleton<U, V>(abstract: Identifier<U>, concrete?: Identifier<V> | Function): void;
-
-    /**
-     * Register an existing instance as shared in the container.
-     *
-     * @param {Identifier} abstract
-     * @param {*} instance
-     * @returns {*}
-     */
-    instance<U, V>(abstract: Identifier<U>, instance: V): V;
 
     /**
      * Define a contextual binding.

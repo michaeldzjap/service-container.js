@@ -74,8 +74,11 @@ class Resolver implements IResolver {
         // we'll just return an existing instance instead of instantiating new
         // instances so the developer can keep using the same objects instance
         // every time.
-        if (this._container.hasSharedInstance<T>(abstract) && !needsContextualBuild) {
-            return this._container.getSharedInstance<T>(abstract);
+        if (this._container.getInstanceSharer().hasSharedInstance<T>(abstract)
+            && !needsContextualBuild) {
+            return this._container
+                .getInstanceSharer()
+                .getSharedInstance<T>(abstract);
         }
 
         this._container.getBuilder().pushParameterOverride(parameters);
@@ -103,7 +106,9 @@ class Resolver implements IResolver {
         // creating an entirely new instance of an object on each subsequent
         // request for it.
         if (this._container.isShared<T>(abstract) && !needsContextualBuild) {
-            this._container.addSharedInstance<T>(abstract, object);
+            this._container
+                .getInstanceSharer()
+                .addSharedInstance<T>(abstract, object);
         }
 
         this._fireResolvingCallbacks<T>(abstract, object);
@@ -131,7 +136,7 @@ class Resolver implements IResolver {
         }
 
         return this._resolved.has(abstract)
-            || this._container.hasSharedInstance<T>(abstract);
+            || this._container.getInstanceSharer().hasSharedInstance<T>(abstract);
     }
 
     /**

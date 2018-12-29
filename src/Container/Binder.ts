@@ -64,7 +64,8 @@ class Binder implements IBinder {
      * @returns {boolean}
      */
     public bound<T>(abstract: Identifier<T>): boolean {
-        return this._bindings.has(abstract) || this._container.hasSharedInstance(abstract)
+        return this._bindings.has(abstract)
+            || this._container.getInstanceSharer().hasSharedInstance(abstract)
             || this._container.isAlias<T>(abstract);
     }
 

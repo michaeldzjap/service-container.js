@@ -37,11 +37,17 @@ class Extender implements IExtender {
     public extend<T>(abstract: Identifier<T>, closure: Function): void {
         abstract = this._container.getAlias<T>(abstract);
 
-        if (this._container.hasSharedInstance(abstract)) {
-            this._container.addSharedInstance(
-                abstract,
-                closure(this._container.getSharedInstance(abstract), this)
-            );
+        if (this._container.getInstanceSharer().hasSharedInstance(abstract)) {
+            this._container
+                .getInstanceSharer()
+                .addSharedInstance(
+                    abstract,
+                    closure(
+                        this._container
+                            .getInstanceSharer()
+                            .getSharedInstance(abstract), this
+                    )
+                );
 
             this._container.rebound<T>(abstract);
         } else {

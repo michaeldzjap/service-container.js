@@ -9,6 +9,7 @@ import ContextualBinder from './ContextualBinder';
 import EntryNotFoundError from './EntryNotFoundError';
 import Extender from './Extender';
 import IContainer from '../Contracts/Container/IContainer';
+import InstanceSharer from './InstanceSharer';
 import MethodBinder from './MethodBinder';
 import Resolver from './Resolver';
 import Tagger from './Tagger';
@@ -25,13 +26,6 @@ class Container implements IContainer {
     protected static _instance?: Container;
 
     /**
-     * The container's shared instances.
-     *
-     * @var {Map}
-     */
-    protected _instances: Map<any, any> = new Map;
-
-    /**
      * The contextual binding manager.
      *
      * @var {ContextualBinder}
@@ -44,6 +38,13 @@ class Container implements IContainer {
      * @var {Aliaser}
      */
     protected _aliaser: Aliaser;
+
+    /**
+     * The instance sharer instance.
+     *
+     * @var {InstanceSharer}
+     */
+    protected _instanceSharer: InstanceSharer;
 
     /**
      * The builder instance.
@@ -92,6 +93,7 @@ class Container implements IContainer {
      */
     public constructor() {
         this._contextualBinder = new ContextualBinder(this);
+        this._instanceSharer = new InstanceSharer(this);
         this._aliaser = new Aliaser(this);
         this._builder = new Builder(this);
         this._extender = new Extender(this);
@@ -147,7 +149,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public bound<T>(abstract: Identifier<T>): boolean {
-        return this._binder.bound(abstract);
+        return this._binder.bound<T>(abstract);
     }
 
     /**
@@ -178,9 +180,9 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public isShared<T>(abstract: Identifier<T>): boolean {
-        return this._instances.has(abstract)
-            || (this._binder.hasBinding(abstract)
-                && this._binder.getBinding(abstract)!.shared);
+        return this._instanceSharer.hasInstance<T>(abstract)
+            || (this._binder.hasBinding<T>(abstract)
+                && this._binder.getBinding<T>(abstract)!.shared);
     }
 
     /**
@@ -190,7 +192,7 @@ class Container implements IContainer {
      * @returns {boolean}
      */
     public isAlias<T>(name: Identifier<T>): boolean {
-        return this._aliaser.isAlias(name);
+        return this._aliaser.isAlias<T>(name);
     }
 
     /**
@@ -203,7 +205,7 @@ class Container implements IContainer {
      */
     public bind<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
-        this._binder.bind(abstract, concrete, shared);
+        this._binder.bind<U, V>(abstract, concrete, shared);
     }
 
     /**
@@ -213,9 +215,9 @@ class Container implements IContainer {
      * @returns {void}
      */
     public unbind<T>(abstract: Identifier<T>): void {
-        this._binder.forgetBinding(abstract);
-        this._instances.delete(abstract);
-        this._resolver.forgetResolved(abstract);
+        this._binder.forgetBinding<T>(abstract);
+        this._instanceSharer.forgetInstance<T>(abstract);
+        this._resolver.forgetResolved<T>(abstract);
     }
 
     /**
@@ -236,7 +238,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public bindMethod<T>(method: [Instantiable<T>, string] | string, callback: Function): void {
-        this._methodBinder.bindMethod(method, callback);
+        this._methodBinder.bindMethod<T>(method, callback);
     }
 
     /**
@@ -251,37 +253,6 @@ class Container implements IContainer {
     }
 
     /**
-     * Determine if the container contains the given shared instance.
-     *
-     * @param {Identifier} abstract
-     * @returns {boolean}
-     */
-    public hasSharedInstance<T>(abstract: Identifier<T>): boolean {
-        return this._instances.has(abstract);
-    }
-
-    /**
-     * Get a shared instance from the container.
-     *
-     * @param {Identifier} abstract
-     * @returns {*}
-     */
-    public getSharedInstance<T>(abstract: Identifier<T>): any {
-        return this._instances.get(abstract);
-    }
-
-    /**
-     * Add a shared instance to the container.
-     *
-     * @param {Identifier} abstract
-     * @param {*} implementation
-     * @returns {void}
-     */
-    public addSharedInstance<T>(abstract: Identifier<T>, implementation: any): void {
-        this._instances.set(abstract, implementation);
-    }
-
-    /**
      * Register a binding if it hasn't already been registered.
      *
      * @param {Identifier} abstract
@@ -291,7 +262,7 @@ class Container implements IContainer {
      */
     public bindIf<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
         shared: boolean = false): void {
-        this._binder.bindIf(abstract, concrete, shared);
+        this._binder.bindIf<U, V>(abstract, concrete, shared);
     }
 
     /**
@@ -324,21 +295,7 @@ class Container implements IContainer {
      * @returns {*}
      */
     public instance<U, V>(abstract: Identifier<U>, instance: V): V {
-        this._aliaser.removeAbstractAlias<U>(abstract);
-
-        const isBound = this.bound<U>(abstract);
-
-        this._aliaser.forgetAlias(abstract);
-
-        // We'll check to determine if this type has been bound before, and if
-        // it has we will fire the rebound callbacks registered with the
-        // container and it can be updated with consuming classes that have
-        // gotten resolved here.
-        this._instances.set(abstract, instance);
-
-        if (isBound) this.rebound<U>(abstract);
-
-        return instance;
+        return this._instanceSharer.instance<U, V>(abstract, instance);
     }
 
     /**
@@ -349,7 +306,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public tag<T>(abstracts: Identifier<T>[] | Identifier<T>, tags: string[]): void {
-        this._tagger.tag(abstracts, tags);
+        this._tagger.tag<T>(abstracts, tags);
     }
 
     /**
@@ -407,7 +364,7 @@ class Container implements IContainer {
      * @returns {Function}
      */
     public wrap<T>(callback: Callable<T>, parameters?: any[] | object): Function {
-        return (): unknown => this.call(callback, parameters);
+        return (): unknown => this.call<T>(callback, parameters);
     }
 
     /**
@@ -529,6 +486,15 @@ class Container implements IContainer {
     }
 
     /**
+     * Get the instance sharer.
+     *
+     * @returns {InstanceSharer}
+     */
+    public getInstanceSharer(): InstanceSharer {
+        return this._instanceSharer;
+    }
+
+    /**
      * Get the builder.
      *
      * @returns {Builder}
@@ -592,7 +558,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public forgetExtenders<T>(abstract: Identifier<T>): void {
-        this._extender.forgetExtenders(abstract);
+        this._extender.forgetExtenders<T>(abstract);
     }
 
     /**
@@ -602,7 +568,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public forgetInstance<T>(abstract: Identifier<T>): void {
-        this._instances.delete(abstract);
+        this._instanceSharer.forgetInstance<T>(abstract);
     }
 
     /**
@@ -611,7 +577,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public forgetInstances(): void {
-        this._instances.clear();
+        this._instanceSharer.forgetInstances();
     }
 
     /**
@@ -623,7 +589,7 @@ class Container implements IContainer {
         this._aliaser.forgetAliases();
         this._resolver.forgetAllResolved();
         this._binder.forgetBindings();
-        this._instances.clear();
+        this.forgetInstances();
         this._aliaser.forgetAbstractAliases();
     }
 
@@ -634,7 +600,7 @@ class Container implements IContainer {
      * @returns {void}
      */
     public rebound<T>(abstract: Identifier<T>): void {
-        this._binder.rebound(abstract);
+        this._binder.rebound<T>(abstract);
     }
 
 }
