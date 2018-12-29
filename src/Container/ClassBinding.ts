@@ -1,8 +1,9 @@
 import Container from './Container';
+import IClassBinding from '../Contracts/Container/IClassBinding';
 import {equals} from '../Support/helpers';
 import {Identifier, Instantiable} from '../Support/types';
 
-class ClassBinding {
+class ClassBinding implements IClassBinding {
 
     /**
      * The underlying container instance.

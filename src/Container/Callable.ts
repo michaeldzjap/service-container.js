@@ -1,7 +1,8 @@
+import ICallable from '../Contracts/Container/ICallable';
 import {isInstance, isInstantiable} from '../Support/helpers';
 import {Instantiable, Instance} from '../Support/types';
 
-class Callable<T> {
+class Callable<T> implements ICallable<T> {
 
     /**
      * The class definition or instance to target.
@@ -77,7 +78,7 @@ class Callable<T> {
      * Call the specified method on the specified target with the given array of
      * arguments.
      *
-     * @param {*[]} args
+     * @param {Array} args
      * @returns {*}
      */
     public call(args: any[]): any {
