@@ -535,6 +535,56 @@ export const sortRecursive = (array: unknown[] | object): unknown[] | object => 
 };
 
 /**
+ * Convert the array into a query string.
+ *
+ * @param {Object} obj
+ * @returns {string}
+ */
+export const query = (obj: object): string => {
+    /**
+     * Replace any spaces with '%20'.
+     *
+     * @param {string} str
+     * @returns {string}
+     */
+    const replaceSpaces = (str: string): string => str.replace(/ /g, '%20');
+
+    const str = Object.keys(obj)
+        .reduce((acc: string, key: string): string => {
+            return `${acc}&${replaceSpaces(key)}=${replaceSpaces(obj[key])}`;
+        }, '');
+
+    return str.slice(1).replace(/[!'()*]/g, (c: string): string => (
+        `%${c.charCodeAt(0).toString(16)}`
+    ));
+};
+
+/**
+ * Filter the array using the given callback.
+ *
+ * @param {(*[]|Object)} array
+ * @param {Function} callback
+ * @returns {(*[]|Object)}
+ */
+export const where = (array: unknown[] | object, callback: any): unknown[] | object => {
+    if (Array.isArray(array)) {
+        return array.filter(
+            (value: unknown, index: number, array: unknown[]): boolean => (
+                callback(value, index, array)
+            )
+        );
+    }
+
+    return Object.keys(array)
+        .filter((key: string): boolean => callback(array[key], key, array))
+        .reduce((acc: object, key: string): object => {
+            acc[key] = array[key];
+
+            return acc;
+        }, {});
+};
+
+/**
  * If the given value is not an array and not null, wrap it in one.
  *
  * @param {*} value

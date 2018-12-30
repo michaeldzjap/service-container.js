@@ -1,4 +1,5 @@
 import * as Arr from '@src/Support/Arr';
+import {isString} from '@src/Support/helpers';
 
 describe('Arr', (): void => {
     test('accesible', (): void => {
@@ -373,5 +374,31 @@ describe('Arr', (): void => {
         };
 
         expect(Arr.sortRecursive(obj)).toEqual(expected);
+    });
+
+    test('query', (): void => {
+        const obj = {a: 'hey ', b: 'now', c: '!'};
+
+        expect(Arr.query(obj)).toBe('a=hey%20&b=now&c=%21');
+    });
+
+    test('where', (): void => {
+        const array = [100, '200', 300, '400', 500];
+
+        const result = Arr.where(array, (value: number | string): boolean => (
+            isString(value)
+        ));
+
+        expect(result).toEqual(['200', '400']);
+    });
+
+    test('where key', (): void => {
+        const obj = {'10': 1, foo: 3, '20': 2};
+
+        const result = Arr.where(obj, (value: number, key: any): boolean => (
+            !isNaN(key)
+        ));
+
+        expect(result).toEqual({'10': 1, '20': 2});
     });
 });
