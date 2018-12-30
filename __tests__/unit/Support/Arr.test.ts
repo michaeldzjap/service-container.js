@@ -450,4 +450,14 @@ describe('Arr', (): void => {
         Arr.forget(obj, ['emails.riley@example.com', 'emails.eric@localhost']);
         expect(obj).toEqual({emails: {'riley@example.com': {name: 'Riley'}}});
     });
+
+    test('wrap', (): void => {
+        const str = 'a';
+        const array = ['a'];
+        const obj = {value: 'a'};
+        expect(Arr.wrap(str)).toEqual(['a']);
+        expect(Arr.wrap(array)).toEqual(array);
+        expect(Arr.wrap(obj)).toEqual([obj]);
+        expect(Arr.wrap(null)).toEqual([]);
+    });
 });
