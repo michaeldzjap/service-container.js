@@ -327,4 +327,51 @@ describe('Arr', (): void => {
         expect(Arr.shuffle([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], '1234'))
             .toEqual(Arr.shuffle([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100], '1234'));
     });
+
+    test('sort recursive', (): void => {
+        const obj = {
+            users: [
+                {
+                    // Should sort objects by keys
+                    name: 'Riley Martin',
+                    mail: 'riley.martin@example.com',
+                    // Should sort deeply nested arrays
+                    numbers: [2, 1, 0]
+                },
+                {
+                    name: 'Eric The Actor',
+                    age: 39
+                },
+            ],
+            '20': [2, 1, 0],
+            '30': {
+                // Should sort non-incrementing numerical keys by keys
+                '2': 'a',
+                '1': 'b',
+                '0': 'c'
+            }
+        };
+
+        const expected = {
+            '20': [0, 1, 2],
+            '30': {
+                '0': 'c',
+                '1': 'b',
+                '2': 'a'
+            },
+            users: [
+                {
+                    mail: 'riley.martin@example.com',
+                    name: 'Riley Martin',
+                    numbers: [0, 1, 2]
+                },
+                {
+                    age: 39,
+                    name: 'Eric The Actor'
+                }
+            ]
+        };
+
+        expect(Arr.sortRecursive(obj)).toEqual(expected);
+    });
 });

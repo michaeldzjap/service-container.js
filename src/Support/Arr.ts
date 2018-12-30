@@ -500,6 +500,41 @@ export const shuffle = (array: unknown[], seed?: string): unknown[] => {
 };
 
 /**
+ * Recursively sort an array by keys and values.
+ *
+ * @param {(*[]|Object)} array
+ * @returns {(*[]|Object)}
+ */
+export const sortRecursive = (array: unknown[] | object): unknown[] | object => {
+    if (Array.isArray(array)) {
+        const arr = array.reduce((acc: unknown[], value: any): unknown[] => {
+            acc.push(accessible(value) ? sortRecursive(value) : value);
+
+            return acc;
+        }, []);
+
+        return arr.sort();
+    }
+
+    const obj = Object.keys(array)
+        .reduce((acc: object, key: string): object => {
+            acc[key] = accessible(array[key])
+                ? sortRecursive(array[key])
+                : array[key];
+
+            return acc;
+        }, {});
+
+    return Object.keys(obj)
+        .sort()
+        .reduce((acc: object, key: string): object => {
+            acc[key] = obj[key];
+
+            return acc;
+        }, {});
+};
+
+/**
  * If the given value is not an array and not null, wrap it in one.
  *
  * @param {*} value
