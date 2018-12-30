@@ -210,10 +210,10 @@ export const flatten = (array: unknown[], depth: number = Infinity): unknown[] =
  * notation.
  *
  * @param {Object} obj
- * @param {(string[]|string)} keys
+ * @param {?(string[]|string|undefined)} keys
  * @returns {void}
  */
-export const forget = (obj: object, keys: string[] | string): void => {
+export const forget = (obj: object, keys?: string[] | string): void => {
     const original = obj;
 
     keys = wrap(keys) as string[];

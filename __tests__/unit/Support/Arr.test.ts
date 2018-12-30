@@ -401,4 +401,53 @@ describe('Arr', (): void => {
 
         expect(result).toEqual({'10': 1, '20': 2});
     });
+
+    // eslint-disable-next-line max-statements
+    test('forget', (): void => {
+        let obj: any = {products: {desk: {price: 100}}};
+        Arr.forget(obj);
+        expect(obj).toEqual({products: {desk: {price: 100}}});
+
+        obj = {products: {desk: {price: 100}}};
+        Arr.forget(obj, []);
+        expect(obj).toEqual({products: {desk: {price: 100}}});
+
+        obj = {products: {desk: {price: 100}}};
+        Arr.forget(obj, 'products.desk');
+        expect(obj).toEqual({products: {}});
+
+        obj = {products: {desk: {price: 100}}};
+        Arr.forget(obj, 'products.desk.price');
+        expect(obj).toEqual({products: {desk: {}}});
+
+        obj = {products: {desk: {price: 100}}};
+        Arr.forget(obj, 'products.final.price');
+        expect(obj).toEqual({products: {desk: {price: 100}}});
+
+        obj = {shop: {cart: {'150': 0}}};
+        Arr.forget(obj, 'shop.final.cart');
+        expect(obj).toEqual({shop: {cart: {'150': 0}}});
+
+        obj = {products: {desk: {price: {original: 50, taxes: 60}}}};
+        Arr.forget(obj, 'products.desk.price.taxes');
+        expect(obj).toEqual({products: {desk: {price: {original: 50}}}});
+
+        obj = {products: {desk: {price: {original: 50, taxes: 60}}}};
+        Arr.forget(obj, 'products.desk.final.taxes');
+        expect(obj).toEqual({products: {desk: {price: {original: 50, taxes: 60}}}});
+
+        obj = {products: {desk: {price: 50}, 'null': 'something'}};
+        Arr.forget(obj, ['products.amount.all', 'products.desk.price']);
+        expect(obj).toEqual({products: {desk: {}, 'null': 'something'}});
+
+        // Only works on first level keys
+        obj = {'riley@example.com': 'Riley', 'eric@example.com': 'Eric'};
+        Arr.forget(obj, 'riley@example.com');
+        expect(obj).toEqual({'eric@example.com': 'Eric'});
+
+        // Does not work for nested keys
+        obj = {emails: {'riley@example.com': {name: 'Riley'}, 'eric@localhost': {name: 'Eric'}}};
+        Arr.forget(obj, ['emails.riley@example.com', 'emails.eric@localhost']);
+        expect(obj).toEqual({emails: {'riley@example.com': {name: 'Riley'}}});
+    });
 });
