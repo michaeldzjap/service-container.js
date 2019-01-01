@@ -1,5 +1,6 @@
 import Collection from '@src/Support/Collection';
 import IJsonable from '@src/Contracts/IJsonable';
+import IJsonSerializable from '@src/Contracts/IJsonSerializable';
 import IObjectable from '@src/Contracts/IObjectable';
 
 describe('Collection', (): void => {
@@ -134,6 +135,18 @@ describe('Collection', (): void => {
         items = new TestJsonableObject;
         obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
+
+        items = new TestJsonSerializeObject;
+        obj = method.value(items);
+        expect(obj).toEqual({foo: 'bar'});
+
+        items = new Collection({foo: 'bar'});
+        obj = method.value(items);
+        expect(obj).toEqual({foo: 'bar'});
+
+        items = {foo: 'bar'};
+        obj = method.value(items);
+        expect(obj).toEqual({foo: 'bar'});
     });
 });
 
@@ -149,6 +162,14 @@ class TestJsonableObject implements IJsonable {
 
     public toJson(): string {
         return '{"foo":"bar"}';
+    }
+
+}
+
+class TestJsonSerializeObject implements IJsonSerializable {
+
+    public jsonSerialize(): object {
+        return {foo: 'bar'};
     }
 
 }

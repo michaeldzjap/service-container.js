@@ -1,6 +1,7 @@
 import {first, last, shuffle, wrap} from './Arr';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
+import {isJsonSerializable} from '../Contracts/IJsonSerializable';
 import {isObject, isString, isUndefined, isInstance, dataGet} from './helpers';
 
 class Collection {
@@ -287,6 +288,10 @@ class Collection {
 
         if (isInstance(items) && isJsonable(items)) {
             return JSON.parse(items.toJson());
+        }
+
+        if (isInstance(items) && isJsonSerializable(items)) {
+            return items.jsonSerialize();
         }
 
         return [items];
