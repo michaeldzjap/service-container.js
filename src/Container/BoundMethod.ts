@@ -3,7 +3,7 @@ import Container from './Container';
 import ReflectionMethod from '../Reflection/ReflectionMethod';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {Identifier, Instantiable} from '../Support/types';
-import {isNullOrUndefined, isInstance, isInstantiable} from '../Support/helpers';
+import {isUndefined, isInstantiable} from '../Support/helpers';
 
 class BoundMethod {
 
@@ -48,7 +48,7 @@ class BoundMethod {
         // method for dependency binding.
         const method = target.method || defaultMethod;
 
-        if (isNullOrUndefined(method)) {
+        if (isUndefined(method)) {
             throw new Error('Method not provided.');
         }
 
@@ -163,7 +163,7 @@ class BoundMethod {
      * @returns {ReflectionMethod}
      */
     protected static _getCallReflector<T>(callback: Callable<T>): ReflectionMethod {
-        if (isNullOrUndefined(callback.method)) {
+        if (isUndefined(callback.method)) {
             throw new Error('Method name is missing.');
         }
 
@@ -195,8 +195,7 @@ class BoundMethod {
      * @returns {boolean}
      */
     private static _isCallable<T>(callback: Callable<T>): boolean {
-        return (isInstantiable(callback.target) || isInstance(callback.target))
-         && !callback.isStatic;
+        return isInstantiable(callback.target) && !callback.isStatic;
     }
 
 }

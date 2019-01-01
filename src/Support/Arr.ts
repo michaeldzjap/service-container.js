@@ -1,6 +1,8 @@
 import Rand from 'rand-seed';
 
-import {dataGet, isNullOrUndefined, isObject, isString, value} from './helpers';
+import {
+    dataGet, isUndefined, isNullOrUndefined, isObject, isString, value
+} from './helpers';
 
 /**
  * Determine whether the given value is array accessible.
@@ -143,24 +145,64 @@ export const exists = (array: unknown[] | object, key: number | string): boolean
 };
 
 /**
+ * Return the first element in an array or object passing a given truth test.
+ *
+ * @param {(Array|Object)} items
+ * @param {?(Function|undefined)} callback
+ * @param {(*|undefined)} dflt
+ * @returns {*}
+ */
+export const first = (items: unknown[] | object, callback?: Function | null, dflt?: unknown): unknown => {
+    if (Array.isArray(items)) {
+        return firstArray(items, callback, dflt);
+    }
+
+    return firstObject(items, callback, dflt);
+};
+
+/**
  * Return the first element in an array passing a given truth test.
  *
  * @param {*[]} array
- * @param {(Function|undefined)} callback
- * @param {*} dflt
+ * @param {?(Function|undefined)} callback
+ * @param {(*|undefined)} dflt
  * @returns {*}
  */
-export const first = (array: unknown[], callback?: Function, dflt?: unknown): unknown => {
+const firstArray = (array: unknown[], callback?: Function | null, dflt?: unknown): unknown => {
     if (isNullOrUndefined(callback)) {
         if (!array.length) return value(dflt);
 
         for (const item of array) return item;
     }
 
-    let key = 0;
+    let index = 0;
     for (const value of array) {
+        if ((callback as Function)(value, index)) return value;
+        index++;
+    }
+
+    return value(dflt);
+};
+
+/**
+ * Return the first element in an array passing a given truth test.
+ *
+ * @param {Object} obj
+ * @param {?(Function|undefined)} callback
+ * @param {(*|undefined)} dflt
+ * @returns {*}
+ */
+const firstObject = (obj: object, callback?: Function | null, dflt?: unknown): unknown => {
+    if (isNullOrUndefined(callback)) {
+        const keys = Object.keys(obj);
+
+        if (!keys.length) return value(dflt);
+
+        for (const key of keys) return obj[key];
+    }
+
+    for (const key of Object.keys(obj)) {
         if ((callback as Function)(value, key)) return value;
-        key++;
     }
 
     return value(dflt);
@@ -169,17 +211,37 @@ export const first = (array: unknown[], callback?: Function, dflt?: unknown): un
 /**
  * Return the last element in an array passing a given truth test.
  *
- * @param {*[]} array
- * @param {(Function|undefined)} callback
+ * @param {(Array|Object)} items
+ * @param {?(Function|undefined)} callback
  * @param {(*|undefined)} dflt
  * @returns {*}
  */
-export const last = (array: unknown[], callback?: Function, dflt?: unknown): any => {
+export const last = (items: unknown[] | object, callback?: Function | null, dflt?: unknown): any => {
     if (isNullOrUndefined(callback)) {
-        return array.length ? array[array.length - 1] : value(dflt);
+        if (Array.isArray(items)) {
+            return items.length ? items[items.length - 1] : value(dflt);
+        }
+
+        const keys = Object.keys(items);
+
+        return keys.length ? items[keys[keys.length - 1]] : value(dflt);
     }
 
-    return first(array.reverse(), callback, dflt);
+    if (Array.isArray(items)) {
+        return first(items.reverse(), callback, dflt);
+    }
+
+    return first(
+        Object.keys(items)
+            .reverse()
+            .reduce((acc: object, key: string): object => {
+                acc[key] = items[key];
+
+                return acc;
+            }, {}),
+        callback,
+        dflt
+    );
 };
 
 /**
@@ -386,7 +448,7 @@ export const pluck = (array: object[], value: string | string[] | null, key?: st
  * @returns {(*[]|Object)}
  */
 export const prepend = (array: unknown[] | object, value: unknown, key?: string): unknown[] | object => {
-    if (isNullOrUndefined(key) && Array.isArray(array)) {
+    if (isUndefined(key) && Array.isArray(array)) {
         array = [value, ...array];
     } else if (isObject(array)) {
         array = {...array, [key as string]: value};
@@ -429,14 +491,14 @@ export const random = (array: unknown[], number?: number): any => {
         throw new Error(`You requested ${requested} items, but there are only ${count} items available.`);
     }
 
-    if (isNullOrUndefined(number)) {
+    if (isUndefined(number)) {
         return array[Math.floor(Math.random() * array.length)];
     }
 
     if (number === 0) return [];
 
     const keys = _shuffle(
-        Array.from(Array(number as number), (x: undefined, i: number): number => i)
+        Array.from(Array(number), (x: undefined, i: number): number => i)
     );
 
     const results = [];
@@ -481,14 +543,29 @@ export const set = (obj: object, key: string | null, value: unknown): object | u
 };
 
 /**
+ * Shuffle the given array or object and return the result.
+ *
+ * @param {(Array|Object)} items
+ * @param {(string|undefined)} seed
+ * @returns {*[]}
+ */
+export const shuffle = (items: unknown[] | object, seed?: string): unknown[] | object => {
+    if (Array.isArray(items)) {
+        return shuffleArray(items, seed);
+    }
+
+    return shuffleObject(items, seed);
+};
+
+/**
  * Shuffle the given array and return the result.
  *
  * @param {*[]} array
  * @param {(string|undefined)} seed
  * @returns {*[]}
  */
-export const shuffle = (array: unknown[], seed?: string): unknown[] => {
-    if (isNullOrUndefined(seed)) {
+const shuffleArray = (array: unknown[], seed?: string): unknown[] => {
+    if (isUndefined(seed)) {
         return _shuffle(array);
     }
 
@@ -497,6 +574,36 @@ export const shuffle = (array: unknown[], seed?: string): unknown[] => {
     array.sort((): number => Math.floor(rand.next() * 2 - 1));
 
     return array;
+};
+
+/**
+ * Shuffle the given array and return the result.
+ *
+ * @param {Object} obj
+ * @param {(string|undefined)} seed
+ * @returns {Object}
+ */
+const shuffleObject = (obj: object, seed?: string): object => {
+    if (isUndefined(seed)) {
+        const keys = _shuffle(Object.keys(obj));
+
+        return keys.reduce((acc: object, key: string): object => {
+            acc[key] = obj[key];
+
+            return acc;
+        }, {});
+    }
+
+    const rand = new Rand(seed);
+    const keys = Object.keys(obj);
+
+    return keys
+        .sort((): number => Math.floor(rand.next() * 2 - 1))
+        .reduce((acc: object, key: string): object => {
+            acc[key] = obj[key];
+
+            return acc;
+        }, {});
 };
 
 /**
@@ -605,7 +712,7 @@ export const wrap = (value: unknown): any[] => {
  * @param {*[]} array
  * @returns {*[]}
  */
-const _shuffle = (array: unknown[]): unknown[] => {
+const _shuffle = (array: unknown[]): any[] => {
     array = [...array];
 
     let currentIndex = array.length;

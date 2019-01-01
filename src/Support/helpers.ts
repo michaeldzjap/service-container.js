@@ -107,7 +107,7 @@ export const hasPrototype = (target: object | Function): target is Function => (
  * @returns {boolean}
  */
 export const hasConstructor = (target: object | Function): target is object => (
-    target.hasOwnProperty('constructor')
+    !isUndefined(target.constructor)
 );
 
 /**
@@ -117,7 +117,7 @@ export const hasConstructor = (target: object | Function): target is object => (
  * @returns {boolean}
  */
 export const isInstance = <T>(target: any): target is Instance<T> => (
-    !hasPrototype(target) && hasConstructor(target)
+    isObject(target) && !hasPrototype(target) && hasConstructor(target)
 );
 
 /**
