@@ -1,8 +1,10 @@
 import Collection from '@src/Support/Collection';
+import IArrayable from '@src/Contracts/IArrayable';
 import IJsonable from '@src/Contracts/IJsonable';
 import IJsonSerializable from '@src/Contracts/IJsonSerializable';
 import IObjectable from '@src/Contracts/IObjectable';
 
+// eslint-disable-next-line max-statements
 describe('Collection', (): void => {
     test('first returns first item in collection', (): void => {
         const c = new Collection(['foo', 'bar']);
@@ -128,7 +130,11 @@ describe('Collection', (): void => {
             Collection.prototype, '_getArrayableItems'
         ) as PropertyDescriptor;
 
-        let items: any = new TestObjectableObject;
+        let items: any = new TestArrayableObject;
+        const array = method.value(items);
+        expect(array).toEqual([1, 2, 3]);
+
+        items = new TestObjectableObject;
         let obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
 
@@ -148,7 +154,113 @@ describe('Collection', (): void => {
         obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
     });
+
+    test('forget single key', (): void => {
+        let c = new Collection(['foo', 'bar']);
+        c.forget(0);
+        expect(c.all()).toEqual(['bar']);
+
+        c = new Collection({foo: 'bar', baz: 'qux'});
+        c.forget('foo');
+        expect(c.all()).toEqual({baz: 'qux'});
+    });
+
+    test('forget array of keys', (): void => {
+        let c = new Collection(['foo', 'bar', 'baz']);
+        c.forget([0, 2]);
+        expect(c.all()).toEqual(['bar']);
+
+        c = new Collection({name: 'Riley Martin', foo: 'bar', baz: 'qux'});
+        c.forget(['foo', 'baz']);
+        expect(c.all()).toEqual({name: 'Riley Martin'});
+    });
+
+    test('countable', (): void => {
+        const c = new Collection(['foo', 'bar']);
+        expect(c.count()).toBe(2);
+    });
+
+    test('iterable', (): void => {
+        let c = new Collection(['foo']);
+        expect(c.getIterator()).toBeInstanceOf(Object);
+
+        let generator = c.getIterator();
+        expect(generator.next().value).toBe('foo');
+        expect(generator.next().value).toBeUndefined();
+
+        c = new Collection({foo: 'bar'});
+        expect(c.getIterator()).toBeInstanceOf(Object);
+
+        generator = c.getIterator();
+        expect(generator.next().value).toBe('bar');
+        expect(generator.next().value).toBeUndefined();
+    });
+
+    test('filter', (): void => {
+        let c = new Collection([{id: 1, name: 'Hey'}, {id: 2, name: 'Now'}]);
+        expect(
+            c.filter((item: {id: number, name: string}): boolean => item.id === 2).all()
+        ).toEqual([{id: 2, name: 'Now'}]);
+
+        c = new Collection(['', 'Hey', '', 'Now']);
+        expect(c.filter().values().all()).toEqual(['Hey', 'Now']);
+
+        c = new Collection({id: 1, first: 'Hey', second: 'Now'});
+        expect(
+            c.filter((item: unknown, key: string): boolean => key !== 'id').all()
+        ).toEqual({first: 'Hey', second: 'Now'});
+    });
+
+    // eslint-disable-next-line max-statements
+    test('where', (): void => {
+        let c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+
+        expect(c.where('v', 3).values().all()).toEqual([{v: 3}, {v: '3'}]);
+        expect(c.where('v', '=', 3).values().all()).toEqual([{v: 3}, {v: '3'}]);
+        expect(c.where('v', '==', 3).values().all()).toEqual([{v: 3}, {v: '3'}]);
+        expect(c.where('v', 'garbage', 3).values().all()).toEqual([{v: 3}, {v: '3'}]);
+        expect(c.where('v', '===', 3).values().all()).toEqual([{v: 3}]);
+
+        expect(c.where('v', '<>', 3).values().all()).toEqual([{v: 1}, {v: 2}, {v: 4}]);
+        expect(c.where('v', '!=', 3).values().all()).toEqual([{v: 1}, {v: 2}, {v: 4}]);
+        expect(c.where('v', '!==', 3).values().all()).toEqual([{v: 1}, {v: 2}, {v: '3'}, {v: 4}]);
+        expect(c.where('v', '<=', 3).values().all()).toEqual([{v: 1}, {v: 2}, {v: 3}, {v: '3'}]);
+        expect(c.where('v', '>=', 3).values().all()).toEqual([{v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.where('v', '<', 3).values().all()).toEqual([{v: 1}, {v: 2}]);
+        expect(c.where('v', '>', 3).values().all()).toEqual([{v: 4}]);
+
+        const obj = {foo: 'bar'};
+
+        expect(c.where('v', obj).values().all()).toEqual([]);
+
+        expect(c.where('v', '<>', obj).values().all()).toEqual([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+
+        expect(c.where('v', '!=', obj).values().all()).toEqual([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+
+        expect(c.where('v', '!==', obj).values().all()).toEqual([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+
+        expect(c.where('v', '>', obj).values().all()).toEqual([]);
+
+        c = new Collection([{v: 1}, {v: obj}]);
+        expect(c.where('v', obj).values().all()).toEqual([{v: obj}]);
+
+        expect(c.where('v', '<>', null).values().all()).toEqual([{v: 1}, {v: obj}]);
+
+        expect(c.where('v', '<', null).values().all()).toEqual([]);
+
+        // Different, because 2 == true --> "true" in PHP, but "false" in JS
+        c = new Collection([{v: 1}, {v: 1}, {v: undefined}]); // eslint-disable-line no-undefined
+        expect(c.where('v').values().all()).toEqual([{v: 1}, {v: 1}]);
+    });
 });
+
+class TestArrayableObject implements IArrayable {
+
+    public toArray(): number[] {
+        return [1, 2, 3];
+    }
+
+}
 
 class TestObjectableObject implements IObjectable {
 

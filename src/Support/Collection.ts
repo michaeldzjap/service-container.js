@@ -1,8 +1,9 @@
-import {first, last, shuffle, wrap} from './Arr';
+import {first, last, shuffle, where, wrap} from './Arr';
+import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
-import {isObject, isString, isUndefined, isInstance, dataGet} from './helpers';
+import {isObject, isString, isUndefined, isInstance, dataGet, value} from './helpers';
 
 class Collection {
 
@@ -81,6 +82,64 @@ class Collection {
                 )
             )
         ).map(callback);
+    }
+
+    /**
+     * Get an array iterator for the items.
+     *
+     * @param {Array} items
+     * @returns {Function}
+     */
+    private static _getArrayIterator(items: unknown[]): IterableIterator<unknown> {
+        return (function *generator(): IterableIterator<unknown> {
+            for (let i = 0; i < items.length; i++) {
+                yield items[i];
+            }
+        })();
+    }
+
+    /**
+     * Get an array iterator for the items.
+     *
+     * @param {Object} items
+     * @returns {Function}
+     */
+    private static _getObjectIterator(items: object): IterableIterator<unknown> {
+        return (function *generator(): IterableIterator<unknown> {
+            for (const key of Object.keys(items)) {
+                yield items[key];
+            }
+        })();
+    }
+
+    /**
+     * Run a filter over each of the items.
+     *
+     * @param {(Function|undefined)} callback
+     * @returns {Collection}
+     */
+    public filter(callback?: Function): Collection {
+        if (!isUndefined(callback)) {
+            return new Collection(where(this._items, callback));
+        }
+
+        const items = Array.isArray(this._items)
+            ? this._items.filter((value: unknown): boolean => !!value)
+            : Object.keys(this._items).filter((key: string): boolean => !!this._items[key]);
+
+        return new Collection(items);
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param {string} key
+     * @param {(string|undefined)} operator
+     * @param {(*|undefined)} value
+     * @returns {Collection}
+     */
+    public where(key: string, operator?: unknown, value?: unknown): Collection {
+        return this.filter(this._operatorForWhere(key, operator, value));
     }
 
     /**
@@ -203,8 +262,8 @@ class Collection {
         }
 
         const keys = Object.keys(this._items);
-        const firstItem = this._items[0];
-        delete this._items[0];
+        const firstItem = this._items[keys[0]];
+        delete this._items[keys[0]];
 
         return firstItem;
     }
@@ -220,6 +279,108 @@ class Collection {
     }
 
     /**
+     * Remove an item from the collection by key.
+     *
+     * @param {(string|number|Array)} keys
+     * @returns {this}
+     */
+    public forget(keys: string | number | (string | number)[]): this {
+        if (Array.isArray(this._items)) {
+            const k = wrap(keys);
+
+            for (let i = k.length - 1; i >= 0; i--) {
+                this._items.splice(k[i], 1);
+            }
+        } else {
+            for (const key of wrap(keys)) {
+                delete this._items[key];
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Get an item from the collection by key.
+     *
+     * @param {(number|string)} key
+     * @param {*} dflt
+     * @returns {*}
+     */
+    public get(key: number | string, dflt?: unknown): unknown {
+        if (this.offsetExists(key)) {
+            return this._items[key];
+        }
+
+        return value(dflt);
+    }
+
+    /**
+     * Determine if an item exists at an offset.
+     *
+     * @param {(number|string)} key
+     * @returns {boolean}
+     */
+    public offsetExists(key: number | string): boolean {
+        if (Array.isArray(this._items) && typeof key === 'number') {
+            return key >= 0 && key < this._items.length;
+        }
+
+        if (isObject(this._items) && typeof key === 'string') {
+            return this._items.hasOwnProperty(key);
+        }
+
+        return false;
+    }
+
+    /**
+     * Get an item at a given offset.
+     *
+     * @param {(number|string)} key
+     * @returns {*}
+     */
+    public offsetGet(key: number | string): unknown {
+        return this._items[key];
+    }
+
+    /**
+     * Reset the keys on the underlying object or array.
+     *
+     * @returns {Collection}
+     */
+    public values(): Collection {
+        return new Collection(
+            Array.isArray(this._items)
+                ? [...this._items]
+                : (Object as any).values(this._items)
+        );
+    }
+
+    /**
+     * Get an iterator for the items.
+     *
+     * @returns {Function}
+     */
+    public getIterator(): IterableIterator<unknown> {
+        if (Array.isArray(this._items)) {
+            return Collection._getArrayIterator(this._items);
+        }
+
+        return Collection._getObjectIterator(this._items);
+    }
+
+    /**
+     * Count the number of items in the collection.
+     *
+     * @returns {number}
+     */
+    public count(): number {
+        return Array.isArray(this._items)
+            ? this._items.length
+            : Object.keys(this._items).length;
+    }
+
+    /**
      * Get an operator checker callback.
      *
      * @param {string} key
@@ -227,14 +388,12 @@ class Collection {
      * @param {(*|undefined)} value
      * @returns {Function}
      */
-    protected _operatorForWhere(key: string, operator?: string, value?: any): Function {
+    protected _operatorForWhere(key: string, operator?: unknown, value?: any): Function {
         if (isUndefined(operator) && isUndefined(value)) {
             value = true;
 
             operator = '=';
-        }
-
-        if (isUndefined(value)) {
+        } else if (isUndefined(value)) {
             value = operator;
 
             operator = '=';
@@ -280,6 +439,10 @@ class Collection {
 
         if (items instanceof Collection) {
             return items.all();
+        }
+
+        if (isInstance(items) && isArrayable(items)) {
+            return items.toArray();
         }
 
         if (isInstance(items) && isObjectable(items)) {

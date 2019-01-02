@@ -181,7 +181,7 @@ export const dataGet = (target: any, key: string[] | string | null, dflt?: unkno
     key = Array.isArray(key) ? [...key] : key!.split('.');
 
     let segment = key.shift();
-    while (!isNullOrUndefined(segment)) {
+    while (!isUndefined(segment)) {
         if (segment === '*') {
             // eslint-disable-next-line max-depth
             if (!isObject(target)) return value(dflt);
@@ -196,8 +196,8 @@ export const dataGet = (target: any, key: string[] | string | null, dflt?: unkno
             return key.includes('*') ? collapse(result) : result;
         }
 
-        if (accessible(target) && exists(target, segment as string)) {
-            target = target[segment as string];
+        if (accessible(target) && exists(target, segment)) {
+            target = target[segment];
         } else {
             return value(dflt);
         }
