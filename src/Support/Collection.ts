@@ -4,6 +4,7 @@ import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
 import {isObject, isString, isUndefined, isInstance, dataGet, value} from './helpers';
+import {Instantiable} from './types';
 
 class Collection {
 
@@ -140,6 +141,56 @@ class Collection {
      */
     public where(key: string, operator?: unknown, value?: unknown): Collection {
         return this.filter(this._operatorForWhere(key, operator, value));
+    }
+
+    /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param {string} key
+     * @param {*} value
+     * @returns {Collection}
+     */
+    public whereStrict(key: string, value: unknown): Collection {
+        return this.where(key, '===', value);
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param {string} key
+     * @param {Array} values
+     * @param {boolean} strict
+     * @returns {Collection}
+     */
+    public whereIn(key: string, values: unknown[], strict: boolean = false): Collection {
+        const items = this._getArrayableItems(values) as unknown[];
+
+        return this.filter((item: unknown): boolean => {
+            return strict
+                ? items.includes(dataGet(item, key))
+                : !isUndefined(values.find((_: unknown): boolean => dataGet(item, key) == _)); // eslint-disable-line eqeqeq
+        });
+    }
+
+    /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param {string} key
+     * @param {Array} values
+     * @returns {Collection}
+     */
+    public whereInStrict(key: string, values: unknown[]): Collection {
+        return this.whereIn(key, values, true);
+    }
+
+    /**
+     * Filter the items, removing any items that don't match the given type.
+     *
+     * @param {Instantiable} type
+     * @returns {Collection}
+     */
+    public whereInstanceOf<T>(type: Instantiable<T>): Collection {
+        return this.filter((value: unknown): boolean => value instanceof type);
     }
 
     /**

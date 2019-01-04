@@ -252,6 +252,27 @@ describe('Collection', (): void => {
         c = new Collection([{v: 1}, {v: 1}, {v: undefined}]); // eslint-disable-line no-undefined
         expect(c.where('v').values().all()).toEqual([{v: 1}, {v: 1}]);
     });
+
+    test('where strict', (): void => {
+        const c = new Collection([{v: 3}, {v: '3'}]);
+
+        expect(c.whereStrict('v', 3).values().all()).toEqual([{v: 3}]);
+    });
+
+    test('where instance of', (): void => {
+        const c = new Collection([new Collection, new Collection, {}, new Collection]);
+        expect(c.whereInstanceOf(Collection).count()).toBe(3);
+    });
+
+    test('where in', (): void => {
+        const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.whereIn('v', [1, 3]).values().all()).toEqual([{v: 1}, {v: 3}, {v: '3'}]);
+    });
+
+    test('where in strict', (): void => {
+        const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.whereInStrict('v', [1, 3]).values().all()).toEqual([{v: 1}, {v: 3}]);
+    });
 });
 
 class TestArrayableObject implements IArrayable {
