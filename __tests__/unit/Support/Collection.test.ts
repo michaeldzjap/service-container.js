@@ -376,6 +376,22 @@ describe('Collection', (): void => {
         expect(c.merge(new Collection({name: 'Now', id: 1})).all())
             .toEqual({name: 'Now', id: 1});
     });
+
+    test('union null', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.union().all()).toEqual({name: 'Hey'});
+    });
+
+    test('union object', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.union({id: 1}).all()).toEqual({name: 'Hey', id: 1});
+    });
+
+    test('union collection', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.union(new Collection({name: 'Now', id: 1})).all())
+            .toEqual({name: 'Hey', id: 1});
+    });
 });
 
 class TestArrayableObject implements IArrayable {

@@ -389,6 +389,33 @@ class Collection {
     }
 
     /**
+     * Union the collection with the given items.
+     *
+     * @param {(Array|Object|Collection|undefined)} items
+     * @returns {Collection}
+     */
+    public union(items?: object | Collection): Collection {
+        if (Array.isArray(this._items)) {
+            // If the collection does not have any keys, simply return a shallow
+            // copy
+            return new Collection([...this._items]);
+        }
+
+        const result = this._getArrayableItems(items);
+        const lkeys = Object.keys(this._items);
+        const union = {};
+
+        for (const key of lkeys) union[key] = this._items[key];
+        for (const key of Object.keys(result)) {
+            if (!lkeys.includes(key)) {
+                union[key] = result[key];
+            }
+        }
+
+        return new Collection(union);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @returns {*}
@@ -608,7 +635,9 @@ class Collection {
      * @param {*} items
      * @returns {(Array|Object)}
      */
-    protected _getArrayableItems(items: any): unknown[] | object {
+    protected _getArrayableItems(items?: any): unknown[] | object {
+        if (isUndefined(items)) return [];
+
         if (Array.isArray(items) || (isObject(items) && items.constructor.name === 'Object')) {
             return items;
         }
