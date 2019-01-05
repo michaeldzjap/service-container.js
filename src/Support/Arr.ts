@@ -1,7 +1,9 @@
 import Rand from 'rand-seed';
 
+import Collection from './Collection';
 import {
-    dataGet, isUndefined, isNullOrUndefined, isObject, isString, value
+    dataGet, isUndefined, isNullOrUndefined, isObject, isString, isInstantiable,
+    isInstance, value
 } from './helpers';
 
 /**
@@ -247,18 +249,25 @@ export const last = (items: unknown[] | object, callback?: Function | null, dflt
 /**
  * Flatten a multi-dimensional array into a single level.
  *
- * @param {*[]} array
+ * @param {(*[]|Object)} array
  * @param {number} depth
  * @returns {*[]}
  */
-export const flatten = (array: unknown[], depth: number = Infinity): unknown[] => {
+export const flatten = (array: unknown[] | object, depth: number = Infinity): unknown[] => {
     let result: unknown[] = [];
 
-    for (const item of array) {
-        if (!Array.isArray(item)) {
+    const arr = Array.isArray(array) ? array : (Object as any).values(array);
+
+    for (let item of arr) {
+        item = item instanceof Collection ? item.all() : item;
+
+        if (!Array.isArray(item) && !(isObject(item) && !isInstance(item))) {
             result.push(item);
         } else if (depth === 1) {
-            result = [...result, ...item];
+            result = [
+                ...result,
+                ...(Array.isArray(item) ? item : (Object as any).values(item))
+            ];
         } else {
             result = [...result, ...flatten(item, depth - 1)];
         }

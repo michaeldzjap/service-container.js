@@ -118,6 +118,7 @@ export const hasConstructor = (target: object | Function): target is object => (
  */
 export const isInstance = <T>(target: any): target is Instance<T> => (
     isObject(target) && !hasPrototype(target) && hasConstructor(target)
+        && target.constructor.name !== 'Object'
 );
 
 /**

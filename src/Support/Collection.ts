@@ -1,4 +1,4 @@
-import {first, last, shuffle, where, wrap} from './Arr';
+import {first, flatten, last, shuffle, where, wrap} from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
@@ -86,6 +86,16 @@ class Collection {
     }
 
     /**
+     * Determine if the given value is callable, but not a string.
+     *
+     * @param {*} value
+     * @returns {boolean}
+     */
+    protected static _useAsCallable(value: unknown): value is Function {
+        return !isString(value) && value instanceof Function;
+    }
+
+    /**
      * Get an array iterator for the items.
      *
      * @param {Array} items
@@ -111,6 +121,20 @@ class Collection {
                 yield items[key];
             }
         })();
+    }
+
+    /**
+     * Determine if an array includes the given item.
+     *
+     * @param {Array} values
+     * @param {*} item
+     * @param {boolean} [strict=false]
+     * @returns {boolean}
+     */
+    private static _includes(values: unknown[], item: unknown, strict: boolean = false): boolean {
+        return strict
+            ? values.includes(item)
+            : !isUndefined(values.find((_: unknown): boolean => item == _)); // eslint-disable-line eqeqeq
     }
 
     /**
@@ -165,11 +189,9 @@ class Collection {
     public whereIn(key: string, values: unknown[], strict: boolean = false): Collection {
         const items = this._getArrayableItems(values) as unknown[];
 
-        return this.filter((item: unknown): boolean => {
-            return strict
-                ? items.includes(dataGet(item, key))
-                : !isUndefined(values.find((_: unknown): boolean => dataGet(item, key) == _)); // eslint-disable-line eqeqeq
-        });
+        return this.filter((item: unknown): boolean => (
+            Collection._includes(items, dataGet(item, key), strict)
+        ));
     }
 
     /**
@@ -184,6 +206,45 @@ class Collection {
     }
 
     /**
+     * Filter items where the given key between values.
+     *
+     * @param {string} key
+     * @param {Array} values
+     * @returns {Collection}
+     */
+    public whereBetween(key: string, values: unknown[]): Collection {
+        return this.where(key, '>=', first(values))
+            .where(key, '<=', last(values));
+    }
+
+    /**
+     * Filter items by the given key value pair.
+     *
+     * @param {string} key
+     * @param {Array} values
+     * @param {boolean} strict
+     * @returns {Collection}
+     */
+    public whereNotIn(key: string, values: unknown[], strict: boolean = false): Collection {
+        const items = this._getArrayableItems(values) as unknown[];
+
+        return this.reject((item: unknown): boolean => (
+            Collection._includes(items, dataGet(item, key), strict)
+        ));
+    }
+
+    /**
+     * Filter items by the given key value pair using strict comparison.
+     *
+     * @param {string} key
+     * @param {Array} values
+     * @returns {Collection}
+     */
+    public whereNotInStrict(key: string, values: unknown[]): Collection {
+        return this.whereNotIn(key, values, true);
+    }
+
+    /**
      * Filter the items, removing any items that don't match the given type.
      *
      * @param {Instantiable} type
@@ -191,6 +252,23 @@ class Collection {
      */
     public whereInstanceOf<T>(type: Instantiable<T>): Collection {
         return this.filter((value: unknown): boolean => value instanceof type);
+    }
+
+    /**
+     * Create a collection of all elements that do not pass a given truth test.
+     *
+     * @param {(*|Function)} callback
+     * @returns {Collection}
+     */
+    public reject(callback: unknown | Function): Collection {
+        if (Collection._useAsCallable(callback)) {
+            return this.filter((value: unknown, key: string): boolean => (
+                !callback(value, key)
+            ));
+        }
+
+        // eslint-disable-next-line eqeqeq
+        return this.filter((item: unknown): boolean => item != callback);
     }
 
     /**
@@ -253,6 +331,16 @@ class Collection {
     }
 
     /**
+     * Get a flattened array or object of the items in the collection.
+     *
+     * @param {number} depth
+     * @returns {Collection}
+     */
+    public flatten(depth: number = Infinity): Collection {
+        return new Collection(flatten(this._items, depth));
+    }
+
+    /**
      * Get the last item from the collection.
      *
      * @param {?(Function|undefined)} callback
@@ -261,6 +349,43 @@ class Collection {
      */
     public last(callback?: Function | null, dflt?: unknown): unknown {
         return last(this._items, callback, dflt);
+    }
+
+    /**
+     * Merge the collection with the given items.
+     *
+     * @param {(Array|Object|Collection)} items
+     * @returns {Collection}
+     */
+    public merge(items?: unknown[] | object | Collection): Collection {
+        if (isUndefined(items)) {
+            return new Collection(
+                Array.isArray(this._items) ? [...this._items] : {...this._items}
+            );
+        }
+
+        const result = this._getArrayableItems(items);
+
+        if (Array.isArray(this._items) && Array.isArray(result)) {
+            return new Collection([...this._items, ...result]);
+        }
+
+        // If only one of the mergeables is an array, keys are lost
+
+        if (!Array.isArray(this._items) && Array.isArray(result)) {
+
+            return new Collection([
+                ...(Object as any).values(this._items), ...result
+            ]);
+        }
+
+        if (Array.isArray(this._items) && !Array.isArray(result)) {
+            return new Collection([
+                ...this._items, ...(Object as any).values(result)
+            ]);
+        }
+
+        return new Collection({...this._items, ...result});
     }
 
     /**

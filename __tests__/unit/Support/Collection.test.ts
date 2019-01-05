@@ -273,6 +273,109 @@ describe('Collection', (): void => {
         const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
         expect(c.whereInStrict('v', [1, 3]).values().all()).toEqual([{v: 1}, {v: 3}]);
     });
+
+    test('where not in', (): void => {
+        const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.whereNotIn('v', [1, 3]).values().all()).toEqual([{v: 2}, {v: 4}]);
+    });
+
+    test('where not in strict', (): void => {
+        const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.whereNotInStrict('v', [1, 3]).values().all()).toEqual([{v: 2}, {v: '3'}, {v: 4}]);
+    });
+
+    test('values', (): void => {
+        const c = new Collection([{id: 1, name: 'Hey'}, {id: 2, name: 'Now'}]);
+        expect(
+            c.filter((item: {id: number, name: string}): boolean => item.id === 2).values().all()
+        ).toEqual([{id: 2, name: 'Now'}]);
+    });
+
+    test('between', (): void => {
+        const c = new Collection([{v: 1}, {v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+
+        expect(c.whereBetween('v', [2, 4]).values().all()).toEqual([{v: 2}, {v: 3}, {v: '3'}, {v: 4}]);
+        expect(c.whereBetween('v', [-1, 1]).values().all()).toEqual([{v: 1}]);
+        expect(c.whereBetween('v', [3, 3]).values().all()).toEqual([{v: 3}, {v: '3'}]);
+    });
+
+    test('flatten', (): void => {
+        // Flat arrays are unaffected
+        let c = new Collection(['#foo', '#bar', '#baz']);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Nested arrays are flattened with existing flat items
+        c = new Collection([['#foo', '#bar'], '#baz']);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Sets of nested arrays are flattened
+        c = new Collection([['#foo', '#bar'], ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Deeply nested arrays are flattened
+        c = new Collection([['#foo', ['#bar']], ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Nested collections are flattened alongside arrays
+        c = new Collection([new Collection(['#foo', '#bar']), ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Nested collections containing plain arrays are flattened
+        c = new Collection([new Collection(['#foo', ['#bar']]), ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Nested arrays containing collections are flattened
+        c = new Collection([['#foo', new Collection(['#bar'])], ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Nested arrays containing collections containing arrays are flattened
+        c = new Collection([['#foo', new Collection(['#bar', ['#zap']])], ['#baz']]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#zap', '#baz']);
+    });
+
+    test('flatten with depth', (): void => {
+        // No depth flattens recursively
+        let c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz', '#zap']);
+
+        // Specifying a depth only flattens to that depth
+        c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        expect(c.flatten(1).all()).toEqual(['#foo', ['#bar', ['#baz']], '#zap']);
+
+        c = new Collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        expect(c.flatten(2).all()).toEqual(['#foo', '#bar', ['#baz'], '#zap']);
+    });
+
+    test('flatten ignores keys', (): void => {
+        // No depth ignores keys
+        let c = new Collection(['#foo', {key: '#bar'}, {key: '#baz'}]);
+        expect(c.flatten().all()).toEqual(['#foo', '#bar', '#baz']);
+
+        // Depth of 1 ignores keys
+        c = new Collection(['#foo', {key: '#bar'}, {key: '#baz'}]);
+        expect(c.flatten(1).all()).toEqual(['#foo', '#bar', '#baz']);
+    });
+
+    test('merge undefined', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.merge().all()).toEqual({name: 'Hey'});
+    });
+
+    test('merge array', (): void => {
+        const c = new Collection([1]);
+        expect(c.merge([2]).all()).toEqual([1, 2]);
+    });
+
+    test('merge object', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.merge({id: 1}).all()).toEqual({name: 'Hey', id: 1});
+    });
+
+    test('merge collection', (): void => {
+        const c = new Collection({name: 'Hey'});
+        expect(c.merge(new Collection({name: 'Now', id: 1})).all())
+            .toEqual({name: 'Now', id: 1});
+    });
 });
 
 class TestArrayableObject implements IArrayable {
