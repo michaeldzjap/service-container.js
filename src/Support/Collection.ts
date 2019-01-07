@@ -21,7 +21,7 @@ class Collection {
      * @param {*} items
      */
     public constructor(items: unknown = []) {
-        this._items = this._getArrayableItems(items);
+        this._items = Collection._getArrayableItems(items);
     }
 
     /**
@@ -96,6 +96,43 @@ class Collection {
     }
 
     /**
+     * Results array of items from Collection or Arrayable.
+     *
+     * @param {*} items
+     * @returns {(Array|Object)}
+     */
+    protected static _getArrayableItems(items?: any): unknown[] | object {
+        if (isUndefined(items)) return [];
+
+        if (Array.isArray(items)
+            || (isObject(items) && items.constructor.name === 'Object')) {
+            return items;
+        }
+
+        if (items instanceof Collection) {
+            return items.all();
+        }
+
+        if (isInstance(items) && isArrayable(items)) {
+            return items.toArray();
+        }
+
+        if (isInstance(items) && isObjectable(items)) {
+            return items.toObject();
+        }
+
+        if (isInstance(items) && isJsonable(items)) {
+            return JSON.parse(items.toJson());
+        }
+
+        if (isInstance(items) && isJsonSerializable(items)) {
+            return items.jsonSerialize();
+        }
+
+        return [items];
+    }
+
+    /**
      * Get an array iterator for the items.
      *
      * @param {Array} items
@@ -135,6 +172,68 @@ class Collection {
         return strict
             ? values.includes(item)
             : !isUndefined(values.find((_: unknown): boolean => item == _)); // eslint-disable-line eqeqeq
+    }
+
+    /**
+     * Get the items in the collection that are not present in the given items.
+     *
+     * @param {(Array|Object|Collection|undefined)} items
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public diff(items?: unknown[] | object | Collection, callback?: Function): Collection {
+        if (isUndefined(items)) {
+            return new Collection(
+                Array.isArray(this._items) ? [...this._items] : {...this._items}
+            );
+        }
+
+        const result = Collection._getArrayableItems(items);
+
+        // If any of the comparables is an array, lose the keys of the other
+
+        if (Array.isArray(result)) {
+            const values = Array.isArray(this._items)
+                ? this._items
+                : (Object as any).values(this._items);
+            const diff = values.filter((value: unknown, index: number): boolean => {
+                if (isUndefined(callback)) {
+                    return !result.includes(value);
+                }
+
+                return !callback(value, index, values, result);
+            });
+
+            return new Collection(diff);
+        }
+
+        if (Array.isArray(this._items)) {
+            const values = (Object as any).values(result);
+            const diff = this._items.filter((value: unknown, index: number): boolean => {
+                if (isUndefined(callback)) {
+                    return !values.includes(value);
+                }
+
+                return !callback(value, index, this._items, values);
+            });
+
+            return new Collection(diff);
+        }
+
+        // If both comparables are objects, keep keys
+
+        const values = (Object as any).values(result);
+        const diff = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                if (isUndefined(callback) && !values.includes(this._items[key])
+                    || (!isUndefined(callback) && !callback(this._items[key], key, this._items, result))) {
+                    acc[key] = this._items[key];
+                }
+
+                return acc;
+            }, {});
+
+        return new Collection(diff);
     }
 
     /**
@@ -187,7 +286,7 @@ class Collection {
      * @returns {Collection}
      */
     public whereIn(key: string, values: unknown[], strict: boolean = false): Collection {
-        const items = this._getArrayableItems(values) as unknown[];
+        const items = Collection._getArrayableItems(values) as unknown[];
 
         return this.filter((item: unknown): boolean => (
             Collection._includes(items, dataGet(item, key), strict)
@@ -226,7 +325,7 @@ class Collection {
      * @returns {Collection}
      */
     public whereNotIn(key: string, values: unknown[], strict: boolean = false): Collection {
-        const items = this._getArrayableItems(values) as unknown[];
+        const items = Collection._getArrayableItems(values) as unknown[];
 
         return this.reject((item: unknown): boolean => (
             Collection._includes(items, dataGet(item, key), strict)
@@ -364,7 +463,7 @@ class Collection {
             );
         }
 
-        const result = this._getArrayableItems(items);
+        const result = Collection._getArrayableItems(items);
 
         if (Array.isArray(this._items) && Array.isArray(result)) {
             return new Collection([...this._items, ...result]);
@@ -391,7 +490,7 @@ class Collection {
     /**
      * Union the collection with the given items.
      *
-     * @param {(Array|Object|Collection|undefined)} items
+     * @param {(Object|Collection|undefined)} items
      * @returns {Collection}
      */
     public union(items?: object | Collection): Collection {
@@ -401,7 +500,7 @@ class Collection {
             return new Collection([...this._items]);
         }
 
-        const result = this._getArrayableItems(items);
+        const result = Collection._getArrayableItems(items);
         const lkeys = Object.keys(this._items);
         const union = {};
 
@@ -627,42 +726,6 @@ class Collection {
                 case '!==': return retrieved !== value;
             }
         };
-    }
-
-    /**
-     * Results array of items from Collection or Arrayable.
-     *
-     * @param {*} items
-     * @returns {(Array|Object)}
-     */
-    protected _getArrayableItems(items?: any): unknown[] | object {
-        if (isUndefined(items)) return [];
-
-        if (Array.isArray(items) || (isObject(items) && items.constructor.name === 'Object')) {
-            return items;
-        }
-
-        if (items instanceof Collection) {
-            return items.all();
-        }
-
-        if (isInstance(items) && isArrayable(items)) {
-            return items.toArray();
-        }
-
-        if (isInstance(items) && isObjectable(items)) {
-            return items.toObject();
-        }
-
-        if (isInstance(items) && isJsonable(items)) {
-            return JSON.parse(items.toJson());
-        }
-
-        if (isInstance(items) && isJsonSerializable(items)) {
-            return items.jsonSerialize();
-        }
-
-        return [items];
     }
 
 }

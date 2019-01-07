@@ -127,7 +127,7 @@ describe('Collection', (): void => {
 
     test('get arrayable items', (): void => {
         const method = Reflect.getOwnPropertyDescriptor(
-            Collection.prototype, '_getArrayableItems'
+            Collection, '_getArrayableItems'
         ) as PropertyDescriptor;
 
         let items: any = new TestArrayableObject;
@@ -391,6 +391,36 @@ describe('Collection', (): void => {
         const c = new Collection({name: 'Hey'});
         expect(c.union(new Collection({name: 'Now', id: 1})).all())
             .toEqual({name: 'Hey', id: 1});
+    });
+
+    test('diff collection', (): void => {
+        const c = new Collection({id: 1, firstWord: 'Hey'});
+        expect(c.diff(new Collection({firstWord: 'Hey', lastWord: 'Now'})).all())
+            .toEqual({id: 1});
+    });
+
+    test('diff with collection', (): void => {
+        const c = new Collection(['en_GB', 'fr', 'HR']);
+        // Demonstrate that diffKeys wont support case insensitivity
+        expect(c.diff(new Collection(['en_gb', 'hr'])).all())
+            .toEqual(['en_GB', 'fr', 'HR']);
+        // Allow for case insensitive difference
+        expect(
+            c.diff(
+                new Collection(['en_gb', 'hr']),
+                (value: string, index: number, left: unknown[], right: any): boolean => (
+                    right.includes(value.toLowerCase())
+                )
+            ).all()
+        ).toEqual(['fr']);
+    });
+
+    test('diff with undefined', (): void => {
+        let c = new Collection(['en_GB', 'fr', 'HR']);
+        expect(c.diff().all()).toEqual(['en_GB', 'fr', 'HR']);
+
+        c = new Collection({id: 1, firstWord: 'Hey'});
+        expect(c.diff().all()).toEqual({id: 1, firstWord: 'Hey'});
     });
 });
 
