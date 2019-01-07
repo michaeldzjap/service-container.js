@@ -178,14 +178,12 @@ class Collection {
      * Get the items in the collection that are not present in the given items.
      *
      * @param {(Array|Object|Collection|undefined)} items
-     * @param {Function} callback
+     * @param {(Function|undefined)} callback
      * @returns {Collection}
      */
     public diff(items?: unknown[] | object | Collection, callback?: Function): Collection {
         if (isUndefined(items)) {
-            return new Collection(
-                Array.isArray(this._items) ? [...this._items] : {...this._items}
-            );
+            return this._shallowCopy();
         }
 
         const result = Collection._getArrayableItems(items);
@@ -226,6 +224,33 @@ class Collection {
         const diff = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
                 if (isUndefined(callback) && !values.includes(this._items[key])
+                    || (!isUndefined(callback) && !callback(this._items[key], key, this._items, result))) {
+                    acc[key] = this._items[key];
+                }
+
+                return acc;
+            }, {});
+
+        return new Collection(diff);
+    }
+
+    /**
+     * Get the items in the collection whose keys are not present in the given
+     * items.
+     *
+     * @param {(Object|Collection|undefined)} items
+     * @param {(Function|undefined)} callback
+     * @returns {Collection}
+     */
+    public diffKeys(items?: object | Collection, callback?: Function): Collection {
+        if (isUndefined(items)) {
+            return this._shallowCopy();
+        }
+
+        const result = Collection._getArrayableItems(items);
+        const diff = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                if (isUndefined(callback) && !result.hasOwnProperty(key)
                     || (!isUndefined(callback) && !callback(this._items[key], key, this._items, result))) {
                     acc[key] = this._items[key];
                 }
@@ -497,7 +522,7 @@ class Collection {
         if (Array.isArray(this._items)) {
             // If the collection does not have any keys, simply return a shallow
             // copy
-            return new Collection([...this._items]);
+            return this._shallowCopy();
         }
 
         const result = Collection._getArrayableItems(items);
@@ -726,6 +751,17 @@ class Collection {
                 case '!==': return retrieved !== value;
             }
         };
+    }
+
+    /**
+     * Return a shallow copy of the collection.
+     *
+     * @returns {Collection}
+     */
+    private _shallowCopy(): Collection {
+        return new Collection(
+            Array.isArray(this._items) ? [...this._items] : {...this._items}
+        );
     }
 
 }

@@ -422,6 +422,26 @@ describe('Collection', (): void => {
         c = new Collection({id: 1, firstWord: 'Hey'});
         expect(c.diff().all()).toEqual({id: 1, firstWord: 'Hey'});
     });
+
+    test('diff keys', (): void => {
+        const c1 = new Collection({id: 1, firstWord: 'Hey'});
+        let c2 = new Collection({id: 123, fooBar: 'Hey'});
+
+        expect(c1.diffKeys(c2).all()).toEqual({firstWord: 'Hey'});
+
+        c2 = new Collection({ID: 123, fooBar: 'Hey'});
+        // Demonstrate that diffKeys won't support case insensitivity
+        expect(c1.diffKeys(c2).all()).toEqual({id: 1, firstWord: 'Hey'});
+        // Allow for case insensitive difference
+        expect(
+            c1.diffKeys(
+                c2,
+                (value: string, key: string, left: object, right: object): boolean => (
+                    right.hasOwnProperty(key.toUpperCase())
+                )
+            ).all()
+        ).toEqual({firstWord: 'Hey'});
+    });
 });
 
 class TestArrayableObject implements IArrayable {
