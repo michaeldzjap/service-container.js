@@ -8,7 +8,8 @@
         "lib": ["es5", "es6", "es7", "dom"],
         "strict": true,
         "suppressImplicitAnyIndexErrors": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "esModuleInterop": true
     },
     "include": [
         "src/**/*"

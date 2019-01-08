@@ -1,3 +1,5 @@
+import isEqual from 'lodash.isequal';
+
 import {first, flatten, last, shuffle, where, wrap} from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
@@ -131,6 +133,20 @@ class Collection {
         }
 
         return [items];
+    }
+
+    /**
+     * Get a value retrieving callback.
+     *
+     * @param {(string|Function|undefined)} value
+     * @returns {Function}
+     */
+    protected static _valueRetriever(value?: string | Function): Function {
+        if (Collection._useAsCallable(value)) {
+            return value;
+        }
+
+        return (item: unknown): unknown => dataGet(item, value);
     }
 
     /**
@@ -323,6 +339,78 @@ class Collection {
 
             return callback(...c);
         });
+    }
+
+    /**
+     * Intersect the collection with the given items.
+     *
+     * @param {(Array|Object|Collection|undefined)} items
+     * @returns {Collection}
+     */
+    public intersect(items?: unknown[] | object | Collection): Collection {
+        if (isUndefined(items)) {
+            return new Collection([]);
+        }
+
+        const result = Collection._getArrayableItems(items);
+
+        // If any of the comparables is an array, lose the keys of the other
+
+        if (Array.isArray(result)) {
+            const values = Array.isArray(this._items)
+                ? this._items
+                : (Object as any).values(this._items);
+
+            return new Collection(values.filter((value: unknown): boolean => (
+                result.includes(value)
+            )));
+        }
+
+        if (Array.isArray(this._items)) {
+            const values = (Object as any).values(result);
+
+            return new Collection(this._items.filter((value: unknown): boolean => (
+                values.includes(value)
+            )));
+        }
+
+        // If both comparables are objects, keep keys
+
+        const values = (Object as any).values(result);
+        const intersect = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                if (values.includes(this._items[key])) {
+                    acc[key] = this._items[key];
+                }
+
+                return acc;
+            }, {});
+
+        return new Collection(intersect);
+    }
+
+    /**
+     * Intersect the collection with the given items by key.
+     *
+     * @param {(Object|Collection|undefined)} items
+     * @returns {Collection}
+     */
+    public intersectByKeys(items?: object | Collection): Collection {
+        if (isUndefined(items) || Array.isArray(this._items)) {
+            return new Collection([]);
+        }
+
+        const result = Collection._getArrayableItems(items);
+        const intersect = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                if (result.hasOwnProperty(key)) {
+                    acc[key] = this._items[key];
+                }
+
+                return acc;
+            }, {});
+
+        return new Collection(intersect);
     }
 
     /**
@@ -601,6 +689,29 @@ class Collection {
         }
 
         return new Collection(union);
+    }
+
+    /**
+     * Return only unique items from the collection array.
+     *
+     * @param {(string|Function|undefined)} key
+     * @param {(boolean)} [strict=false]
+     * @returns {Collection}
+     */
+    public unique(key?: string | Function, strict: boolean = false): Collection {
+        const callback = Collection._valueRetriever(key);
+
+        const exists: string[] = [];
+
+        return this.reject((item: unknown, key: string): boolean | undefined => {
+            const id = callback(item, key);
+
+            if (strict ? exists.includes(id) : exists.find((_: any): boolean => isEqual(_, id))) {
+                return true;
+            }
+
+            exists.push(id);
+        });
     }
 
     /**

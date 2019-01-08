@@ -172,11 +172,11 @@ export const value = (value: unknown): unknown => (
  * Get an item from an array or object using "dot" notation.
  *
  * @param {*} target
- * @param {?(string[]|string)} key
+ * @param {?(string[]|string|undefined)} key
  * @param {*} dflt
  * @returns {*}
  */
-export const dataGet = (target: any, key: string[] | string | null, dflt?: unknown): any => {
+export const dataGet = (target: any, key?: string[] | string | null, dflt?: unknown): any => {
     if (isNullOrUndefined(key)) return target;
 
     key = Array.isArray(key) ? [...key] : key!.split('.');

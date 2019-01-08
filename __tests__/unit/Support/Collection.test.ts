@@ -503,6 +503,60 @@ describe('Collection', (): void => {
         });
         expect(result).toEqual([[1, 'a'], [2, 'b']]);
     });
+
+    test('intersect undefined', (): void => {
+        const c = new Collection({id: 1, firstWord: 'Hey'});
+        expect(c.intersect().all()).toEqual([]);
+    });
+
+    test('intersect collection', (): void => {
+        const c = new Collection({id: 1, firstWord: 'Hey'});
+        expect(c.intersect(new Collection({firstWord: 'Hey', lastWord: 'Now'})).all())
+            .toEqual({firstWord: 'Hey'});
+    });
+
+    test('intersect by keys undefined', (): void => {
+        const c = new Collection({name: 'Riley', age: 69});
+        expect(c.intersectByKeys().all()).toEqual([]);
+    });
+
+    test('intersect by keys', (): void => {
+        const c = new Collection({name: 'Riley', age: 69});
+        expect(c.intersectByKeys(new Collection({name: 'Riley', surname: 'Martin'})).all())
+            .toEqual({name: 'Riley'});
+    });
+
+    test('unique', (): void => {
+        let c = new Collection(['Hey', 'Now', 'Now']);
+        expect(c.unique().all()).toEqual(['Hey', 'Now']);
+
+        c = new Collection([[1, 2], [1, 2], [2, 3], [3, 4], [2, 3]]);
+        expect(c.unique().all()).toEqual([[1, 2], [2, 3], [3, 4]]);
+    });
+
+    test('unique with callback', (): void => {
+        const c = new Collection({
+            '1': {id: 1, first: 'Eric', last: 'The Actor'},
+            '2': {id: 2, first: 'Eric', last: 'The Actor'},
+            '3': {id: 3, first: 'Jeff', last: 'The Actor'},
+            '4': {id: 4, first: 'Jeff', last: 'The Actor'},
+            '5': {id: 5, first: 'Eric', last: 'The Astronaut'},
+            '6': {id: 6, first: 'Eric', last: 'The Astronaut'},
+        });
+
+        expect(c.unique('first').all()).toEqual({
+            '1': {id: 1, first: 'Eric', last: 'The Actor'},
+            '3': {id: 3, first: 'Jeff', last: 'The Actor'},
+        });
+
+        expect(c.unique((item: {id: number, first: string, last: string}): string => (
+            `${item.first}${item.last}`
+        )).all()).toEqual({
+            '1': {id: 1, first: 'Eric', last: 'The Actor'},
+            '3': {id: 3, first: 'Jeff', last: 'The Actor'},
+            '5': {id: 5, first: 'Eric', last: 'The Astronaut'},
+        });
+    });
 });
 
 class TestArrayableObject implements IArrayable {
