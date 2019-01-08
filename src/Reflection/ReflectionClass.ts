@@ -22,6 +22,7 @@ class ReflectionClass {
     /**
      * Create a new reflection class instance.
      *
+     * @constructor
      * @param {*} target
      */
     public constructor(target: any) {

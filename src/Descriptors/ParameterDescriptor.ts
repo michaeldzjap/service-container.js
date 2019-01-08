@@ -31,6 +31,7 @@ class ParameterDescriptor {
     /**
      * Create a new parameter descriptor instance.
      *
+     * @constructor
      * @param {Object} props
      * @param {*} value
      */

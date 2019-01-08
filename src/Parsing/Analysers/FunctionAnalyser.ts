@@ -36,6 +36,7 @@ class FunctionAnalyser implements IFunctionAnalyser {
     /**
      * Create a new function analyser instance.
      *
+     * @constructor
      * @param {Object} ast
      * @param {mixed} target
      * @param {(string|undefined)} name

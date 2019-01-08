@@ -6,6 +6,7 @@ class ConstructorAnalyser extends AbstractMethodAnalyser {
     /**
      * Create a new constructor analyser instance.
      *
+     * @constructor
      * @param {Object} ast
      * @param {*} target
      */

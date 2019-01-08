@@ -22,6 +22,7 @@ class ReflectionParameter {
     /**
      * Create a new reflection parameter instance.
      *
+     * @constructor
      * @param {*} target
      * @param {ParameterDescriptor} descriptor
      * @param {number} position

@@ -18,6 +18,7 @@ class Collection {
     /**
      * Create a new collection.
      *
+     * @constructor
      * @param {*} items
      */
     public constructor(items: unknown = []) {
@@ -259,6 +260,69 @@ class Collection {
             }, {});
 
         return new Collection(diff);
+    }
+
+    /**
+     * Get the items in the collection whose keys and values are not present in
+     * the given items.
+     *
+     * @param {(Object|Collection|undefined)} items
+     * @returns {Collection}
+     */
+    public diffAssoc(items?: object | Collection): Collection {
+        if (isUndefined(items)) {
+            return this._shallowCopy();
+        }
+
+        const result = Collection._getArrayableItems(items);
+        const diff = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                if (!result.hasOwnProperty(key) || result[key] !== this._items[key]) {
+                    acc[key] = this._items[key];
+                }
+
+                return acc;
+            }, {});
+
+        return new Collection(diff);
+    }
+
+    /**
+     * Execute a callback over eacht item.
+     *
+     * @param {Function} callback
+     * @returns {this}
+     */
+    public each(callback: Function): this {
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                if (callback(this._items[i], i) === false) break;
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                if (callback(this._items[key], key) === false) break;
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Execute a callback over each nested chunk of items.
+     *
+     * @param {Function} callback
+     * @returns {this}
+     */
+    public eachSpread(callback: Function): this {
+        return this.each((chunk: unknown[] | Collection, key: string): boolean | undefined => {
+            let c: any = Collection.unwrap(chunk);
+            c = [
+                ...(Array.isArray(c) ? c : (Object as any).values(c)),
+                key
+            ];
+
+            return callback(...c);
+        });
     }
 
     /**

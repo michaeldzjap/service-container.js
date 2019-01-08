@@ -21,6 +21,7 @@ abstract class AbstractReflectionFunction implements IReflectionFunction {
     /**
      * Create a new abstract reflection function instance.
      *
+     * @constructor
      * @param {*} target
      * @param {string} name
      */

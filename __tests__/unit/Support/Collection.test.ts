@@ -3,6 +3,7 @@ import IArrayable from '@src/Contracts/IArrayable';
 import IJsonable from '@src/Contracts/IJsonable';
 import IJsonSerializable from '@src/Contracts/IJsonSerializable';
 import IObjectable from '@src/Contracts/IObjectable';
+import {isString} from '@src/Support/helpers';
 
 // eslint-disable-next-line max-statements
 describe('Collection', (): void => {
@@ -441,6 +442,66 @@ describe('Collection', (): void => {
                 )
             ).all()
         ).toEqual({firstWord: 'Hey'});
+    });
+
+    test('diff assoc', (): void => {
+        let c1 = new Collection({id: 1, firstWord: 'Hey', notAffected: 'value'});
+        let c2 = new Collection({id: 123, fooBar: 'Hey', notAffected: 'value'});
+        expect(c1.diffAssoc(c2).all()).toEqual({id: 1, firstWord: 'Hey'});
+
+        c1 = new Collection({a: 'green', b: 'brown', c: 'blue'});
+        c2 = new Collection({A: 'green'});
+        // Demonstrate that the case of the keys will affect the output
+        expect(c1.diffAssoc(c2).all()).toEqual({a: 'green', b: 'brown', c: 'blue'});
+    });
+
+    test('each', (): void => {
+        const original = {foo: 'bar', bam: 'baz'};
+        const c = new Collection(original);
+
+        let result = {};
+        c.each((item: unknown, key: string): void => {
+            result[key] = item;
+        });
+        expect(result).toEqual(original);
+
+        result = {};
+        c.each((item: unknown, key: string): boolean | undefined => {
+            result[key] = item;
+            if (isString(key)) return false;
+        });
+        expect(result).toEqual({foo: 'bar'});
+    });
+
+    test('each spread', (): void => {
+        let c = new Collection([[1, 'a'], [2, 'b']]);
+
+        let result: any = [];
+        c.eachSpread((number: number, character: string): void => {
+            result.push([number, character]);
+        });
+        expect(c.all()).toEqual(result);
+
+        result = [];
+        c.eachSpread((number: number, character: string): boolean => {
+            result.push([number, character]);
+
+            return false;
+        });
+        expect(result).toEqual([[1, 'a']]);
+
+        result = [];
+        c.eachSpread((number: number, character: string, key: string): void => {
+            result.push([number, character, key]);
+        });
+        expect(result).toEqual([[1, 'a', 0], [2, 'b', 1]]);
+
+        c = new Collection([new Collection([1, 'a']), new Collection([2, 'b'])]);
+        result = [];
+        c.eachSpread((number: number, character: string): void => {
+            result.push([number, character]);
+        });
+        expect(result).toEqual([[1, 'a'], [2, 'b']]);
     });
 });
 

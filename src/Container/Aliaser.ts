@@ -29,6 +29,7 @@ class Aliaser implements IAliaser {
     /**
      * Create a new class binding builder.
      *
+     * @constructor
      * @param {Container} container
      */
     public constructor(container: Container) {

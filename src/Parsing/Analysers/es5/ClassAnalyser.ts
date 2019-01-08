@@ -32,6 +32,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * Create a new class parser instance.
      *
+     * @constructor
      * @param {Object} ast
      */
     public constructor(ast: any) {

@@ -16,6 +16,7 @@ class ClassAnalyserManager extends Manager {
     /**
      * Create a new class analyser manager instance.
      *
+     * @constructor
      * @param {*} ast
      */
     public constructor(ast: any) {

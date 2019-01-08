@@ -28,6 +28,7 @@ class Callable<T> implements ICallable<T> {
     /**
      * Create a new callable instance.
      *
+     * @constructor
      * @param {(Instantiable|Instance)} target
      * @param {(string|undefined)} method
      * @param {boolean} [isStatic=false]

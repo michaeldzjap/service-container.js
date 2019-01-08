@@ -32,6 +32,7 @@ class ContextualBinder implements IContextualBinder {
     /**
      * Add a contextual binding to the container.
      *
+     * @constructor
      * @param {*} concrete
      * @param {Identifier} abstract
      * @param {*} implementation

@@ -10,6 +10,7 @@ class ReflectionType {
     /**
      * Create a new reflection type instance.
      *
+     * @constructor
      * @param {*} type
      */
     public constructor(type: any) {

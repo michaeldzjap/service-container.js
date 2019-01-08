@@ -17,6 +17,7 @@ class ReflectionMethod extends AbstractReflectionFunction {
     /**
      * Create a new reflection method instance.
      *
+     * @constructor
      * @param {*} target
      * @param {string} name
      */

@@ -22,6 +22,7 @@ class Tagger implements ITagger {
     /**
      * Create a new tagger.
      *
+     * @constructor
      * @param {Container} container
      */
     public constructor(container: Container) {

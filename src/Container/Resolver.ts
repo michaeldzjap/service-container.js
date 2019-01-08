@@ -51,6 +51,7 @@ class Resolver implements IResolver {
     /**
      * Create a new resolver.
      *
+     * @constructor
      * @param {Container} container
      */
     public constructor(container: Container) {

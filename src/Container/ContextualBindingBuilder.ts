@@ -29,6 +29,7 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
     /**
      * Create a new contextual binding builder.
      *
+     * @constructor
      * @param {Container} container
      * @param {*} concrete
      */

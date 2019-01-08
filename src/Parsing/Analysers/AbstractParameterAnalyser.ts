@@ -46,6 +46,7 @@ abstract class AbstractParameterAnalyser {
     /**
      * Create a new parameter parser base instance.
      *
+     * @constructor
      * @param {Array} ast
      * @param {*} target
      * @param {(string|undefined)} name

@@ -21,6 +21,7 @@ class Extender implements IExtender {
     /**
      * Create a new class binding builder.
      *
+     * @constructor
      * @param {Container} container
      */
     public constructor(container: Container) {

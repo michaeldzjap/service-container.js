@@ -21,6 +21,7 @@ class InstanceSharer implements IInstanceSharer {
     /**
      * Create a new class binding builder.
      *
+     * @constructor
      * @param {Container} container
      */
     public constructor(container: Container) {

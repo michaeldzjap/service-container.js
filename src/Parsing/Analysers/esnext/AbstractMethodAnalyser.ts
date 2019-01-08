@@ -29,6 +29,7 @@ abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
     /**
      * Create a new function analyser instance.
      *
+     * @constructor
      * @param {Object} ast
      * @param {*} target
      */

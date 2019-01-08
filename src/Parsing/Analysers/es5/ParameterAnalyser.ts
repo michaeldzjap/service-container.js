@@ -15,6 +15,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
     /**
      * Create a new parameter parser instance.
      *
+     * @constructor
      * @param {Object} ast
      * @param {Object} block
      * @param {*} target

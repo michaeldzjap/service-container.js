@@ -90,6 +90,8 @@ class Container implements IContainer {
 
     /**
      * Create a new container instance.
+     *
+     * @constructor
      */
     public constructor() {
         this._contextualBinder = new ContextualBinder(this);
