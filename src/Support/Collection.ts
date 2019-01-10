@@ -1,11 +1,11 @@
-import isEqual from 'lodash.isequal';
-
 import {first, flatten, last, shuffle, where, wrap} from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
-import {isObject, isString, isUndefined, isInstance, dataGet, value} from './helpers';
+import {
+    isObject, isString, isUndefined, isInstance, inArray, dataGet, value
+} from './helpers';
 import {Instantiable} from './types';
 
 class Collection {
@@ -706,7 +706,7 @@ class Collection {
         return this.reject((item: unknown, key: string): boolean | undefined => {
             const id = callback(item, key);
 
-            if (strict ? exists.includes(id) : exists.find((_: any): boolean => isEqual(_, id))) {
+            if (inArray(id, exists, strict)) {
                 return true;
             }
 

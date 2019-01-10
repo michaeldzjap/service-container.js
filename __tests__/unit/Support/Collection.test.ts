@@ -556,6 +556,13 @@ describe('Collection', (): void => {
             '3': {id: 3, first: 'Jeff', last: 'The Actor'},
             '5': {id: 5, first: 'Eric', last: 'The Astronaut'},
         });
+
+        expect(c.unique((item: {id: number, first: string, last: string}, key: string): boolean => (
+            !!(parseInt(key) % 2)
+        )).all()).toEqual({
+            '1': {id: 1, first: 'Eric', last: 'The Actor'},
+            '2': {id: 2, first: 'Eric', last: 'The Actor'}
+        });
     });
 });
 

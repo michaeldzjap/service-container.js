@@ -1,3 +1,5 @@
+import isEqual from 'lodash.isequal';
+
 import {accessible, collapse, exists} from './Arr';
 import {Instantiable, Instance} from './types';
 
@@ -129,6 +131,22 @@ export const isInstance = <T>(target: any): target is Instance<T> => (
  * @returns {boolean}
  */
 export const equals = (a: any, b: any): boolean => a === b;
+
+/**
+ * Determine if an element is in the given array.
+ *
+ * @param {*} item
+ * @param {Array} array
+ * @param {boolean} [strict=false]
+ * @returns {boolean}
+ */
+export const inArray = (item: any, array: any[], strict: boolean = false): boolean => {
+    if (strict) {
+        return array.includes(item);
+    }
+
+    return !isUndefined(array.find((_: any): boolean => isEqual(_, item)));
+};
 
 /**
  * Attempt to get the name of an object or function.
