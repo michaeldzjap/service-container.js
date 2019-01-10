@@ -1,4 +1,6 @@
-import {first, flatten, last, shuffle, where, wrap} from './Arr';
+import {
+    collapse, crossJoin, first, flatten, last, shuffle, where, wrap
+} from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
@@ -342,6 +344,34 @@ class Collection {
     }
 
     /**
+     * Determine if all the items in the collection pass the given test.
+     *
+     * @param {(string|Function)} key
+     * @param {(string|undefined)} operator
+     * @param {(*|undefined)} value
+     * @returns {boolean}
+     */
+    public every(key: string | Function, operator?: unknown, value?: unknown): boolean {
+        if (isUndefined(operator) && isUndefined(value)) {
+            const callback = Collection._valueRetriever(key);
+
+            if (Array.isArray(this._items)) {
+                for (let i = 0; i < this._items.length; i++) {
+                    if (!callback(this._items[i], i)) return false;
+                }
+            } else {
+                for (const key of Object.keys(this._items)) {
+                    if (!callback(this._items[key], key)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        return this.every(this._operatorForWhere(key as string, operator, value));
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param {(Array|Object|Collection|undefined)} items
@@ -557,6 +587,31 @@ class Collection {
     }
 
     /**
+     * Collapse the collection of items into a single array / object.
+     *
+     * @returns {Collection}
+     */
+    public collapse(): Collection {
+        return new Collection(collapse(this._items));
+    }
+
+    /**
+     * Cross join with the given lists, returning all possible permutations.
+     *
+     * @param {...(Array|Collection)} lists
+     * @returns {Collection}
+     */
+    public crossJoin(...lists: unknown[]): Collection {
+        return new Collection(crossJoin(
+            this._items, ...lists.map((_: unknown): unknown[] => {
+                const items = Collection._getArrayableItems(_);
+
+                return Array.isArray(items) ? items : (Object as any).values(items);
+            })
+        ));
+    }
+
+    /**
      * Run a map over each of the items.
      *
      * @param {Function} callback
@@ -715,6 +770,17 @@ class Collection {
     }
 
     /**
+     * Return only unique items from the collection array using strict
+     * comparison.
+     *
+     * @param {(string|Function|undefined)} key
+     * @returns {Collection}
+     */
+    public uniqueStrict(key?: string | Function): Collection {
+        return this.unique(key, true);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @returns {*}
@@ -729,6 +795,22 @@ class Collection {
         delete this._items[keys[keys.length - 1]];
 
         return lastItem;
+    }
+
+    /**
+     * Push an item onto the end of the collection.
+     *
+     * @param {*} value
+     * @returns {Collection}
+     */
+    public push(value: unknown | {key: string, value: unknown}): this {
+        if (Array.isArray(this._items)) {
+            this._items.push(value);
+        } else if (isObject(value)) {
+            this._items = {...this._items, ...value};
+        }
+
+        return this;
     }
 
     /**
@@ -778,6 +860,28 @@ class Collection {
      */
     public shuffle(seed?: string): Collection {
         return new Collection(shuffle(this._items, seed));
+    }
+
+    /**
+     * Sort through each item with a callback.
+     *
+     * @param {(Function|undefined)} callback
+     * @returns {Collection}
+     */
+    public sort(callback?: Function): Collection {
+        const items = Array.isArray(this._items)
+            ? this._items
+            : (Object as any).values(this._items);
+
+        if (isUndefined(callback)) {
+            items.every((item: unknown): boolean => typeof item === 'number')
+                ? items.sort((a: number, b: number): number => a - b)
+                : items.sort();
+        } else {
+            items.sort(callback);
+        }
+
+        return new Collection(items);
     }
 
     /**
@@ -885,7 +989,7 @@ class Collection {
     /**
      * Get an operator checker callback.
      *
-     * @param {string} key
+     * @param {(string|Function)} key
      * @param {(string|undefined)} operator
      * @param {(*|undefined)} value
      * @returns {Function}

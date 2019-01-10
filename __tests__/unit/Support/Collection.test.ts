@@ -564,6 +564,90 @@ describe('Collection', (): void => {
             '2': {id: 2, first: 'Eric', last: 'The Actor'}
         });
     });
+
+    test('unique strict', (): void => {
+        const c = new Collection([
+            {id: '0', name: 'zero'},
+            {id: '00', name: 'double zero'},
+            {id: '0', name: 'again zero'},
+        ]);
+
+        expect(c.uniqueStrict('id').all()).toEqual([
+            {id: '0', name: 'zero'},
+            {id: '00', name: 'double zero'},
+        ]);
+    });
+
+    test('collapse', (): void => {
+        const object1 = {};
+        const object2 = {};
+        const c = new Collection([[object1], [object2]]);
+        expect(c.collapse().all()).toEqual([object1, object2]);
+    });
+
+    test('collapse with nested collections', (): void => {
+        const c = new Collection([new Collection([1, 2, 3]), new Collection([4, 5, 6])]);
+        expect(c.collapse().all()).toEqual([1, 2, 3, 4, 5, 6]);
+    });
+
+    test('cross join', (): void => {
+        // Cross join with an array
+        expect((new Collection([1, 2])).crossJoin(['a', 'b']).all())
+            .toEqual([[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]);
+
+        // Cross join with a collection
+        expect((new Collection([1, 2])).crossJoin(new Collection(['a', 'b'])).all())
+            .toEqual([[1, 'a'], [1, 'b'], [2, 'a'], [2, 'b']]);
+
+        // Cross join with 2 collections
+        expect((new Collection([1, 2])).crossJoin(new Collection(['a', 'b']), new Collection(['I', 'II'])).all())
+            .toEqual([
+                [1, 'a', 'I'], [1, 'a', 'II'],
+                [1, 'b', 'I'], [1, 'b', 'II'],
+                [2, 'a', 'I'], [2, 'a', 'II'],
+                [2, 'b', 'I'], [2, 'b', 'II'],
+            ]);
+    });
+
+    test('sort', (): void => {
+        let c = (new Collection([5, 3, 1, 2, 4])).sort();
+        expect(c.all()).toEqual([1, 2, 3, 4, 5]);
+
+        c = (new Collection([-1, -3, -2, -4, -5, 0, 5, 3, 1, 2, 4])).sort();
+        expect(c.all()).toEqual([-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]);
+
+        c = (new Collection(['foo', 'bar-10', 'bar-1'])).sort();
+        expect(c.all()).toEqual(['bar-1', 'bar-10', 'foo']);
+    });
+
+    test('sort with callback', (): void => {
+        const c = (new Collection([5, 3, 1, 2, 4]).sort((a: number, b: number): number => {
+            if (a === b) return 0;
+
+            return a < b ? -1 : 1;
+        }));
+
+        expect(c.all()).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    test('every', (): void => {
+        let c = new Collection([]);
+        expect(c.every('key', 'value')).toBeTruthy();
+        expect(c.every((): boolean => false)).toBeTruthy();
+
+        c = new Collection([{age: 18}, {age: 20}, {age: 20}]);
+        expect(c.every('age', 18)).toBeFalsy();
+        expect(c.every('age', '>=', 18)).toBeTruthy();
+        expect(c.every((item: {age: number}): boolean => item.age >= 18)).toBeTruthy();
+        expect(c.every((item: {age: number}): boolean => item.age >= 20)).toBeFalsy();
+
+        c = new Collection([null, null]);
+        expect(c.every((item: null): boolean => item === null)).toBeTruthy();
+
+        c = new Collection([{active: true}, {active: true}]);
+        expect(c.every('active')).toBeTruthy();
+        expect(c.push({key: 'active', value: false}).every('active')).toBeFalsy();
+    });
 });
 
 class TestArrayableObject implements IArrayable {

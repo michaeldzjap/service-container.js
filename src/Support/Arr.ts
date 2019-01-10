@@ -37,15 +37,15 @@ export const add = (obj: object, key: string, value: any): object => {
 /**
  * Collapse an array of arrays into a single array.
  *
- * @param {*[]} array
+ * @param {*[]} items
  * @returns {(*[]|Object)}
  */
-export const collapse = (array: unknown[] | object): unknown[] | object => {
-    if (Array.isArray(array)) {
-        return collapseArray(array);
+export const collapse = (items: unknown[] | object): unknown[] | object => {
+    if (Array.isArray(items)) {
+        return collapseArray(items);
     }
 
-    return collapseObject(array);
+    return collapseObject(items);
 };
 
 /**
@@ -768,7 +768,9 @@ const explodePluckParameters = (value: string[] | string | null,
 const collapseArray = (array: unknown[]): unknown[] => {
     let results: unknown[] = [];
 
-    for (const values of array) {
+    for (let values of array) {
+        values = values instanceof Collection ? values.all() : values;
+
         if (!Array.isArray(values)) continue;
 
         results = [...results, ...values];
@@ -787,9 +789,11 @@ const collapseObject = (obj: object): object => {
     let results: object = {};
 
     for (const key of Object.keys(obj)) {
-        if (!isObject(obj[key])) continue;
+        const values = obj[key] instanceof Collection ? obj[key].all() : obj[key];
 
-        results = {...results, ...obj[key]};
+        if (!isObject(values)) continue;
+
+        results = {...results, ...values};
     }
 
     return results;
