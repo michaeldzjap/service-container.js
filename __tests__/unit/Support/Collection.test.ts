@@ -630,6 +630,55 @@ describe('Collection', (): void => {
         expect(c.all()).toEqual([1, 2, 3, 4, 5]);
     });
 
+    test('sort by', (): void => {
+        let c = new Collection(['riley', 'eric']);
+        c = c.sortBy((x: string): string => x);
+
+        expect(c.all()).toEqual(['eric', 'riley']);
+
+        c = new Collection(['eric', 'riley']);
+        c = c.sortByDesc((x: string): string => x);
+
+        expect(c.all()).toEqual(['riley', 'eric']);
+
+        c = new Collection({a: 'riley', b: 'eric'});
+        c = c.sortBy((x: string): string => x);
+
+        expect(c.all()).toEqual({b: 'eric', a: 'riley'});
+    });
+
+    test('sort by string', (): void => {
+        let c = new Collection([{name: 'riley'}, {name: 'eric'}]);
+        c = c.sortBy('name');
+
+        expect(c.all()).toEqual([{name: 'eric'}, {name: 'riley'}]);
+
+        c = new Collection([{name: 'eric'}, {name: 'riley'}]);
+        c = c.sortByDesc('name');
+
+        expect(c.all()).toEqual([{name: 'riley'}, {name: 'eric'}]);
+    });
+
+    test('sort keys', (): void => {
+        const c = new Collection({b: 'eric', a: 'riley'});
+
+        expect(c.sortKeys().all()).toEqual({a: 'riley', b: 'eric'});
+    });
+
+    test('sort keys desc', (): void => {
+        const c = new Collection({a: 'riley', b: 'eric'});
+
+        expect(c.sortKeysDesc().all()).toEqual({b: 'eric', a: 'riley'});
+    });
+
+    test('reverse', (): void => {
+        let c = new Collection(['riley', 'eric']);
+        expect(c.reverse().all()).toEqual(['eric', 'riley']);
+
+        c = new Collection({name: 'riley', language: 'typescript'});
+        expect(c.reverse().all()).toEqual({language: 'typescript', name: 'riley'});
+    });
+
     test('every', (): void => {
         let c = new Collection([]);
         expect(c.every('key', 'value')).toBeTruthy();

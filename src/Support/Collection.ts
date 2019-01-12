@@ -143,12 +143,12 @@ class Collection {
      * @param {(string|Function|undefined)} value
      * @returns {Function}
      */
-    protected static _valueRetriever(value?: string | Function): Function {
+    protected static _valueRetriever<T>(value?: string | Function): Function {
         if (Collection._useAsCallable(value)) {
             return value;
         }
 
-        return (item: unknown): unknown => dataGet(item, value);
+        return (item: T): T => dataGet(item, value);
     }
 
     /**
@@ -578,6 +578,27 @@ class Collection {
     }
 
     /**
+     * Reverse items order.
+     *
+     * @returns {Collection}
+     */
+    public reverse(): Collection {
+        if (Array.isArray(this._items)) {
+            return new Collection([...this._items].reverse());
+        }
+
+        const result = Object.keys(this._items)
+            .reverse()
+            .reduce((acc: object, key: string): object => {
+                acc[key] = this._items[key];
+
+                return acc;
+            }, {});
+
+        return new Collection(result);
+    }
+
+    /**
      * Get all of the items in the collection.
      *
      * @returns {(Array|Object)}
@@ -882,6 +903,106 @@ class Collection {
         }
 
         return new Collection(items);
+    }
+
+    /**
+     * Sort the collection using the given callback.
+     *
+     * @param {(Function|string)} callback
+     * @param {boolean} [descending=false]
+     * @returns {Collection}
+     */
+    public sortBy(callback: Function | string, descending: boolean = false): Collection {
+        type Item = {key: string | number, value: any};
+
+        const results: Item[] = [];
+
+        callback = Collection._valueRetriever(callback);
+
+        // First we will loop through the items and get the comparator from a
+        // callback function which we were given. Then, we will sort the
+        // returned values and grab the corresponding values for the sorted keys
+        // from this array.
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                results.push({key: i, value: callback(this._items[i], i)});
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                results.push({key, value: callback(this._items[key], key)});
+            }
+        }
+
+        // eslint-disable-next-line require-jsdoc
+        const c = (a: Item, b: Item): number => {
+            if (a.value < b.value) return -1;
+            if (a.value > b.value) return 1;
+
+            return 0;
+        };
+        descending ? results.sort(c).reverse() : results.sort(c);
+
+        // Once we have sorted all of the keys in the array, we will loop
+        // through them and grab the corresponding model so we can set the
+        // underlying items list to the sorted version. Then we'll just return
+        // the collection instance.
+        for (const item of results) {
+            item.value = this._items[item.key];
+        }
+
+        const ordered = Array.isArray(this._items)
+            ? results.reduce((acc: unknown[], item: Item): unknown[] => {
+                acc.push(item.value);
+
+                return acc;
+            }, [])
+            : results.reduce((acc: object, item: Item): object => {
+                acc[item.key] = item.value;
+
+                return acc;
+            }, {});
+
+        return new Collection(ordered);
+    }
+
+    /**
+     * Sort the collection in descending order using the given callback.
+     *
+     * @param {(Function|string)} callback
+     * @returns {Collection}
+     */
+    public sortByDesc(callback: Function | string): Collection {
+        return this.sortBy(callback, true);
+    }
+
+    /**
+     * Sort the collection keys.
+     *
+     * @param {boolean} [descending=false]
+     * @returns {Collection}
+     */
+    public sortKeys(descending: boolean = false): Collection {
+        if (Array.isArray(this._items)) {
+            return new Collection([...this._items]);
+        }
+
+        const keys = Object.keys(this._items);
+        descending ? keys.sort().reverse() : keys.sort();
+
+        return new Collection(keys.reduce((acc: object, key: string): object => {
+            acc[key] = this._items[key];
+
+            return acc;
+        }, {}));
+    }
+
+    /**
+     * Sort the collection keys in descending order.
+     *
+     * @returns {Collection}
+     */
+    public sortKeysDesc(): Collection {
+        return this.sortKeys(true);
     }
 
     /**
