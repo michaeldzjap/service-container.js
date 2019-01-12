@@ -679,6 +679,11 @@ describe('Collection', (): void => {
         expect(c.reverse().all()).toEqual({language: 'typescript', name: 'riley'});
     });
 
+    test('flip', (): void => {
+        const c = new Collection({name: 'riley', language: 'typescript'});
+        expect(c.flip().all()).toEqual({riley: 'name', typescript: 'language'});
+    });
+
     test('every', (): void => {
         let c = new Collection([]);
         expect(c.every('key', 'value')).toBeTruthy();

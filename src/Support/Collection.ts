@@ -693,6 +693,26 @@ class Collection {
     }
 
     /**
+     * Flip the items in the collection.
+     *
+     * @returns {Collection}
+     */
+    public flip(): Collection {
+        if (Array.isArray(this._items)) {
+            return new Collection([...this._items]);
+        }
+
+        const result = Object.keys(this._items)
+            .reduce((acc: object, key: string): object => {
+                acc[this._items[key]] = key;
+
+                return acc;
+            }, {});
+
+        return new Collection(result);
+    }
+
+    /**
      * Get the last item from the collection.
      *
      * @param {?(Function|undefined)} callback
