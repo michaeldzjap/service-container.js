@@ -419,12 +419,12 @@ export const only = (obj: object, keys: unknown[] | string): object => {
 /**
  * Pluck an array of values from an array.
  *
- * @param {Object[]} array
+ * @param {*[]} array
  * @param {?(string[]|string)} value
  * @param {(string[]|string|undefined)} key
  * @returns {(*[]|Object)}
  */
-export const pluck = (array: object[], value: string | string[] | null, key?: string | string[]): unknown[] | object => {
+export const pluck = (array: unknown[], value: string | string[] | null, key?: string | string[]): unknown[] | object => {
     [value, key] = explodePluckParameters(value, key);
 
     const results = isNullOrUndefined(key) ? [] : {};

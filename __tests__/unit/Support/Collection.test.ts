@@ -684,6 +684,27 @@ describe('Collection', (): void => {
         expect(c.flip().all()).toEqual({riley: 'name', typescript: 'language'});
     });
 
+    test('chunk', (): void => {
+        let c = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        c = c.chunk(3);
+
+        expect(c).toBeInstanceOf(Collection);
+        expect(c.all()[0]).toBeInstanceOf(Collection);
+        expect(c.all()).toHaveLength(4);
+        expect(c.all()[0].all()).toEqual([1, 2, 3]);
+        expect(c.all()[3].all()).toEqual([10]);
+    });
+
+    test('chunk when given zero as size', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        expect(c.chunk(0).all()).toEqual([]);
+    });
+
+    test('chunk when given less than zero', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        expect(c.chunk(-1).all()).toEqual([]);
+    });
+
     test('every', (): void => {
         let c = new Collection([]);
         expect(c.every('key', 'value')).toBeTruthy();
@@ -701,6 +722,46 @@ describe('Collection', (): void => {
         c = new Collection([{active: true}, {active: true}]);
         expect(c.every('active')).toBeTruthy();
         expect(c.push({key: 'active', value: false}).every('active')).toBeFalsy();
+    });
+
+    test('except', (): void => {
+        const c = new Collection({first: 'Riley', last: 'Martin', email: 'riley.martin@space.com'});
+
+        expect(c.except(['last', 'email', 'missing']).all()).toEqual({first: 'Riley'});
+        expect(c.except('last', 'email', 'missing').all()).toEqual({first: 'Riley'});
+
+        expect(c.except(new Collection(['last', 'email', 'missing'])).all()).toEqual({first: 'Riley'});
+        expect(c.except(['last']).all()).toEqual({first: 'Riley', email: 'riley.martin@space.com'});
+        expect(c.except('last').all()).toEqual({first: 'Riley', email: 'riley.martin@space.com'});
+    });
+
+    test('except self', (): void => {
+        const c = new Collection({fist: 'Riley', last: 'Martin'});
+        expect(c.except(c).all()).toEqual({});
+    });
+
+    test('pluck with array and object values', (): void => {
+        const c = new Collection([{name: 'riley', email: 'foo'}, {name: 'eric', email: 'bar'}]);
+        expect(c.pluck('email', 'name').all()).toEqual({riley: 'foo', eric: 'bar'});
+        expect(c.pluck('email').all()).toEqual(['foo', 'bar']);
+    });
+
+    test('has', (): void => {
+        const c = new Collection({id: 1, first: 'Hey', second: 'Now'});
+        expect(c.has('first')).toBeTruthy();
+        expect(c.has('third')).toBeFalsy();
+        expect(c.has(['first', 'second'])).toBeTruthy();
+        expect(c.has(['third', 'first'])).toBeFalsy();
+    });
+
+    test('implode', (): void => {
+        let c = new Collection([{name: 'riley', email: 'foo'}, {name: 'eric', email: 'bar'}]);
+        expect(c.implode('email')).toBe('foobar');
+        expect(c.implode('email', ',')).toBe('foo,bar');
+
+        c = new Collection(['riley', 'eric']);
+        expect(c.implode('')).toBe('rileyeric');
+        expect(c.implode(',')).toBe('riley,eric');
     });
 });
 

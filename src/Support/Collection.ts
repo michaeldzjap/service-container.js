@@ -1,5 +1,6 @@
 import {
-    collapse, crossJoin, first, flatten, last, shuffle, where, wrap
+    collapse, crossJoin, except, first, flatten, last, pluck, shuffle, where,
+    wrap
 } from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
@@ -372,6 +373,68 @@ class Collection {
     }
 
     /**
+     * Get all items except for those with the specified keys.
+     *
+     * @param {(Collection|Array|string)} keys
+     * @returns {Collection}
+     */
+    public except(...keys: any[]): Collection {
+        if (keys.length === 1 && keys[0] instanceof Collection) {
+            const k = keys[0].all();
+            keys = (Array.isArray(k) ? k : Object.keys(k)) as string[];
+        } else if (keys.length === 1 && Array.isArray(keys[0])) {
+            keys = keys[0];
+        }
+
+        return new Collection(except(this._items, keys));
+    }
+
+    /**
+     * Determine if an item exists in the collection by key.
+     *
+     * @param {(Array|string|number)} keys
+     * @returns {boolean}
+     */
+    public has(...keys: any[]): boolean {
+        if (keys.length === 1 && Array.isArray(keys[0])) {
+            keys = keys[0];
+        }
+
+        for (const key of keys) {
+            if (!(Array.isArray(this._items) ? (key >= 0 && key < this._items.length) : this._items.hasOwnProperty(key))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Concatenate values of a given key as a string.
+     *
+     * @param {string} value
+     * @param {(string|undefined)} glue
+     * @returns {string}
+     */
+    public implode(value: string, glue?: string): string {
+        const first = this.first();
+
+        if (Array.isArray(first) || (isObject(first) && !isInstance(first))) {
+            const items = this.pluck(value).all();
+
+            return (
+                Array.isArray(items) ? items : (Object as any).values(items)
+            ).join(isUndefined(glue) ? '' : glue);
+        }
+
+        return (
+            Array.isArray(this._items)
+                ? this._items
+                : (Object as any).values(this._items)
+        ).join(isUndefined(value) ? '' : value);
+    }
+
+    /**
      * Intersect the collection with the given items.
      *
      * @param {(Array|Object|Collection|undefined)} items
@@ -724,6 +787,22 @@ class Collection {
     }
 
     /**
+     * Get the values of a given key.
+     *
+     * @param {(string|Array)} value
+     * @param {(string|undefined)} key
+     * @returns {Collection}
+     */
+    public pluck(value: string | string[], key?: string): Collection {
+        if (Array.isArray(this._items)
+            && this._items.every((_: unknown): boolean => isObject(_))) {
+            return new Collection(pluck(this._items, value, key));
+        }
+
+        return new Collection;
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param {(Array|Object|Collection)} items
@@ -901,6 +980,34 @@ class Collection {
      */
     public shuffle(seed?: string): Collection {
         return new Collection(shuffle(this._items, seed));
+    }
+
+    /**
+     * Chunk the underlying collection array.
+     *
+     * @param {number} size
+     * @returns {Collection}
+     */
+    public chunk(size: number): Collection {
+        if (size <= 0) return new Collection;
+
+        const items = Array.isArray(this._items)
+            ? this._items
+            : (Object as any).values(this._items);
+
+        const chunks = items.reduce((acc: Collection[], item: unknown, index: number): unknown[] => {
+            const chunkIndex = Math.floor(index / size);
+
+            if (!acc[chunkIndex]) {
+                acc[chunkIndex] = new Collection; // Start a new chunk
+            }
+
+            acc[chunkIndex].push(item);
+
+            return acc;
+        }, []);
+
+        return new Collection(chunks);
     }
 
     /**
