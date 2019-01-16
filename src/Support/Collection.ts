@@ -983,6 +983,25 @@ class Collection {
     }
 
     /**
+     * Slice the underlying collection array.
+     *
+     * @param {number} offset
+     * @param {number} length
+     * @returns {Collection}
+     */
+    public slice(offset: number, length?: number): Collection {
+        if (!Array.isArray(this._items)) {
+            return new Collection;
+        }
+
+        return new Collection(
+            [...this._items].slice(
+                offset, isUndefined(length) ? length : offset + length
+            )
+        );
+    }
+
+    /**
      * Chunk the underlying collection array.
      *
      * @param {number} size

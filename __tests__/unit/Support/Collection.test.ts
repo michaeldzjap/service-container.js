@@ -763,6 +763,16 @@ describe('Collection', (): void => {
         expect(c.implode('')).toBe('rileyeric');
         expect(c.implode(',')).toBe('riley,eric');
     });
+
+    test('slice offset', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);
+    });
+
+    test('slice negative offset', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(-3).all()).toEqual([6, 7, 8]);
+    });
 });
 
 class TestArrayableObject implements IArrayable {
