@@ -773,6 +773,26 @@ describe('Collection', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(-3).all()).toEqual([6, 7, 8]);
     });
+
+    test('slice offset and length', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(3, 3).all()).toEqual([4, 5, 6]);
+    });
+
+    test('slice offset and negative length', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(3, -1).all()).toEqual([4, 5, 6, 7]);
+    });
+
+    test('slice negative offset and length', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(-5, 3).all()).toEqual([4, 5, 6]);
+    });
+
+    test('slice negative offset and negative length', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
+        expect(c.slice(-6, -2).all()).toEqual([3, 4, 5, 6]);
+    });
 });
 
 class TestArrayableObject implements IArrayable {

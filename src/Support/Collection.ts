@@ -994,11 +994,26 @@ class Collection {
             return new Collection;
         }
 
-        return new Collection(
-            [...this._items].slice(
-                offset, isUndefined(length) ? length : offset + length
-            )
-        );
+        /**
+         * Compute the end index for "slice()".
+         *
+         * @param {number} arrLength
+         * @param {(number|undefined)} length
+         * @returns {(number|undefined)}
+         */
+        const end = ((arrLength: number, length: number | undefined): number | undefined => {
+            if (!isUndefined(length) && length < 0) {
+                return arrLength + length;
+            }
+
+            if (!isUndefined(length) && length >= 0) {
+                return offset + length;
+            }
+
+            return length;
+        })(this._items.length, length);
+
+        return new Collection([...this._items].slice(offset, end));
     }
 
     /**
