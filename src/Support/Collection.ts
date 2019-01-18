@@ -1,13 +1,13 @@
 import {
-    collapse, crossJoin, except, first, flatten, last, pluck, shuffle, where,
-    wrap
+    collapse, crossJoin, except, first, flatten, last, pluck, random, shuffle,
+    where, wrap
 } from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
 import {
-    isObject, isString, isUndefined, isInstance, inArray, dataGet, value
+    isObject, isString, isUndefined, isNull, isInstance, inArray, dataGet, value
 } from './helpers';
 import {Instantiable} from './types';
 
@@ -33,23 +33,27 @@ class Collection {
     /**
      * Create a new collection instance if the value isn't one already.
      *
+     * @param {Collection} this
      * @param {*} items
      * @returns {Collection}
      */
-    public static make(items: unknown[] | object | Collection = []): Collection {
-        return new Collection(items);
+    public static make<T extends Collection>(this: { new (items: unknown): T },
+        items: unknown | unknown[] | object | Collection = []): T {
+        return new this(items) as T;
     }
 
     /**
      * Wrap the given value in a collection if applicable.
      *
+     * @param {Collection} this
      * @param {*} value
      * @returns {Collection}
      */
-    public static wrap(value: unknown): Collection {
-        return value instanceof Collection
-            ? new Collection(value)
-            : new Collection(wrap(value));
+    public static wrap<T extends Collection>(this: { new (value: unknown): T },
+        value: unknown): T {
+        return (
+            value instanceof Collection ? new this(value) : new this(wrap(value))
+        ) as T;
     }
 
     /**
@@ -65,30 +69,32 @@ class Collection {
     /**
      * Create a new collection by invoking the callback a given amount of times.
      *
+     * @param {Collection} this
      * @param {number} number
      * @param {(Function|undefined)} callback
      * @returns {Collection}
      */
-    public static times(number: number, callback?: Function): Collection {
+    public static times<T extends Collection>(this: {new (array?: unknown[]): T},
+        number: number, callback?: Function): T {
         if (number < 1) {
-            return new Collection;
+            return new this as T;
         }
 
         if (isUndefined(callback)) {
-            return new Collection(
+            return new this(
                 Array.from(
                     Array(number), (x: undefined, i: number): number => i + 1
                 )
-            );
+            ) as T;
         }
 
         return (
-            new Collection(
+            new this(
                 Array.from(
                     Array(number), (x: undefined, i: number): number => i + 1
                 )
             )
-        ).map(callback);
+        ).map(callback) as T;
     }
 
     /**
@@ -666,7 +672,7 @@ class Collection {
      *
      * @returns {(Array|Object)}
      */
-    public all(): unknown[] | object {
+    public all(): any {
         return this._items;
     }
 
@@ -934,6 +940,42 @@ class Collection {
     }
 
     /**
+     * Put an item in the collection by key.
+     *
+     * @param {?(string|number)} key
+     * @param {*} value
+     * @returns {this}
+     */
+    public put(key: string | number | null, value: unknown): this {
+        this.offsetSet(key, value);
+
+        return this;
+    }
+
+    /**
+     * Get one or a specified number of items randomly from the collection.
+     *
+     * @param {(number|undefined)} number
+     * @returns {(Collection|*)}
+     */
+    public random(number?: number): any {
+        if (isUndefined(number)) {
+            return random(
+                Array.isArray(this._items)
+                    ? this._items
+                    : (Object as any).values(this._items)
+            );
+        }
+
+        return new Collection(random(
+            Array.isArray(this._items)
+                ? this._items
+                : (Object as any).values(this._items),
+            number
+        ));
+    }
+
+    /**
      * Determine if the collection is empty or not.
      *
      * @returns {boolean}
@@ -998,10 +1040,14 @@ class Collection {
          * Compute the end index for "slice()".
          *
          * @param {number} arrLength
-         * @param {(number|undefined)} length
          * @returns {(number|undefined)}
          */
-        const end = ((arrLength: number, length: number | undefined): number | undefined => {
+        const end = ((arrLength: number): number | undefined => {
+            if (!isUndefined(length) && offset < 0 && length >= 0
+                && Math.abs(offset) === length) {
+                return;
+            }
+
             if (!isUndefined(length) && length < 0) {
                 return arrLength + length;
             }
@@ -1011,9 +1057,47 @@ class Collection {
             }
 
             return length;
-        })(this._items.length, length);
+        })(this._items.length);
 
         return new Collection([...this._items].slice(offset, end));
+    }
+
+    /**
+     * Split a collection into a certain number of groups.
+     *
+     * @param {number} numberOfGroups
+     * @returns {Collection}
+     */
+    public split(numberOfGroups: number): Collection {
+        if (this.isEmpty() || !Array.isArray(this._items)) {
+            return new Collection;
+        }
+
+        const groups = new Collection;
+
+        const groupSize = Math.floor(this.count() / numberOfGroups);
+
+        const remain = this.count() % numberOfGroups;
+
+        let start = 0;
+
+        for (let i = 0; i < numberOfGroups; i++) {
+            let size = groupSize;
+
+            if (i < remain) {
+                size++;
+            }
+
+            if (size) {
+                groups.push(
+                    new Collection([...this._items].slice(start, start + size))
+                );
+
+                start += size;
+            }
+        }
+
+        return groups;
     }
 
     /**
@@ -1167,6 +1251,20 @@ class Collection {
     }
 
     /**
+     * Take the first or last "limit" items.
+     *
+     * @param {number} limit
+     * @returns {Collection}
+     */
+    public take(limit: number): Collection {
+        if (limit < 0) {
+            return this.slice(limit, Math.abs(limit));
+        }
+
+        return this.slice(0, limit);
+    }
+
+    /**
      * Remove an item from the collection by key.
      *
      * @param {(string|number|Array)} keys
@@ -1229,6 +1327,23 @@ class Collection {
      */
     public offsetGet(key: number | string): unknown {
         return this._items[key];
+    }
+
+    /**
+     * Set the item at a given offset.
+     *
+     * @param {?(string|number)} key
+     * @param {*} value
+     * @returns {void}
+     */
+    public offsetSet(key: string | number | null, value: unknown): void {
+        if (isNull(key) && Array.isArray(this._items)) {
+            this._items.push(value);
+        } else if (typeof key === 'number' && Array.isArray(this._items)) {
+            this._items.splice(key, 0, value);
+        } else if (!isNull(key) && !Array.isArray(this._items)) {
+            this._items[key] = value;
+        }
     }
 
     /**

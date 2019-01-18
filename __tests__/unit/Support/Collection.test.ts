@@ -764,6 +764,138 @@ describe('Collection', (): void => {
         expect(c.implode(',')).toBe('riley,eric');
     });
 
+    test('take', (): void => {
+        let c = new Collection(['riley', 'eric', 'alice']);
+        c = c.take(2);
+        expect(c.all()).toEqual(['riley', 'eric']);
+    });
+
+    test('take last', (): void => {
+        let c = new Collection(['riley', 'eric', 'alice']);
+        c = c.take(-2);
+        expect(c.all()).toEqual(['eric', 'alice']);
+    });
+
+    test('put', (): void => {
+        let c = new Collection({name: 'riley', email: 'foo'});
+        c = c.put('name', 'eric');
+        expect(c.all()).toEqual({name: 'eric', email: 'foo'});
+    });
+
+    test('put with no key', (): void => {
+        let c = new Collection(['riley', 'eric']);
+        c = c.put(null, 'alice');
+        expect(c.all()).toEqual(['riley', 'eric', 'alice']);
+    });
+
+    test('random', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 6]);
+
+        let random = c.random();
+        expect(typeof random).toBe('number');
+        expect(c.all()).toContain(random);
+
+        random = c.random(0);
+        expect(random).toBeInstanceOf(Collection);
+        expect(random.all()).toHaveLength(0);
+
+        random = c.random(1);
+        expect(random).toBeInstanceOf(Collection);
+        expect(random.all()).toHaveLength(1);
+
+        random = c.random(2);
+        expect(random).toBeInstanceOf(Collection);
+        expect(random.all()).toHaveLength(2);
+    });
+
+    test('random on empty collection', (): void => {
+        const c = new Collection;
+
+        const random = c.random(0);
+        expect(random).toBeInstanceOf(Collection);
+        expect(random.all()).toHaveLength(0);
+    });
+
+    test('macroable', (): void => {
+        type Macroable = Collection & {foo: Function};
+
+        const c: Macroable = new Collection(['a', 'a', 'aa', 'aaa', 'bar']) as Macroable;
+        c.foo = (): string[] => {
+            return c
+                .filter((item: string): boolean => item.indexOf('a') === 0)
+                .unique()
+                .all();
+        };
+
+        expect(c.foo()).toEqual(['a', 'aa', 'aaa']);
+    });
+
+    test('make method', (): void => {
+        const c = Collection.make('foo');
+        expect(c.all()).toEqual(['foo']);
+    });
+
+    test('make method from undefined', (): void => {
+        const c = Collection.make();
+        expect(c.all()).toEqual([]);
+    });
+
+    test('make method from collection', (): void => {
+        const first = Collection.make({foo: 'bar'});
+        const second = Collection.make(first);
+        expect(second.all()).toEqual({foo: 'bar'});
+    });
+
+    test('make method from object', (): void => {
+        const c = Collection.make({foo: 'bar'});
+        expect(c.all()).toEqual({foo: 'bar'});
+    });
+
+    test('wrap with scalar', (): void => {
+        const c = Collection.wrap('foo');
+        expect(c.all()).toEqual(['foo']);
+    });
+
+    test('wrap with array', (): void => {
+        const c = Collection.wrap(['foo']);
+        expect(c.all()).toEqual(['foo']);
+    });
+
+    test('wrap with arrayable', (): void => {
+        const o = new TestArrayableObject;
+        const c = Collection.wrap(o);
+        expect(c.all()).toEqual([o]);
+    });
+
+    test('wrap with objectable', (): void => {
+        const o = new TestObjectableObject;
+        const c = Collection.wrap(o);
+        expect(c.all()).toEqual([o]);
+    });
+
+    test('wrap with jsonable', (): void => {
+        const o = new TestJsonableObject;
+        const c = Collection.wrap(o);
+        expect(c.all()).toEqual([o]);
+    });
+
+    test('wrap with json serialize', (): void => {
+        const o = new TestJsonSerializeObject;
+        const c = Collection.wrap(o);
+        expect(c.all()).toEqual([o]);
+    });
+
+    test('wrap with collection class', (): void => {
+        const c = Collection.wrap(Collection.make(['foo']));
+        expect(c.all()).toEqual(['foo']);
+    });
+
+    test('wrap with collection subclass', (): void => {
+        const c = TestCollectionSubclass.wrap(Collection.make(['foo']));
+        expect(c.all()).toEqual(['foo']);
+        expect(c).toBeInstanceOf(TestCollectionSubclass);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);
@@ -792,6 +924,60 @@ describe('Collection', (): void => {
     test('slice negative offset and negative length', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(-6, -2).all()).toEqual([3, 4, 5, 6]);
+    });
+
+    test('split collection with a divisable count', (): void => {
+        let c = new Collection(['a', 'b', 'c', 'd']);
+
+        expect(c.split(2).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a', 'b'], ['c', 'd']]);
+
+        c = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        expect(c.split(2).map((chunk: Collection): number[] => chunk.all()).all())
+            .toEqual([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]);
+    });
+
+    test('split collection with an undivisable count', (): void => {
+        const c = new Collection(['a', 'b', 'c']);
+
+        expect(c.split(2).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a', 'b'], ['c']]);
+    });
+
+    test('split collection with count less then divisor', (): void => {
+        const c = new Collection(['a']);
+
+        expect(c.split(2).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a']]);
+    });
+
+    test('split collection into three with count of four', (): void => {
+        const c = new Collection(['a', 'b', 'c', 'd']);
+
+        expect(c.split(3).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a', 'b'], ['c'], ['d']]);
+    });
+
+    test('split collection into three with count of five', (): void => {
+        const c = new Collection(['a', 'b', 'c', 'd', 'e']);
+
+        expect(c.split(3).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a', 'b'], ['c', 'd'], ['e']]);
+    });
+
+    test('split collection into six with count of ten', (): void => {
+        const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+
+        expect(c.split(6).map((chunk: Collection): string[] => chunk.all()).all())
+            .toEqual([['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i'], ['j']]);
+    });
+
+    test('split empty collection', (): void => {
+        const c = new Collection;
+
+        expect(c.split(2).map((chunk: Collection): unknown[] => chunk.all()).all())
+            .toEqual([]);
     });
 });
 
@@ -826,3 +1012,5 @@ class TestJsonSerializeObject implements IJsonSerializable {
     }
 
 }
+
+class TestCollectionSubclass extends Collection {}
