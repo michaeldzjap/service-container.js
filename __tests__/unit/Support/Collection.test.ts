@@ -896,6 +896,123 @@ describe('Collection', (): void => {
         expect(c).toBeInstanceOf(TestCollectionSubclass);
     });
 
+    test('unwrap collection', (): void => {
+        const c = new Collection(['foo']);
+        expect(Collection.unwrap(c)).toEqual(['foo']);
+    });
+
+    test('unwrap collection with array', (): void => {
+        expect(Collection.unwrap(['foo'])).toEqual(['foo']);
+    });
+
+    test('unwrap collection with scalar', (): void => {
+        expect(Collection.unwrap('foo')).toEqual('foo');
+    });
+
+    test('times method', (): void => {
+        const two = Collection.times(2, (number: number): string => `slug-${number}`);
+
+        const zero = Collection.times(0, (number: number): string => `slug-${number}`);
+
+        const negative = Collection.times(-4, (number: number): string => `slug-${number}`);
+
+        const range = Collection.times(5);
+
+        expect(two.all()).toEqual(['slug-1', 'slug-2']);
+        expect(zero.isEmpty()).toBeTruthy();
+        expect(negative.isEmpty()).toBeTruthy();
+        expect(range.all()).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    test('construct make from object', (): void => {
+        const c = Collection.make({foo: 'bar'});
+        expect(c.all()).toEqual({foo: 'bar'});
+    });
+
+    test('construct method', (): void => {
+        const c = new Collection('foo');
+        expect(c.all()).toEqual(['foo']);
+    });
+
+    test('construct method from undefined', (): void => {
+        const c = new Collection;
+        expect(c.all()).toEqual([]);
+    });
+
+    test('construct method from collection', (): void => {
+        const first = new Collection({foo: 'bar'});
+        const second = new Collection(first);
+        expect(second.all()).toEqual({foo: 'bar'});
+    });
+
+    test('construct method from array', (): void => {
+        const c = new Collection(['foo', 'bar']);
+        expect(c.all()).toEqual(['foo', 'bar']);
+    });
+
+    test('construct method from object', (): void => {
+        const c = new Collection({foo: 'bar'});
+        expect(c.all()).toEqual({foo: 'bar'});
+    });
+
+    test('splice', (): void => {
+        let c = new Collection(['foo', 'baz']);
+        c.splice(1);
+        expect(c.all()).toEqual(['foo']);
+
+        c = new Collection(['foo', 'baz']);
+        c.splice(1, 0, 'bar');
+        expect(c.all()).toEqual(['foo', 'bar', 'baz']);
+
+        c = new Collection(['foo', 'baz']);
+        c.splice(1, 1);
+        expect(c.all()).toEqual(['foo']);
+
+        c = new Collection(['foo', 'baz']);
+        const cut = c.splice(1, 1, 'bar');
+        expect(c.all()).toEqual(['foo', 'bar']);
+        expect(cut.all()).toEqual(['baz']);
+    });
+
+    test('map', (): void => {
+        let c = new Collection({first: 'riley', last: 'martin'});
+        c = c.map((item: string, key: string): string => (
+            `${key}-${item.split('').reverse().join('')}`
+        ));
+        expect(c.all()).toEqual({first: 'first-yelir', last: 'last-nitram'});
+    });
+
+    test('map spread', (): void => {
+        let c = new Collection([[1, 'a'], [2, 'b']]);
+
+        let result = c.mapSpread((number: number, character: string): string => (
+            `${number}-${character}`
+        ));
+        expect(result.all()).toEqual(['1-a', '2-b']);
+
+        result = c.mapSpread((number: number, character: string, index: number): string => (
+            `${number}-${character}-${index}`
+        ));
+        expect(result.all()).toEqual(['1-a-0', '2-b-1']);
+
+        c = new Collection([new Collection([1, 'a']), new Collection([2, 'b'])]);
+        result = c.mapSpread((number: number, character: string, index: number): string => (
+            `${number}-${character}-${index}`
+        ));
+        expect(result.all()).toEqual(['1-a-0', '2-b-1']);
+    });
+
+    test('flat map', (): void => {
+        let c = new Collection([
+            {name: 'riley', hobbies: ['space', 'aliens']},
+            {name: 'eric', hobbies: ['jfsc', 'idol']},
+        ]);
+        c = c.flatMap((person: {name: string, hobbies: string[]}): string[] => (
+            person.hobbies
+        ));
+        expect(c.all()).toEqual(['space', 'aliens', 'jfsc', 'idol']);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);

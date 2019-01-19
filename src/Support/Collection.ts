@@ -59,10 +59,10 @@ class Collection {
     /**
      * Get the underlying items from the given collection if applicable.
      *
-     * @param {(Array|Object|Collection)} value
+     * @param {(Array|Object|Collection|*)} value
      * @returns {(Array|Object)}
      */
-    public static unwrap(value: unknown[] | object | Collection): unknown[] | object {
+    public static unwrap(value: unknown | unknown[] | object | Collection): unknown[] | object {
         return value instanceof Collection ? value.all() : value;
     }
 
@@ -702,33 +702,6 @@ class Collection {
     }
 
     /**
-     * Run a map over each of the items.
-     *
-     * @param {Function} callback
-     * @returns {Collection}
-     */
-    public map(callback: Function): Collection {
-        if (Array.isArray(this._items)) {
-            return new Collection(
-                this._items.map(
-                    (value: unknown, index: number, array: unknown[]): unknown => (
-                        callback(value, index, array)
-                    )
-                )
-            );
-        }
-
-        const keys = Object.keys(this._items);
-        const items = keys.reduce((acc: object, key: string): object => {
-            acc[key] = callback(this._items[key], key, this._items);
-
-            return acc;
-        }, {});
-
-        return new Collection(items);
-    }
-
-    /**
      * Get the first item from the collection.
      *
      * @param {?(Function|undefined)} callback
@@ -806,6 +779,57 @@ class Collection {
         }
 
         return new Collection;
+    }
+
+    /**
+     * Run a map over each of the items.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public map(callback: Function): Collection {
+        if (Array.isArray(this._items)) {
+            return new Collection(
+                this._items.map(
+                    (value: unknown, index: number, array: unknown[]): unknown => (
+                        callback(value, index, array)
+                    )
+                )
+            );
+        }
+
+        const keys = Object.keys(this._items);
+        const items = keys.reduce((acc: object, key: string): object => {
+            acc[key] = callback(this._items[key], key, this._items);
+
+            return acc;
+        }, {});
+
+        return new Collection(items);
+    }
+
+    /**
+     * Run a map over each nested chunk of items.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public mapSpread(callback: Function): Collection {
+        return this.map((chunk: unknown[], index: number): unknown => {
+            chunk.push(index);
+
+            return callback(...(chunk instanceof Collection ? chunk.all() : chunk));
+        });
+    }
+
+    /**
+     * Map a collection and flatten the result by a single level.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public flatMap(callback: Function): Collection {
+        return this.map(callback).collapse();
     }
 
     /**
@@ -1248,6 +1272,26 @@ class Collection {
      */
     public sortKeysDesc(): Collection {
         return this.sortKeys(true);
+    }
+
+    /**
+     * Splice a portion of the underlying collection array.
+     *
+     * @param {number} offset
+     * @param {(number|undefined)} length
+     * @param {*} replacement
+     * @returns {Collection}
+     */
+    public splice(offset: number, length?: number, replacement: unknown[] | unknown = []): Collection {
+        if (!Array.isArray(this._items)) {
+            return new Collection;
+        }
+
+        if (isUndefined(length)) {
+            return new Collection(this._items.splice(offset));
+        }
+
+        return new Collection(this._items.splice(offset, length, ...wrap(replacement)));
     }
 
     /**
