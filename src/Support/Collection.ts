@@ -755,6 +755,19 @@ class Collection {
     }
 
     /**
+     * Get the keys of the collection items.
+     *
+     * @returns {Collection}
+     */
+    public keys(): Collection {
+        return new Collection(
+            Array.isArray(this._items)
+                ? Array.from(Array(this._items.length), (x: undefined, i: number): number => i)
+                : Object.keys(this._items)
+        );
+    }
+
+    /**
      * Get the last item from the collection.
      *
      * @param {?(Function|undefined)} callback
@@ -823,6 +836,104 @@ class Collection {
     }
 
     /**
+     * Run a dictionary map over the items.
+     *
+     * The callback should return an object with a single key/value pair.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public mapToDictionary(callback: Function): Collection {
+        const dictionary = {};
+
+        /**
+         * Add the key/value pair obtained from the callback to the object.
+         *
+         * @param {(string|number)} key
+         * @param {*} item
+         * @returns {void}
+         */
+        const addItem = (key: string | number, item: unknown): void => {
+            const pair = callback(item, key);
+
+            key = Object.keys(pair)[0];
+
+            const value = pair[key];
+
+            if (!dictionary.hasOwnProperty(key)) {
+                dictionary[key] = [];
+            }
+
+            dictionary[key].push(value);
+        };
+
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                addItem(i, this._items[i]);
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                addItem(key, this._items[key]);
+            }
+        }
+
+        return new Collection(dictionary);
+    }
+
+    /**
+     * Run a grouping map over the items.
+     *
+     * The callback should return an object with a single key/value pair.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public mapToGroups(callback: Function): Collection {
+        const groups = this.mapToDictionary(callback);
+
+        return groups.map((group: object): Collection => Collection.make(group));
+    }
+
+    /**
+     * Run an object map over each of the items.
+     *
+     * The callback should return an object with a single key/value pair.
+     *
+     * @param {Function} callback
+     * @returns {Collection}
+     */
+    public mapWithKeys(callback: Function): Collection {
+        const result = {};
+
+        /**
+         * Add the key/value pair obtained from the callback to the object.
+         *
+         * @param {(string|number)} key
+         * @param {*} item
+         * @returns {void}
+         */
+        const addItem = (key: string | number, item: unknown): void => {
+            const obj = callback(item, key);
+
+            for (const mapKey of Object.keys(obj)) {
+                result[mapKey] = obj[mapKey];
+            }
+        };
+
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                addItem(i, this._items[i]);
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                addItem(key, this._items[key]);
+            }
+        }
+
+        return new Collection(result);
+    }
+
+    /**
      * Map a collection and flatten the result by a single level.
      *
      * @param {Function} callback
@@ -830,6 +941,18 @@ class Collection {
      */
     public flatMap(callback: Function): Collection {
         return this.map(callback).collapse();
+    }
+
+    /**
+     * Map the values into a new class.
+     *
+     * @param {*} target
+     * @returns {Collection}
+     */
+    public mapInto(target: any): Collection {
+        return this.map((value: unknown, key: unknown): unknown => (
+            new target(value, key)
+        ));
     }
 
     /**
@@ -894,6 +1017,33 @@ class Collection {
         }
 
         return new Collection(union);
+    }
+
+    /**
+     * Create a new collection consisting of every n-th element.
+     *
+     * @param {number} step
+     * @param {(number|undefined)} offset
+     * @returns {Collection}
+     */
+    public nth(step: number, offset: number = 0): Collection {
+        const result = [];
+
+        let position = 0;
+
+        const items = Array.isArray(this._items)
+            ? this._items
+            : (Object as any).values(this._items);
+
+        for (const item of items) {
+            if (position % step === offset) {
+                result.push(item);
+            }
+
+            position++;
+        }
+
+        return new Collection(result);
     }
 
     /**
@@ -1337,7 +1487,7 @@ class Collection {
      * @param {*} dflt
      * @returns {*}
      */
-    public get(key: number | string, dflt?: unknown): unknown {
+    public get(key: number | string, dflt?: unknown): any {
         if (this.offsetExists(key)) {
             return this._items[key];
         }
@@ -1401,6 +1551,43 @@ class Collection {
                 ? [...this._items]
                 : (Object as any).values(this._items)
         );
+    }
+
+    /**
+     * Get the collection of items as a plain (combination of) array/object.
+     *
+     * @returns {(Array|Object)}
+     */
+    public toPrimitive(): unknown[] | object {
+        if (Array.isArray(this._items)) {
+            return this._items.map((value: any): unknown => {
+                if (value instanceof Collection) return value.toPrimitive();
+
+                if (isInstance(value) && isArrayable(value)) {
+                    return value.toArray();
+                }
+
+                if (isInstance(value) && isObjectable(value)) {
+                    return value.toObject();
+                }
+
+                return value;
+            });
+        }
+
+        return Object.keys(this._items).reduce((acc: object, key: string): object => {
+            if (this._items[key] instanceof Collection) {
+                acc[key] = this._items[key].toPrimitive();
+            } else if (isInstance(this._items[key]) && isArrayable(this._items[key])) {
+                acc[key] = this._items[key].toArray();
+            } else if (isInstance(this._items[key]) && isObjectable(this._items[key])) {
+                acc[key] = this._items[key].toObject();
+            } else {
+                acc[key] = this._items[key];
+            }
+
+            return acc;
+        }, {});
     }
 
     /**

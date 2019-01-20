@@ -1013,6 +1013,145 @@ describe('Collection', (): void => {
         expect(c.all()).toEqual(['space', 'aliens', 'jfsc', 'idol']);
     });
 
+    test('map to dictionary', (): void => {
+        const c = new Collection([
+            {id: 1, name: 'A'},
+            {id: 2, name: 'B'},
+            {id: 3, name: 'C'},
+            {id: 4, name: 'B'},
+        ]);
+
+        const groups = c.mapToDictionary((item: {id: string, name: string}, key: string): object => ({
+            [item.name]: item.id
+        }));
+
+        expect(groups).toBeInstanceOf(Collection);
+        expect(groups.all()).toEqual({A: [1], B: [2, 4], C: [3]});
+        expect(groups.get('A')).toBeInstanceOf(Array);
+    });
+
+    test('map to dictionary with numeric keys', (): void => {
+        const c = new Collection([1, 2, 3, 2, 1]);
+
+        const groups = c.mapToDictionary((item: number, key: number): object => ({
+            [item]: key
+        }));
+
+        expect(groups.all()).toEqual({'1': [0, 4], '2': [1, 3], '3': [2]});
+    });
+
+    test('map to groups', (): void => {
+        const c = new Collection([
+            {id: 1, name: 'A'},
+            {id: 2, name: 'B'},
+            {id: 3, name: 'C'},
+            {id: 4, name: 'B'},
+        ]);
+
+        const groups = c.mapToGroups((item: {id: string, name: string}, key: string): object => ({
+            [item.name]: item.id
+        }));
+
+        expect(groups).toBeInstanceOf(Collection);
+        expect(groups.toPrimitive()).toEqual({A: [1], B: [2, 4], C: [3]});
+        expect(groups.get('A')).toBeInstanceOf(Collection);
+    });
+
+    test('map to groups with numeric keys', (): void => {
+        const c = new Collection([1, 2, 3, 2, 1]);
+
+        const groups = c.mapToGroups((item: number, key: number): object => ({
+            [item]: key
+        }));
+
+        expect(groups.toPrimitive()).toEqual({'1': [0, 4], '2': [1, 3], '3': [2]});
+    });
+
+    test('map with keys', (): void => {
+        let c = new Collection([
+            {name: 'Riley', lastname: 'Martin'},
+            {name: 'Eric', lastname: 'Lynch'},
+            {name: 'Lester', lastname: 'Green'},
+        ]);
+        c = c.mapWithKeys((wackpacker: {name: string, lastname: string}): object => ({
+            [wackpacker.name]: wackpacker.lastname
+        }));
+        expect(c.all()).toEqual({Riley: 'Martin', Eric: 'Lynch', Lester: 'Green'});
+    });
+
+    test('map with keys integer keys', (): void => {
+        let c = new Collection([
+            {id: 1, name: 'A'},
+            {id: 3, name: 'B'},
+            {id: 2, name: 'C'},
+        ]);
+        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+            [item.id.toString()]: item
+        }));
+        expect(c.keys().all()).toEqual(['1', '2', '3']);
+    });
+
+    test('map with keys multiple rows', (): void => {
+        let c = new Collection([
+            {id: 1, name: 'A'},
+            {id: 2, name: 'B'},
+            {id: 3, name: 'C'},
+        ]);
+        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+            [item.id]: item.name, [item.name]: item.id
+        }));
+        expect(c.all()).toEqual({
+            '1': 'A',
+            '2': 'B',
+            '3': 'C',
+            A: 1,
+            B: 2,
+            C: 3
+        });
+    });
+
+    test('map with keys callback key', (): void => {
+        let c = new Collection({
+            '3': {id: 1, name: 'A'},
+            '5': {id: 3, name: 'B'},
+            '4': {id: 2, name: 'C'},
+        });
+        c = c.mapWithKeys((item: {id: number, name: string}, key: string): object => ({
+            [key]: item.id
+        }));
+        expect(c.keys().all()).toEqual(['3', '4', '5']);
+    });
+
+    test('map into', (): void => {
+        let c = new Collection(['first', 'second']);
+
+        c = c.mapInto(TestCollectionMapIntoObject);
+
+        expect(c.get(0).value).toEqual('first');
+        expect(c.get(1).value).toEqual('second');
+    });
+
+    test('map with keys overwriting keys', (): void => {
+        let c = new Collection([
+            {id: 1, name: 'A'},
+            {id: 2, name: 'B'},
+            {id: 1, name: 'C'},
+        ]);
+        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+            [item.id]: item.name
+        }));
+        expect(c.all()).toEqual({'1': 'C', '2': 'B'});
+    });
+
+    test('nth', (): void => {
+        const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
+
+        expect(c.nth(4).all()).toEqual(['a', 'e']);
+        expect(c.nth(4, 1).all()).toEqual(['b', 'f']);
+        expect(c.nth(4, 2).all()).toEqual(['c']);
+        expect(c.nth(4, 3).all()).toEqual(['d']);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);
@@ -1126,6 +1265,16 @@ class TestJsonSerializeObject implements IJsonSerializable {
 
     public jsonSerialize(): object {
         return {foo: 'bar'};
+    }
+
+}
+
+class TestCollectionMapIntoObject {
+
+    public value: string;
+
+    public constructor(value: string) {
+        this.value = value;
     }
 
 }
