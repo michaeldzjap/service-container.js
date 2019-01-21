@@ -849,11 +849,11 @@ class Collection {
         /**
          * Add the key/value pair obtained from the callback to the object.
          *
-         * @param {(string|number)} key
          * @param {*} item
+         * @param {(string|number)} key
          * @returns {void}
          */
-        const addItem = (key: string | number, item: unknown): void => {
+        const addItem = (item: unknown, key: string | number): void => {
             const pair = callback(item, key);
 
             key = Object.keys(pair)[0];
@@ -867,15 +867,7 @@ class Collection {
             dictionary[key].push(value);
         };
 
-        if (Array.isArray(this._items)) {
-            for (let i = 0; i < this._items.length; i++) {
-                addItem(i, this._items[i]);
-            }
-        } else {
-            for (const key of Object.keys(this._items)) {
-                addItem(key, this._items[key]);
-            }
-        }
+        this._loop(addItem);
 
         return new Collection(dictionary);
     }
@@ -908,11 +900,11 @@ class Collection {
         /**
          * Add the key/value pair obtained from the callback to the object.
          *
-         * @param {(string|number)} key
          * @param {*} item
+         * @param {(string|number)} key
          * @returns {void}
          */
-        const addItem = (key: string | number, item: unknown): void => {
+        const addItem = (item: unknown, key: string | number): void => {
             const obj = callback(item, key);
 
             for (const mapKey of Object.keys(obj)) {
@@ -920,15 +912,7 @@ class Collection {
             }
         };
 
-        if (Array.isArray(this._items)) {
-            for (let i = 0; i < this._items.length; i++) {
-                addItem(i, this._items[i]);
-            }
-        } else {
-            for (const key of Object.keys(this._items)) {
-                addItem(key, this._items[key]);
-            }
-        }
+        this._loop(addItem);
 
         return new Collection(result);
     }
@@ -1553,15 +1537,7 @@ class Collection {
             }
         };
 
-        if (Array.isArray(this._items)) {
-            for (let i = 0; i < this._items.length; i++) {
-                addResult(this._items[i], i);
-            }
-        } else {
-            for (const key of Object.keys(this._items)) {
-                addResult(this._items[key], key);
-            }
-        }
+        this._loop(addResult);
 
         const result = new Collection(results);
 
@@ -1574,6 +1550,35 @@ class Collection {
         }
 
         return result;
+    }
+
+    /**
+     * Key an object by a field or using a callback.
+     *
+     * @param {(Function|string)} keyBy
+     * @returns {Collection}
+     */
+    public keyBy(keyBy: Function | string): Collection {
+        const fn = Collection._valueRetriever(keyBy);
+
+        const results = {};
+
+        /**
+         * Add an item to the results.
+         *
+         * @param {*} item
+         * @param {(string|number)} key
+         * @returns {void}
+         */
+        const addItem = (item: unknown, key: string | number): void => {
+            const resolvedKey = fn(item, key);
+
+            results[resolvedKey] = item;
+        };
+
+        this._loop(addItem);
+
+        return new Collection(results);
     }
 
     /**
@@ -1750,6 +1755,24 @@ class Collection {
         return new Collection(
             Array.isArray(this._items) ? [...this._items] : {...this._items}
         );
+    }
+
+    /**
+     * Loop over the collection items, passing them to the given function.
+     *
+     * @param {Function} fn
+     * @returns {void}
+     */
+    private _loop(fn: Function): void {
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                fn(this._items[i], i);
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                fn(this._items[key], key);
+            }
+        }
     }
 
 }

@@ -1318,6 +1318,46 @@ describe('Collection', (): void => {
         expect(result.toPrimitive()).toEqual(expected);
     });
 
+    test('key by attribute', (): void => {
+        const c = new Collection([
+            {rating: 1, name: '1'},
+            {rating: 2, name: '2'},
+            {rating: 3, name: '3'},
+        ]);
+
+        let result = c.keyBy('rating');
+        expect(result.all()).toEqual({
+            '1': {rating: 1, name: '1'},
+            '2': {rating: 2, name: '2'},
+            '3': {rating: 3, name: '3'},
+        });
+
+        result = c.keyBy((item: {rating: number, name: string}): number => (
+            item.rating * 2
+        ));
+        expect(result.all()).toEqual({
+            '2': {rating: 1, name: '1'},
+            '4': {rating: 2, name: '2'},
+            '6': {rating: 3, name: '3'},
+        });
+    });
+
+    test('key by closure', (): void => {
+        const c = new Collection([
+            {firstname: 'Riley', lastname: 'Martin', locale: 'US'},
+            {firstname: 'Eric', lastname: 'Lynch', locale: 'US'},
+        ]);
+
+        const result = c.keyBy((item: {firstname: string, lastname: string}, key: string): string => (
+            `${key}-${item.firstname}${item.lastname}`.toLowerCase()
+        ));
+
+        expect(result.all()).toEqual({
+            '0-rileymartin': {firstname: 'Riley', lastname: 'Martin', locale: 'US'},
+            '1-ericlynch': {firstname: 'Eric', lastname: 'Lynch', locale: 'US'},
+        });
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 
