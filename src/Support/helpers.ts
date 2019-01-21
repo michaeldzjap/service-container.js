@@ -177,6 +177,18 @@ export const getSymbolName = (target: symbol): string => {
 };
 
 /**
+ * Reverse the given string.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+export const reverse = (str: string): string => (
+    str.split('')
+        .reverse()
+        .join('')
+);
+
+/**
  * Return the default value of the given value.
  *
  * @param {*} value

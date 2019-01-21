@@ -3,7 +3,7 @@ import IArrayable from '@src/Contracts/IArrayable';
 import IJsonable from '@src/Contracts/IJsonable';
 import IJsonSerializable from '@src/Contracts/IJsonSerializable';
 import IObjectable from '@src/Contracts/IObjectable';
-import {isString} from '@src/Support/helpers';
+import {isString, reverse} from '@src/Support/helpers';
 
 // eslint-disable-next-line max-statements
 describe('Collection', (): void => {
@@ -976,9 +976,7 @@ describe('Collection', (): void => {
 
     test('map', (): void => {
         let c = new Collection({first: 'riley', last: 'martin'});
-        c = c.map((item: string, key: string): string => (
-            `${key}-${item.split('').reverse().join('')}`
-        ));
+        c = c.map((item: string, key: string): string => `${key}-${reverse(item)}`);
         expect(c.all()).toEqual({first: 'first-yelir', last: 'last-nitram'});
     });
 
@@ -1141,6 +1139,183 @@ describe('Collection', (): void => {
             [item.id]: item.name
         }));
         expect(c.all()).toEqual({'1': 'C', '2': 'B'});
+    });
+
+    test('transform', (): void => {
+        const c = new Collection({first: 'riley', last: 'martin'});
+        c.transform((item: string, key: string): string => `${key}-${reverse(item)}`);
+        expect(c.all()).toEqual({first: 'first-yelir', last: 'last-nitram'});
+    });
+
+    test('group by attribute', (): void => {
+        const c = new Collection([
+            {rating: 1, url: '1'},
+            {rating: 1, url: '1'},
+            {rating: 2, url: '2'},
+        ]);
+
+        let result = c.groupBy('rating');
+        expect(result.toPrimitive()).toEqual({
+            '1': [{rating: 1, url: '1'}, {rating: 1, url: '1'}],
+            '2': [{rating: 2, url: '2'}]
+        });
+
+        result = c.groupBy('url');
+        expect(result.toPrimitive()).toEqual({
+            '1': [{rating: 1, url: '1'}, {rating: 1, url: '1'}],
+            '2': [{rating: 2, url: '2'}]
+        });
+    });
+
+    test('group by attribute preserving keys', (): void => {
+        const c = new Collection({
+            '10': {rating: 1, url: '1'},
+            '20': {rating: 1, url: '1'},
+            '30': {rating: 2, url: '2'},
+        });
+
+        const result = c.groupBy('rating', true);
+
+        const expected = {
+            '1': {'10': {rating: 1, url: '1'}, '20': {rating: 1, url: '1'}},
+            '2': {'30': {rating: 2, url: '2'}}
+        };
+
+        expect(result.toPrimitive()).toEqual(expected);
+    });
+
+    test('group by closure where items have single group', (): void => {
+        const c = new Collection([
+            {rating: 1, url: '1'},
+            {rating: 1, url: '1'},
+            {rating: 2, url: '2'},
+        ]);
+
+
+        const result = c.groupBy((item: {rating: number, url: string}): number => (
+            item.rating
+        ));
+
+        expect(result.toPrimitive()).toEqual({
+            '1': [{rating: 1, url: '1'}, {rating: 1, url: '1'}],
+            '2': [{rating: 2, url: '2'}]
+        });
+    });
+
+    test('group by closure where items have single group preserving keys', (): void => {
+        const c = new Collection({
+            '10': {rating: 1, url: '1'},
+            '20': {rating: 1, url: '1'},
+            '30': {rating: 2, url: '2'},
+        });
+
+        const result = c.groupBy((item: {rating: number, url: string}): number => (
+            item.rating
+        ), true);
+
+        const expected = {
+            '1': {'10': {rating: 1, url: '1'}, '20': {rating: 1, url: '1'}},
+            '2': {'30': {rating: 2, url: '2'}}
+        };
+
+        expect(result.toPrimitive()).toEqual(expected);
+    });
+
+    test('group by closure where items have multiple groups', (): void => {
+        const c = new Collection([
+            {user: 1, roles: ['Role_1', 'Role_3']},
+            {user: 2, roles: ['Role_1', 'Role_2']},
+            {user: 3, roles: ['Role_1']},
+        ]);
+
+        const result = c.groupBy((item: {user: number, roles: string[]}): string[] => (
+            item.roles
+        ));
+
+        const expected = {
+            Role_1: [
+                {user: 1, roles: ['Role_1', 'Role_3']},
+                {user: 2, roles: ['Role_1', 'Role_2']},
+                {user: 3, roles: ['Role_1']},
+            ],
+            Role_2: [
+                {user: 2, roles: ['Role_1', 'Role_2']},
+            ],
+            Role_3: [
+                {user: 1, roles: ['Role_1', 'Role_3']},
+            ]
+        };
+
+        expect(result.toPrimitive()).toEqual(expected);
+    });
+
+    test('group by closure where items have multiple groups preserving keys', (): void => {
+        const c = new Collection({
+            '10': {user: 1, roles: ['Role_1', 'Role_3']},
+            '20': {user: 2, roles: ['Role_1', 'Role_2']},
+            '30': {user: 3, roles: ['Role_1']},
+        });
+
+        const result = c.groupBy((item: {user: number, roles: string[]}): string[] => (
+            item.roles
+        ), true);
+
+        const expected = {
+            Role_1: {
+                '10': {user: 1, roles: ['Role_1', 'Role_3']},
+                '20': {user: 2, roles: ['Role_1', 'Role_2']},
+                '30': {user: 3, roles: ['Role_1']},
+            },
+            Role_2: {
+                '20': {user: 2, roles: ['Role_1', 'Role_2']},
+            },
+            Role_3: {
+                '10': {user: 1, roles: ['Role_1', 'Role_3']},
+            },
+        };
+
+        expect(result.toPrimitive()).toEqual(expected);
+    });
+
+    test('group by multi level and closure preserving keys', (): void => {
+        const c = new Collection({
+            '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
+            '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
+            '30': {user: 3, skilllevel: 2, roles: ['Role_1']},
+            '40': {user: 4, skilllevel: 2, roles: ['Role_2']},
+        });
+
+        const result = c.groupBy([
+            'skilllevel',
+            (item: {user: number, skilllevel: number, roles: string[]}): string[] => (
+                item.roles
+            )
+        ], true);
+
+        const expected = {
+            '1': {
+                Role_1: {
+                    '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
+                    '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
+                },
+                Role_3: {
+                    '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
+                },
+                Role_2: {
+                    '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
+                }
+            },
+            '2': {
+                Role_1: {
+                    '30': {user: 3, skilllevel: 2, roles: ['Role_1']},
+                },
+                Role_2: {
+                    '40': {user: 4, skilllevel: 2, roles: ['Role_2']},
+                }
+            }
+        };
+
+        expect(result.toPrimitive()).toEqual(expected);
     });
 
     test('nth', (): void => {

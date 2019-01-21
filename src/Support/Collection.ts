@@ -1047,6 +1047,18 @@ class Collection {
     }
 
     /**
+     * Transform each item in the collection using a callback.
+     *
+     * @param {Function} callback
+     * @returns {this}
+     */
+    public transform(callback: Function): this {
+        this._items = this.map(callback).all();
+
+        return this;
+    }
+
+    /**
      * Return only unique items from the collection array.
      *
      * @param {(string|Function|undefined)} key
@@ -1493,6 +1505,75 @@ class Collection {
         }
 
         return value(dflt);
+    }
+
+    /**
+     * Group an object by a field or using a callback.
+     *
+     * @param {(Array|Function|string)} groupBy
+     * @param {bool} preserveKeys
+     * @returns {Collection}
+     */
+    public groupBy(groupBy: [string, Function] | [Function] | Function | string,
+        preserveKeys: boolean = false): Collection {
+        let nextGroups: [string, Function] | [Function] | null = null;
+
+        if (Array.isArray(groupBy)) {
+            nextGroups = groupBy;
+
+            groupBy = nextGroups.shift() as string | Function;
+        }
+
+        groupBy = Collection._valueRetriever(groupBy);
+
+        const results = {};
+
+        /**
+         * Add a group to the results.
+         *
+         * @param {*} value
+         * @param {(key|number)} key
+         * @returns {void}
+         */
+        const addResult = (value: unknown, key: string | number): void => {
+            let groupKeys = (groupBy as Function)(value, key);
+
+            if (!Array.isArray(groupKeys)) {
+                groupKeys = [groupKeys];
+            }
+
+            for (let groupKey of groupKeys) {
+                groupKey = typeof groupKey === 'boolean' ? (groupKey === true ? 1 : 0) : groupKey;
+
+                if (!results.hasOwnProperty(groupKey)) {
+                    results[groupKey] = new Collection(preserveKeys ? {} : []);
+                }
+
+                results[groupKey].offsetSet(preserveKeys ? key : null, value);
+            }
+        };
+
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                addResult(this._items[i], i);
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                addResult(this._items[key], key);
+            }
+        }
+
+        const result = new Collection(results);
+
+        if (!isNull(nextGroups) && nextGroups.length) {
+            return result.map((group: Collection): Collection => (
+                group.groupBy(
+                    [...(nextGroups as [Function])] as [Function], preserveKeys
+                )
+            ));
+        }
+
+        return result;
     }
 
     /**
