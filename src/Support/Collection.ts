@@ -1435,21 +1435,24 @@ class Collection {
 
         const results: Item[] = [];
 
-        callback = Collection._valueRetriever(callback);
+        const fn = Collection._valueRetriever(callback);
+
+        /**
+         * Add an item to the results.
+         *
+         * @param {*} item
+         * @param {(string|number)} key
+         * @returns {void}
+         */
+        const addItem = (item: unknown, key: string | number): void => {
+            results.push({key, value: fn(item, key)});
+        };
 
         // First we will loop through the items and get the comparator from a
         // callback function which we were given. Then, we will sort the
         // returned values and grab the corresponding values for the sorted keys
         // from this array.
-        if (Array.isArray(this._items)) {
-            for (let i = 0; i < this._items.length; i++) {
-                results.push({key: i, value: callback(this._items[i], i)});
-            }
-        } else {
-            for (const key of Object.keys(this._items)) {
-                results.push({key, value: callback(this._items[key], key)});
-            }
-        }
+        this._loop(addItem);
 
         // eslint-disable-next-line require-jsdoc
         const c = (a: Item, b: Item): number => {
