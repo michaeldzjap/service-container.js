@@ -98,6 +98,53 @@ class Collection {
     }
 
     /**
+     * Get an operator checker callback.
+     *
+     * @param {(string|Function)} key
+     * @param {(string|undefined)} operator
+     * @param {(*|undefined)} value
+     * @returns {Function}
+     */
+    protected static _operatorForWhere(key: string, operator?: unknown, value?: any): Function {
+        if (isUndefined(operator) && isUndefined(value)) {
+            value = true;
+
+            operator = '=';
+        } else if (isUndefined(value)) {
+            value = operator;
+
+            operator = '=';
+        }
+
+        return (item: unknown): boolean => {
+            const retrieved = dataGet(item, key);
+
+            const strings = [retrieved, value].filter((value: any): boolean => (
+                isString(value) || (isObject(value) && value.hasOwnProperty('toString'))
+            ));
+
+            if (strings.length < 2
+                && [retrieved, value].filter((value: any): boolean => isObject(value)).length === 1) {
+                return ['!=', '<>', '!=='].includes(operator as string);
+            }
+
+            switch (operator) {
+                default:
+                case '=':
+                case '==': return retrieved == value; // eslint-disable-line eqeqeq
+                case '!=':
+                case '<>': return retrieved != value; // eslint-disable-line eqeqeq
+                case '<': return retrieved < value;
+                case '>': return retrieved > value;
+                case '<=': return retrieved <= value;
+                case '>=': return retrieved >= value;
+                case '===': return retrieved === value;
+                case '!==': return retrieved !== value;
+            }
+        };
+    }
+
+    /**
      * Determine if the given value is callable, but not a string.
      *
      * @param {*} value
@@ -375,7 +422,7 @@ class Collection {
             return true;
         }
 
-        return this.every(this._operatorForWhere(key as string, operator, value));
+        return this.every(Collection._operatorForWhere(key as string, operator, value));
     }
 
     /**
@@ -525,7 +572,9 @@ class Collection {
 
         const items = Array.isArray(this._items)
             ? this._items.filter((value: unknown): boolean => !!value)
-            : Object.keys(this._items).filter((key: string): boolean => !!this._items[key]);
+            : Object.keys(this._items).filter((key: string): boolean => (
+                !!this._items[key]
+            ));
 
         return new Collection(items);
     }
@@ -539,7 +588,7 @@ class Collection {
      * @returns {Collection}
      */
     public where(key: string, operator?: unknown, value?: unknown): Collection {
-        return this.filter(this._operatorForWhere(key, operator, value));
+        return this.filter(Collection._operatorForWhere(key, operator, value));
     }
 
     /**
@@ -721,7 +770,7 @@ class Collection {
      * @returns {*}
      */
     public firstWhere(key: string, operator: string, value?: unknown): unknown {
-        return this.first(this._operatorForWhere(key, operator, value));
+        return this.first(Collection._operatorForWhere(key, operator, value));
     }
 
     /**
@@ -740,18 +789,46 @@ class Collection {
      * @returns {Collection}
      */
     public flip(): Collection {
-        if (Array.isArray(this._items)) {
-            return new Collection([...this._items]);
-        }
+        const result = {};
 
-        const result = Object.keys(this._items)
-            .reduce((acc: object, key: string): object => {
-                acc[this._items[key]] = key;
+        /**
+         * Add an item to the results.
+         *
+         * @param {*} item
+         * @param {(string|number)} key
+         * @returns {void}
+         */
+        const addItem = (item: any, key: string | number): void => {
+            result[item] = key;
+        };
 
-                return acc;
-            }, {});
+        this._loop(addItem);
 
         return new Collection(result);
+    }
+
+    /**
+     * Remove an item from the collection by key.
+     *
+     * @param {(string|number|Array)} keys
+     * @returns {this}
+     */
+    public forget(keys: string | number | (string | number)[]): this {
+        if (Array.isArray(this._items)) {
+            const k = wrap(keys);
+
+            for (let i = k.length - 1; i >= 0; i--) {
+                this._items.splice(k[i], 1);
+            }
+
+            return this;
+        }
+
+        for (const key of wrap(keys)) {
+            delete this._items[key];
+        }
+
+        return this;
     }
 
     /**
@@ -982,21 +1059,47 @@ class Collection {
      * @param {(Object|Collection|undefined)} items
      * @returns {Collection}
      */
-    public union(items?: object | Collection): Collection {
-        if (Array.isArray(this._items)) {
-            // If the collection does not have any keys, simply return a shallow
-            // copy
-            return this._shallowCopy();
+    public union(items?: unknown[] | object | Collection): Collection {
+        if (Array.isArray(this._items) && Array.isArray(items)) {
+            return new Collection([...items, ...this._items]);
         }
 
-        const result = Collection._getArrayableItems(items);
-        const lkeys = Object.keys(this._items);
+        items = Collection._getArrayableItems(items);
+
         const union = {};
 
-        for (const key of lkeys) union[key] = this._items[key];
-        for (const key of Object.keys(result)) {
-            if (!lkeys.includes(key)) {
-                union[key] = result[key];
+        if (Array.isArray(this._items) && !Array.isArray(items)) {
+            // Add the items of the left-hand array
+            for (let i = 0; i < this._items.length; i++) {
+                union[i] = this._items[i];
+            }
+
+            // Add the items of the right-hand object if the key does not exist
+            // as an index in the left-hand array
+            for (const key of Object.keys(items)) {
+                if (!union.hasOwnProperty(key)) union[key] = items[key];
+            }
+        } else if (!Array.isArray(this._items) && Array.isArray(items)) {
+            const lkeys = Object.keys(this._items);
+
+            // Add the items of the left-hand object
+            for (const key of lkeys) union[key] = this._items[key];
+
+            // Add the items of the right-hand array if the index does not exist
+            // as a key in the left-hand object
+            for (let i = 0; i < items.length; i++) {
+                if (!lkeys.includes(i.toString())) union[i] = items[i];
+            }
+        } else {
+            const lkeys = Object.keys(this._items);
+
+            // Add the items of the left-hand object
+            for (const key of lkeys) union[key] = this._items[key];
+
+            // Add the items of the right-hand object if the key does not exist
+            // as a key in the left-hand object
+            for (const key of Object.keys(items)) {
+                if (!lkeys.includes(key)) union[key] = items[key];
             }
         }
 
@@ -1455,28 +1558,6 @@ class Collection {
     }
 
     /**
-     * Remove an item from the collection by key.
-     *
-     * @param {(string|number|Array)} keys
-     * @returns {this}
-     */
-    public forget(keys: string | number | (string | number)[]): this {
-        if (Array.isArray(this._items)) {
-            const k = wrap(keys);
-
-            for (let i = k.length - 1; i >= 0; i--) {
-                this._items.splice(k[i], 1);
-            }
-        } else {
-            for (const key of wrap(keys)) {
-                delete this._items[key];
-            }
-        }
-
-        return this;
-    }
-
-    /**
      * Get an item from the collection by key.
      *
      * @param {(number|string)} key
@@ -1701,52 +1782,6 @@ class Collection {
     }
 
     /**
-     * Get an operator checker callback.
-     *
-     * @param {(string|Function)} key
-     * @param {(string|undefined)} operator
-     * @param {(*|undefined)} value
-     * @returns {Function}
-     */
-    protected _operatorForWhere(key: string, operator?: unknown, value?: any): Function {
-        if (isUndefined(operator) && isUndefined(value)) {
-            value = true;
-
-            operator = '=';
-        } else if (isUndefined(value)) {
-            value = operator;
-
-            operator = '=';
-        }
-
-        return (item: unknown): boolean => {
-            const retrieved = dataGet(item, key);
-
-            const strings = [retrieved, value].filter((value: any): boolean => (
-                isString(value) || (isObject(value) && value.hasOwnProperty('toString'))
-            ));
-
-            if (strings.length < 2 && [retrieved, value].filter((value: any): boolean => isObject(value)).length === 1) {
-                return ['!=', '<>', '!=='].includes(operator as string);
-            }
-
-            switch (operator) {
-                default:
-                case '=':
-                case '==': return retrieved == value; // eslint-disable-line eqeqeq
-                case '!=':
-                case '<>': return retrieved != value; // eslint-disable-line eqeqeq
-                case '<': return retrieved < value;
-                case '>': return retrieved > value;
-                case '<=': return retrieved <= value;
-                case '>=': return retrieved >= value;
-                case '===': return retrieved === value;
-                case '!==': return retrieved !== value;
-            }
-        };
-    }
-
-    /**
      * Return a shallow copy of the collection.
      *
      * @returns {Collection}
@@ -1760,17 +1795,20 @@ class Collection {
     /**
      * Loop over the collection items, passing them to the given function.
      *
-     * @param {Function} fn
+     * @param {Function} fn1
+     * @param {(Function|undefined)} fn2
      * @returns {void}
      */
-    private _loop(fn: Function): void {
+    private _loop(fn1: Function, fn2?: Function): void {
         if (Array.isArray(this._items)) {
             for (let i = 0; i < this._items.length; i++) {
-                fn(this._items[i], i);
+                fn1(this._items[i], i);
             }
         } else {
             for (const key of Object.keys(this._items)) {
-                fn(this._items[key], key);
+                isUndefined(fn2)
+                    ? fn1(this._items[key], key)
+                    : fn2(this._items[key], key);
             }
         }
     }
