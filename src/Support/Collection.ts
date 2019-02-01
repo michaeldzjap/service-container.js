@@ -1,14 +1,14 @@
 import {
-    collapse, crossJoin, except, first, flatten, last, pluck, random, shuffle,
-    where, wrap
+    collapse, crossJoin, except, first, flatten, last, pluck, pull, random,
+    shuffle, where, wrap
 } from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
 import {
-    isObject, isString, isUndefined, isNull, isInstance, inArray, inObject,
-    dataGet, value
+    isObject, isString, isUndefined, isNull, isInstance, findIndex, findKey,
+    inArray, inObject, dataGet, value
 } from './helpers';
 import {Instantiable} from './types';
 
@@ -672,44 +672,6 @@ class Collection {
     }
 
     /**
-     * Create a collection of all elements that do not pass a given truth test.
-     *
-     * @param {(*|Function)} callback
-     * @returns {Collection}
-     */
-    public reject(callback: unknown | Function): Collection {
-        if (Collection._useAsCallable(callback)) {
-            return this.filter((value: unknown, key: string): boolean => (
-                !callback(value, key)
-            ));
-        }
-
-        // eslint-disable-next-line eqeqeq
-        return this.filter((item: unknown): boolean => item != callback);
-    }
-
-    /**
-     * Reverse items order.
-     *
-     * @returns {Collection}
-     */
-    public reverse(): Collection {
-        if (Array.isArray(this._items)) {
-            return new Collection([...this._items].reverse());
-        }
-
-        const result = Object.keys(this._items)
-            .reverse()
-            .reduce((acc: object, key: string): object => {
-                acc[key] = this._items[key];
-
-                return acc;
-            }, {});
-
-        return new Collection(result);
-    }
-
-    /**
      * Get all of the items in the collection.
      *
      * @returns {(Array|Object)}
@@ -1261,6 +1223,17 @@ class Collection {
     }
 
     /**
+     * Get and remove an item from the collection.
+     *
+     * @param {(string|number)} key
+     * @param {(*|undefined)} dflt
+     * @returns {*}
+     */
+    public pull(key: string | number, dflt?: unknown): unknown {
+        return pull(this._items, key, dflt);
+    }
+
+    /**
      * Put an item in the collection by key.
      *
      * @param {?(string|number)} key
@@ -1299,6 +1272,23 @@ class Collection {
     }
 
     /**
+     * Create a collection of all elements that do not pass a given truth test.
+     *
+     * @param {(*|Function)} callback
+     * @returns {Collection}
+     */
+    public reject(callback: unknown | Function): Collection {
+        if (Collection._useAsCallable(callback)) {
+            return this.filter((value: unknown, key: string): boolean => (
+                !callback(value, key)
+            ));
+        }
+
+        // eslint-disable-next-line eqeqeq
+        return this.filter((item: unknown): boolean => item != callback);
+    }
+
+    /**
      * Determine if the collection is empty or not.
      *
      * @returns {boolean}
@@ -1318,6 +1308,55 @@ class Collection {
      */
     public isNotEmpty(): boolean {
         return !this.isEmpty();
+    }
+
+    /**
+     * Reverse items order.
+     *
+     * @returns {Collection}
+     */
+    public reverse(): Collection {
+        if (Array.isArray(this._items)) {
+            return new Collection([...this._items].reverse());
+        }
+
+        const result = Object.keys(this._items)
+            .reverse()
+            .reduce((acc: object, key: string): object => {
+                acc[key] = this._items[key];
+
+                return acc;
+            }, {});
+
+        return new Collection(result);
+    }
+
+    /**
+     * Search the collection for a given value and return the corresponding key
+     * if successful.
+     *
+     * @param {(Function|*)} value
+     * @param {boolean} [strict=false]
+     * @returns {*}
+     */
+    public search(value: Function | unknown, strict: boolean = false): unknown {
+        if (!Collection._useAsCallable(value)) {
+            return Array.isArray(this._items)
+                ? findIndex(value, this._items, strict)
+                : findKey(value, this._items, strict);
+        }
+
+        if (Array.isArray(this._items)) {
+            for (let i = 0; i < this._items.length; i++) {
+                if (value(this._items[i], i)) return i;
+            }
+        } else {
+            for (const key of Object.keys(this._items)) {
+                if (value(this._items[key], key)) return key;
+            }
+        }
+
+        return false;
     }
 
     /**

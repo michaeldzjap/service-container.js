@@ -1472,6 +1472,67 @@ describe('Collection', (): void => {
         expect(c.sum('foo')).toBe(0);
     });
 
+    test('value retriever accepts dot notation', (): void => {
+        let c = new Collection([
+            {id: 1, foo: {bar: 'B'}}, {id: 2, foo: {bar: 'A'}}
+        ]);
+
+        c = c.sortBy('foo.bar');
+        expect(c.pluck('id').all()).toEqual([2, 1]);
+    });
+
+    test('pull retrieves item from collection', (): void => {
+        const c = new Collection(['foo', 'bar']);
+
+        expect(c.pull(0)).toBe('foo');
+    });
+
+    test('pull removes item from collection', (): void => {
+        const c = new Collection(['foo', 'bar']);
+        c.pull(0);
+        expect(c.all()).toEqual(['bar']);
+    });
+
+    test('pull returns default', (): void => {
+        const c = new Collection([]);
+        const value = c.pull(0, 'foo');
+        expect(value).toBe('foo');
+    });
+
+    test('reject removes elements passing truth test', (): void => {
+        let c = new Collection(['foo', 'bar']);
+        expect(c.reject('bar').all()).toEqual(['foo']);
+
+        c = new Collection(['foo', 'bar']);
+        expect(c.reject((v: string): boolean => v === 'bar').all()).toEqual(['foo']);
+
+        c = new Collection(['foo', null]);
+        expect(c.reject(null).all()).toEqual(['foo']);
+
+        c = new Collection(['foo', 'bar']);
+        expect(c.reject('baz').all()).toEqual(['foo', 'bar']);
+
+        c = new Collection(['foo', 'bar']);
+        expect(c.reject((v: string): boolean => v === 'baz').all()).toEqual(['foo', 'bar']);
+
+        c = new Collection({id: 1, primary: 'foo', secondary: 'bar'});
+        expect(c.reject((item: unknown, key: string): boolean => key === 'id').all())
+            .toEqual({primary: 'foo', secondary: 'bar'});
+    });
+
+    test('search returns index of first found item', (): void => {
+        let c = new Collection([1, 2, 3, 4, 5, 2, 5]);
+
+        expect(c.search(2)).toBe(1);
+        expect(c.search('2')).toBe(1);
+        expect(c.search((value: number): boolean => value > 4)).toBe(4);
+
+        c = new Collection({a: 1, foo: 'bar'});
+
+        expect(c.search('bar')).toBe('foo');
+        expect(c.search((value: any): boolean => isNaN(value))).toBe('foo');
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 

@@ -469,15 +469,21 @@ export const prepend = (array: unknown[] | object, value: unknown, key?: string)
 /**
  * Get a value from the array, and remove it.
  *
- * @param {Object} obj
- * @param {string} key
+ * @param {(Array|Object)} items
+ * @param {(string|number)} key
  * @param {(*|undefined)} dflt
  * @returns {*}
  */
-export const pull = (obj: object, key: string, dflt?: unknown): unknown => {
-    const value = get(obj, key, dflt);
+export const pull = (items: unknown[] | object, key: string | number, dflt?: unknown): unknown => {
+    if (Array.isArray(items)) {
+        const value = items.splice(key as number, 1)[0];
 
-    forget(obj, key);
+        return isUndefined(value) ? dflt : value;
+    }
+
+    const value = get(items, key as string, dflt);
+
+    forget(items, key as string);
 
     return value;
 };

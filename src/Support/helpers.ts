@@ -130,7 +130,55 @@ export const isInstance = <T>(target: any): target is Instance<T> => (
  * @param {*} b
  * @returns {boolean}
  */
-export const equals = (a: any, b: any): boolean => a === b;
+export const equals = (a: any, b: any): boolean => a === b
+
+/**
+ * Determine the index of an element in the given array.
+ *
+ * @param {*} item
+ * @param {Array} array
+ * @param {boolean} [strict=false]
+ * @returns {(number|undefined)}
+ */
+export const findIndex = (item: unknown, array: any[], strict: boolean = false): number => {
+    if (strict) {
+        return array.findIndex((_: unknown): boolean => _ === item);
+    }
+
+    return array.findIndex((_: unknown): boolean => {
+        if (!isObject(item) || !isObject(_) || !Array.isArray(item)
+            || !Array.isArray(_)) {
+            return item == _; // eslint-disable-line eqeqeq
+        }
+
+        return isEqual(_, item);
+    });
+};
+
+/**
+ * Determine the key of an element in the given object.
+ *
+ * @param {*} item
+ * @param {Object} obj
+ * @param {boolean} [strict=false]
+ * @returns {(number|undefined)}
+ */
+export const findKey = (item: unknown, obj: object, strict: boolean = false): string | undefined => {
+    const keys = Object.keys(obj);
+
+    if (strict) {
+        return keys.find((key: string): boolean => obj[key] === item);
+    }
+
+    return keys.find((key: string): boolean => {
+        if (!isObject(item) || !isObject(obj[key]) || !Array.isArray(item)
+            || !Array.isArray(obj[key])) {
+            return item == obj[key]; // eslint-disable-line eqeqeq
+        }
+
+        return isEqual(obj[key], item);
+    });
+};
 
 /**
  * Determine if an element is in the given array.
@@ -145,14 +193,7 @@ export const inArray = (item: any, array: any[], strict: boolean = false): boole
         return array.includes(item);
     }
 
-    return !isUndefined(array.find((_: any): boolean => {
-        if (!isObject(item) || !isObject(_) || !Array.isArray(item)
-            || !Array.isArray(_)) {
-            return item == _; // eslint-disable-line eqeqeq
-        }
-
-        return isEqual(_, item);
-    }));
+    return findIndex(item, array, strict) >= 0;
 };
 
 /**
