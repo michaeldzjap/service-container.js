@@ -265,9 +265,8 @@ class Collection {
         // If any of the comparables is an array, lose the keys of the other
 
         if (Array.isArray(result)) {
-            const values = Array.isArray(this._items)
-                ? this._items
-                : (Object as any).values(this._items);
+            const values = this._values();
+
             const diff = values.filter((value: unknown, index: number): boolean => {
                 if (isUndefined(callback)) {
                     return !result.includes(value);
@@ -297,8 +296,11 @@ class Collection {
         const values = (Object as any).values(result);
         const diff = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
-                if (isUndefined(callback) && !values.includes(this._items[key])
-                    || (!isUndefined(callback) && !callback(this._items[key], key, this._items, result))) {
+                if (
+                    isUndefined(callback) && !values.includes(this._items[key])
+                        || (!isUndefined(callback)
+                            && !callback(this._items[key], key, this._items, result))
+                ) {
                     acc[key] = this._items[key];
                 }
 
@@ -476,16 +478,10 @@ class Collection {
         if (Array.isArray(first) || (isObject(first) && !isInstance(first))) {
             const items = this.pluck(value).all();
 
-            return (
-                Array.isArray(items) ? items : (Object as any).values(items)
-            ).join(isUndefined(glue) ? '' : glue);
+            return this._values(items).join(isUndefined(glue) ? '' : glue);
         }
 
-        return (
-            Array.isArray(this._items)
-                ? this._items
-                : (Object as any).values(this._items)
-        ).join(isUndefined(value) ? '' : value);
+        return this._values().join(isUndefined(value) ? '' : value);
     }
 
     /**
@@ -504,11 +500,7 @@ class Collection {
         // If any of the comparables is an array, lose the keys of the other
 
         if (Array.isArray(result)) {
-            const values = Array.isArray(this._items)
-                ? this._items
-                : (Object as any).values(this._items);
-
-            return new Collection(values.filter((value: unknown): boolean => (
+            return new Collection(this._values().filter((value: unknown): boolean => (
                 result.includes(value)
             )));
         }
@@ -791,11 +783,7 @@ class Collection {
             return !isUndefined(this.first(key));
         }
 
-        const items = Array.isArray(this._items)
-            ? this._items
-            : (Object as any).values(this._items);
-
-        return items.includes(key);
+        return this._values().includes(key);
     }
 
     /**
@@ -1182,11 +1170,7 @@ class Collection {
 
         let position = 0;
 
-        const items = Array.isArray(this._items)
-            ? this._items
-            : (Object as any).values(this._items);
-
-        for (const item of items) {
+        for (const item of this._values()) {
             if (position % step === offset) {
                 result.push(item);
             }
@@ -1297,19 +1281,21 @@ class Collection {
      */
     public random(number?: number): any {
         if (isUndefined(number)) {
-            return random(
-                Array.isArray(this._items)
-                    ? this._items
-                    : (Object as any).values(this._items)
-            );
+            return random(this._values());
         }
 
-        return new Collection(random(
-            Array.isArray(this._items)
-                ? this._items
-                : (Object as any).values(this._items),
-            number
-        ));
+        return new Collection(random(this._values(), number));
+    }
+
+    /**
+     * Reduce the collection to a single value.
+     *
+     * @param {Function} callback
+     * @param {*} initial
+     * @returns {*}
+     */
+    public reduce(callback: any, initial?: unknown): any {
+        return this._values().reduce(callback, initial);
     }
 
     /**
@@ -1446,21 +1432,18 @@ class Collection {
     public chunk(size: number): Collection {
         if (size <= 0) return new Collection;
 
-        const items = Array.isArray(this._items)
-            ? this._items
-            : (Object as any).values(this._items);
+        const chunks = this._values()
+            .reduce((acc: Collection[], item: unknown, index: number): unknown[] => {
+                const chunkIndex = Math.floor(index / size);
 
-        const chunks = items.reduce((acc: Collection[], item: unknown, index: number): unknown[] => {
-            const chunkIndex = Math.floor(index / size);
+                if (!acc[chunkIndex]) {
+                    acc[chunkIndex] = new Collection; // Start a new chunk
+                }
 
-            if (!acc[chunkIndex]) {
-                acc[chunkIndex] = new Collection; // Start a new chunk
-            }
+                acc[chunkIndex].push(item);
 
-            acc[chunkIndex].push(item);
-
-            return acc;
-        }, []);
+                return acc;
+            }, []);
 
         return new Collection(chunks);
     }
@@ -1471,10 +1454,8 @@ class Collection {
      * @param {(Function|undefined)} callback
      * @returns {Collection}
      */
-    public sort(callback?: Function): Collection {
-        const items = Array.isArray(this._items)
-            ? this._items
-            : (Object as any).values(this._items);
+    public sort(callback?: (a: any, b: any) => number): Collection {
+        const items = this._values();
 
         if (isUndefined(callback)) {
             items.every((item: unknown): boolean => typeof item === 'number')
@@ -1608,6 +1589,29 @@ class Collection {
         }
 
         return new Collection(this._items.splice(offset, length, ...wrap(replacement)));
+    }
+
+    /**
+     * Get the sum of the given values.
+     *
+     * @param {(Function|string|undefined)} callback
+     * @returns {number}
+     */
+    public sum(callback?: Function | string): number {
+        if (isUndefined(callback)) {
+            const items = this._values()
+                .reduce((acc: number, item: number): number => {
+                    acc += item;
+
+                    return acc;
+                }, 0);
+        }
+
+        const fn = Collection._valueRetriever(callback);
+
+        return this.reduce((result: number, item: any): number => (
+            result + fn(item)
+        ), 0);
     }
 
     /**
@@ -1843,9 +1847,7 @@ class Collection {
      * @returns {number}
      */
     public count(): number {
-        return Array.isArray(this._items)
-            ? this._items.length
-            : Object.keys(this._items).length;
+        return this._values().length;
     }
 
     /**
@@ -1878,6 +1880,18 @@ class Collection {
                     : fn2(this._items[key], key);
             }
         }
+    }
+
+    /**
+     * Get the values of the collection.
+     *
+     * @param {(Array|Object|undefined)} items
+     * @returns {Array}
+     */
+    private _values(items?: unknown[] | object): any[] {
+        items = isUndefined(items) ? this._items : items;
+
+        return Array.isArray(items) ? items : (Object as any).values(items);
     }
 
 }

@@ -1454,6 +1454,24 @@ describe('Collection', (): void => {
         expect(c.contains('v', '>', 4)).toBeTruthy();
     });
 
+    test('getting sum from collection', (): void => {
+        let c = new Collection([{foo: 50}, {foo: 50}]);
+        expect(c.sum('foo')).toBe(100);
+
+        c = new Collection([{foo: 50}, {foo: 50}]);
+        expect(c.sum((i: {foo: number}): number => i.foo)).toBe(100);
+    });
+
+    test('can sum values without a callback', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5]);
+        expect(c.sum()).toBe(15);
+    });
+
+    test('getting sum from empty collection', (): void => {
+        const c = new Collection;
+        expect(c.sum('foo')).toBe(0);
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 
