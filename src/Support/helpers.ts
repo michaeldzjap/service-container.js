@@ -145,8 +145,27 @@ export const inArray = (item: any, array: any[], strict: boolean = false): boole
         return array.includes(item);
     }
 
-    return !isUndefined(array.find((_: any): boolean => isEqual(_, item)));
+    return !isUndefined(array.find((_: any): boolean => {
+        if (!isObject(item) || !isObject(_) || !Array.isArray(item)
+            || !Array.isArray(_)) {
+            return item == _; // eslint-disable-line eqeqeq
+        }
+
+        return isEqual(_, item);
+    }));
 };
+
+/**
+ * Determine if an element is a property of the given object.
+ *
+ * @param {*} item
+ * @param {Object} obj
+ * @param {boolean} [strict=false]
+ * @returns {boolean}
+ */
+export const inObject = (item: any, obj: object, strict: boolean = false): boolean => (
+    inArray(item, (Object as any).values(obj), strict)
+);
 
 /**
  * Attempt to get the name of an object or function.

@@ -1358,6 +1358,102 @@ describe('Collection', (): void => {
         });
     });
 
+    // eslint-disable-next-line max-statements
+    test('contains', (): void => {
+        let c = new Collection([1, 3, 5]);
+
+        expect(c.contains(1)).toBeTruthy();
+        expect(c.contains('1')).toBeTruthy();
+        expect(c.contains(2)).toBeFalsy();
+        expect(c.contains('2')).toBeFalsy();
+
+        c = new Collection(['1']);
+        expect(c.contains('1')).toBeTruthy();
+        expect(c.contains(1)).toBeTruthy();
+
+        c = new Collection([null]);
+        expect(c.contains(null)).toBeTruthy();
+        expect(c.contains(undefined)).toBeTruthy(); // eslint-disable-line no-undefined
+
+        c = new Collection([0]);
+        expect(c.contains(0)).toBeTruthy();
+        expect(c.contains('0')).toBeTruthy();
+        expect(c.contains(false)).toBeTruthy();
+
+        expect(c.contains((value: number): boolean => value < 5)).toBeTruthy();
+        expect(c.contains((value: number): boolean => value > 5)).toBeFalsy();
+
+        c = new Collection([{v: 1}, {v: 3}, {v: 5}]);
+
+        expect(c.contains('v', 1)).toBeTruthy();
+        expect(c.contains('v', 2)).toBeFalsy();
+
+        c = new Collection(['date', 'class', {foo: 50}]);
+
+        expect(c.contains('date')).toBeTruthy();
+        expect(c.contains('class')).toBeTruthy();
+        expect(c.contains('foo')).toBeFalsy();
+
+        c = new Collection([{a: false, b: false}, {a: true, b: false}]);
+
+        expect(c.contains((item: {a: boolean, b: boolean}): boolean => item.a)).toBeTruthy();
+        expect(c.contains((item: {a: boolean, b: boolean}): boolean => item.b)).toBeFalsy();
+
+        c = new Collection([null, 1, 2]);
+
+        expect(c.contains((value: unknown): boolean => value === null)).toBeTruthy();
+    });
+
+    // eslint-disable-next-line max-statements
+    test('contains strict', (): void => {
+        let c = new Collection([1, 3, 5, '02']);
+
+        expect(c.containsStrict(1)).toBeTruthy();
+        expect(c.containsStrict('1')).toBeFalsy();
+        expect(c.containsStrict(2)).toBeFalsy();
+        expect(c.containsStrict('02')).toBeTruthy();
+        expect(c.containsStrict(true)).toBeFalsy();
+        expect(c.containsStrict((value: any): boolean => value < 5)).toBeTruthy();
+        expect(c.containsStrict((value: any): boolean => value > 5)).toBeFalsy();
+
+        c = new Collection([0]);
+        expect(c.containsStrict(0)).toBeTruthy();
+        expect(c.containsStrict('0')).toBeFalsy();
+
+        expect(c.containsStrict(false)).toBeFalsy();
+        expect(c.containsStrict(null)).toBeFalsy();
+
+        c = new Collection([1, null]);
+        expect(c.containsStrict(null)).toBeTruthy();
+        expect(c.containsStrict(0)).toBeFalsy();
+        expect(c.containsStrict(false)).toBeFalsy();
+
+        c = new Collection([{v: 1}, {v: 3}, {v: '04'}, {v: 5}]);
+
+        expect(c.containsStrict('v', 1)).toBeTruthy();
+        expect(c.containsStrict('v', 2)).toBeFalsy();
+        expect(c.containsStrict('v', '1')).toBeFalsy();
+        expect(c.containsStrict('v', 4)).toBeFalsy();
+        expect(c.containsStrict('v', '04')).toBeTruthy();
+
+        c = new Collection(['date', 'class', {foo: 50}, '']);
+
+        expect(c.containsStrict('date')).toBeTruthy();
+        expect(c.containsStrict('class')).toBeTruthy();
+        expect(c.containsStrict('foo')).toBeFalsy();
+        expect(c.containsStrict(null)).toBeFalsy();
+        expect(c.containsStrict('')).toBeTruthy();
+    });
+
+    test('contains with operator', (): void => {
+        const c = new Collection([{v: 1}, {v: 3}, {v: '4'}, {v: 5}]);
+
+        expect(c.contains('v', '=', 4)).toBeTruthy();
+        expect(c.contains('v', '==', 4)).toBeTruthy();
+        expect(c.contains('v', '===', 4)).toBeFalsy();
+        expect(c.contains('v', '>', 4)).toBeTruthy();
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 

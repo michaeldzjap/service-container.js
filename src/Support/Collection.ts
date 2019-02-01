@@ -7,7 +7,8 @@ import {isObjectable} from '../Contracts/IObjectable';
 import {isJsonable} from '../Contracts/IJsonable';
 import {isJsonSerializable} from '../Contracts/IJsonSerializable';
 import {
-    isObject, isString, isUndefined, isNull, isInstance, inArray, dataGet, value
+    isObject, isString, isUndefined, isNull, isInstance, inArray, inObject,
+    dataGet, value
 } from './helpers';
 import {Instantiable} from './types';
 
@@ -732,6 +733,69 @@ class Collection {
      */
     public collapse(): Collection {
         return new Collection(collapse(this._items));
+    }
+
+    /**
+     * Alias for the "contains" method.
+     *
+     * @param {*} key
+     * @param {(*|undefined)} operator
+     * @param {(*|undefined)} value
+     * @returns {boolean}
+     */
+    public some(key: unknown, operator?: unknown, value?: unknown): boolean {
+        return this.contains(key, operator, value);
+    }
+
+    /**
+     * Determine if an item exists in the collection.
+     *
+     * @param {*} key
+     * @param {(*|undefined)} operator
+     * @param {(*|undefined)} value
+     * @returns {boolean}
+     */
+    public contains(key: unknown, operator?: unknown, value?: unknown): boolean {
+        if (isUndefined(operator) && isUndefined(value)) {
+            if (Collection._useAsCallable(key)) {
+                const placeholder = {};
+
+                return this.first(key, placeholder) !== placeholder;
+            }
+
+            return Array.isArray(this._items)
+                ? inArray(key, this._items)
+                : inObject(key, this._items);
+        }
+
+        return this.contains(
+            Collection._operatorForWhere(key as string, operator, value)
+        );
+    }
+
+    /**
+     * Determine if an item exists in the collection using strict comparison.
+     *
+     * @param {*} key
+     * @param {(*|undefined)} value
+     * @returns {boolean}
+     */
+    public containsStrict(key: any, value?: unknown): boolean {
+        if (!isUndefined(value)) {
+            return this.contains((item: unknown): boolean => (
+                dataGet(item, key) === value
+            ));
+        }
+
+        if (Collection._useAsCallable(key)) {
+            return !isUndefined(this.first(key));
+        }
+
+        const items = Array.isArray(this._items)
+            ? this._items
+            : (Object as any).values(this._items);
+
+        return items.includes(key);
     }
 
     /**

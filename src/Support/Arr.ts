@@ -2,8 +2,8 @@ import Rand from 'rand-seed';
 
 import Collection from './Collection';
 import {
-    dataGet, isUndefined, isNullOrUndefined, isObject, isString, isInstantiable,
-    isInstance, value
+    dataGet, isUndefined, isNullOrUndefined, isObject, isString, isInstance,
+    value
 } from './helpers';
 
 /**
