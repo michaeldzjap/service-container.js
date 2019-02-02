@@ -138,7 +138,7 @@ export const equals = (a: any, b: any): boolean => a === b
  * @param {*} item
  * @param {Array} array
  * @param {boolean} [strict=false]
- * @returns {(number|undefined)}
+ * @returns {number}
  */
 export const findIndex = (item: unknown, array: any[], strict: boolean = false): number => {
     if (strict) {

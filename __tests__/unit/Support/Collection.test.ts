@@ -1533,6 +1533,26 @@ describe('Collection', (): void => {
         expect(c.search((value: any): boolean => isNaN(value))).toBe('foo');
     });
 
+    test('search in strict mode', (): void => {
+        const c = new Collection([false, 0, 1, '', []]);
+        expect(c.search('false', true)).toBeFalsy();
+        expect(c.search('1', true)).toBeFalsy();
+        expect(c.search([], true)).toBeFalsy();
+        expect(c.search(false, true)).toBe(0);
+        expect(c.search(0, true)).toBe(1);
+        expect(c.search(1, true)).toBe(2);
+        expect(c.search('', true)).toBe(3);
+    });
+
+    test('search returns false when item is not found', (): void => {
+        const c = new Collection([1, 2, 3, 4, 5, 'bar']);
+
+        expect(c.search(6)).toBeFalsy();
+        expect(c.search('foo')).toBeFalsy();
+        expect(c.search((value: number | string): boolean => value < 1)).toBeFalsy();
+        expect(c.search((value: number | string): boolean => value === 'nope')).toBeFalsy();
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 

@@ -1337,13 +1337,15 @@ class Collection {
      *
      * @param {(Function|*)} value
      * @param {boolean} [strict=false]
-     * @returns {*}
+     * @returns {(number|string|boolean)}
      */
-    public search(value: Function | unknown, strict: boolean = false): unknown {
+    public search(value: Function | unknown, strict: boolean = false): number | string | boolean {
         if (!Collection._useAsCallable(value)) {
-            return Array.isArray(this._items)
+            const key = Array.isArray(this._items)
                 ? findIndex(value, this._items, strict)
                 : findKey(value, this._items, strict);
+
+            return isUndefined(key) || key === -1 ? false : key;
         }
 
         if (Array.isArray(this._items)) {
