@@ -1553,6 +1553,27 @@ describe('Collection', (): void => {
         expect(c.search((value: number | string): boolean => value === 'nope')).toBeFalsy();
     });
 
+    test('keys', (): void => {
+        const c = new Collection({name: 'riley', language: 'typescript'});
+        expect(c.keys().all()).toEqual(['name', 'language']);
+    });
+
+    test('paginate', (): void => {
+        const c = new Collection(['one', 'two', 'three', 'four']);
+        expect(c.forPage(0, 2).all()).toEqual(['one', 'two']);
+        expect(c.forPage(1, 2).all()).toEqual(['one', 'two']);
+        expect(c.forPage(2, 2).all()).toEqual(['three', 'four']);
+        expect(c.forPage(3, 2).all()).toEqual([]);
+    });
+
+    test('prepend', (): void => {
+        let c = new Collection(['one', 'two', 'three', 'four']);
+        expect(c.prepend('zero').all()).toEqual(['zero', 'one', 'two', 'three', 'four']);
+
+        c = new Collection({one: 1, two: 2});
+        expect(c.prepend(0, 'zero').all()).toEqual({zero: 0, one: 1, two: 2});
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 

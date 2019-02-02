@@ -449,7 +449,7 @@ export const pluck = (array: unknown[], value: string | string[] | null, key?: s
 };
 
 /**
- * Push an item onto the beginning of an array.
+ * Push an item onto the beginning of an array / object.
  *
  * @param {(*[]|Object)} array
  * @param {*} value

@@ -1,6 +1,6 @@
 import {
-    collapse, crossJoin, except, first, flatten, last, pluck, pull, random,
-    shuffle, where, wrap
+    collapse, crossJoin, except, first, flatten, last, pluck, prepend, pull,
+    random, shuffle, where, wrap
 } from './Arr';
 import {isArrayable} from '../Contracts/IArrayable';
 import {isObjectable} from '../Contracts/IObjectable';
@@ -1144,6 +1144,19 @@ class Collection {
     }
 
     /**
+     * "Paginate" the collection by slicing it into a smaller collection.
+     *
+     * @param {number} page
+     * @param {number} perPage
+     * @returns {Collection}
+     */
+    public forPage(page: number, perPage: number): Collection {
+        const offset = Math.max(0, (page - 1) * perPage);
+
+        return this.slice(offset, perPage);
+    }
+
+    /**
      * Transform each item in the collection using a callback.
      *
      * @param {Function} callback
@@ -1204,6 +1217,19 @@ class Collection {
         delete this._items[keys[keys.length - 1]];
 
         return lastItem;
+    }
+
+    /**
+     * Push an item onto the beginning of the collection.
+     *
+      * @param {*} value
+      * @param {(string|undefined)} key
+      * @returns {this}
+     */
+    public prepend(value: unknown, key?: string): this {
+        this._items = prepend(this._items, value, key);
+
+        return this;
     }
 
     /**
