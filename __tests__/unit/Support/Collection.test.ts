@@ -1602,6 +1602,24 @@ describe('Collection', (): void => {
         expect(c.get(2).all()).toEqual([3, 6, undefined]); // eslint-disable-line no-undefined
     });
 
+    test('pad pads array with value', (): void => {
+        let c = new Collection([1, 2, 3]);
+        c = c.pad(4, 0);
+        expect(c.all()).toEqual([1, 2, 3, 0]);
+
+        c = new Collection([1, 2, 3, 4, 5]);
+        c = c.pad(4, 0);
+        expect(c.all()).toEqual([1, 2, 3, 4, 5]);
+
+        c = new Collection([1, 2, 3]);
+        c = c.pad(-4, 0);
+        expect(c.all()).toEqual([0, 1, 2, 3]);
+
+        c = new Collection([1, 2, 3, 4, 5]);
+        c = c.pad(-4, 0);
+        expect(c.all()).toEqual([1, 2, 3, 4, 5]);
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 

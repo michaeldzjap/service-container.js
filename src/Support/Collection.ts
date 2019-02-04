@@ -1885,6 +1885,33 @@ class Collection {
     }
 
     /**
+     * Pad collection to the specified length with a value.
+     *
+     * @param {number} size
+     * @param {*} value
+     * @returns {Collection}
+     */
+    public pad(size: number, value: unknown): Collection {
+        if (!Array.isArray(this._items)) {
+            // If the underlying items are elements of an object just return a
+            // shallow copy
+            return new Collection({...this._items});
+        }
+
+        const s = Math.abs(size) - this._items.length;
+
+        if (s < 0) {
+            return new Collection([...this._items]);
+        }
+
+        const items = Array.from(Array(s), (): unknown => value);
+
+        return new Collection(
+            size >= 0 ? [...this._items, ...items] : [...items, ...this._items]
+        );
+    }
+
+    /**
      * Get the collection of items as a plain (combination of) array/object.
      *
      * @returns {(Array|Object)}
