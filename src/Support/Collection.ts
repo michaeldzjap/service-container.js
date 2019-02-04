@@ -431,7 +431,7 @@ class Collection {
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param {(Collection|Array|string)} keys
+     * @param {...(Collection|Array|string)} keys
      * @returns {Collection}
      */
     public except(...keys: any[]): Collection {
@@ -448,7 +448,7 @@ class Collection {
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param {(Array|string|number)} keys
+     * @param {...(Array|string|number)} keys
      * @returns {boolean}
      */
     public has(...keys: any[]): boolean {
@@ -1855,6 +1855,32 @@ class Collection {
             Array.isArray(this._items)
                 ? [...this._items]
                 : (Object as any).values(this._items)
+        );
+    }
+
+    /**
+     * Zip the collection together with one or more arrays.
+     *
+     * e.g. (new Collection([1, 2, 3])).zip([4, 5, 6]);
+     *      => [[1, 4], [2, 5], [3, 6]]
+     *
+     * @param {...Array} items
+     * @returns {Collection}
+     */
+    public zip(...items: any[]): Collection {
+        const arrayableItems = items.map((items: unknown[]): unknown[] => (
+            this._values(Collection._getArrayableItems(items))
+        ));
+
+        return new Collection(
+            this._values().map((_: unknown, i: number): Collection => (
+                new Collection([
+                    _,
+                    ...arrayableItems.map((_: unknown, j: number): unknown => (
+                        arrayableItems[j][i]
+                    ))
+                ])
+            ))
         );
     }
 

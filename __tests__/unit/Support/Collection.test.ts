@@ -1574,6 +1574,34 @@ describe('Collection', (): void => {
         expect(c.prepend(0, 'zero').all()).toEqual({zero: 0, one: 1, two: 2});
     });
 
+    // eslint-disable-next-line max-statements
+    test('zip', (): void => {
+        let c = new Collection([1, 2, 3]);
+        c = c.zip(new Collection([4, 5, 6]));
+        expect(c).toBeInstanceOf(Collection);
+        expect(c.get(0)).toBeInstanceOf(Collection);
+        expect(c.get(1)).toBeInstanceOf(Collection);
+        expect(c.get(2)).toBeInstanceOf(Collection);
+        expect(c.count()).toBe(3);
+        expect(c.get(0).all()).toEqual([1, 4]);
+        expect(c.get(1).all()).toEqual([2, 5]);
+        expect(c.get(2).all()).toEqual([3, 6]);
+
+        c = new Collection([1, 2, 3]);
+        c = c.zip([4, 5, 6], [7, 8, 9]);
+        expect(c.count()).toBe(3);
+        expect(c.get(0).all()).toEqual([1, 4, 7]);
+        expect(c.get(1).all()).toEqual([2, 5, 8]);
+        expect(c.get(2).all()).toEqual([3, 6, 9]);
+
+        c = new Collection([1, 2, 3]);
+        c = c.zip([4, 5, 6], [7]);
+        expect(c.count()).toBe(3);
+        expect(c.get(0).all()).toEqual([1, 4, 7]);
+        expect(c.get(1).all()).toEqual([2, 5, undefined]); // eslint-disable-line no-undefined
+        expect(c.get(2).all()).toEqual([3, 6, undefined]); // eslint-disable-line no-undefined
+    });
+
     test('nth', (): void => {
         const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
 
