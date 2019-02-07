@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/michaeldzjap/service-container.js#readme",
   "devDependencies": {
-    "@types/jest": "^23.3.14",
+    "@types/jest": "^24.0.0",
     "@types/lodash.isequal": "^4.5.3",
     "@types/node": "^10.12.21",
     "eslint": "^5.13.0",
