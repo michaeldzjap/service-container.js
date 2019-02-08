@@ -38,14 +38,32 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * @returns {(Object|undefined)}
      */
     protected _findAssignment(param: any): any {
-        const statement = this._block.body
-            .filter((statement: any): boolean => statement.type === 'IfStatement')
-            .find((statement: any): any => (
-                statement.consequent.body[0].expression.left.name === param.name
-            ));
+        const statements = this._block.body
+            .filter((_: any): boolean => _.type === 'IfStatement');
 
-        if (!isUndefined(statement)) {
-            return statement.consequent.body[0].expression;
+        for (const statement of statements) {
+            const expression = this._filterConsequentBody(
+                statement.consequent.body, param
+            );
+
+            if (!isUndefined(expression)) return expression;
+        }
+    }
+
+    /**
+     * Filter the body property of a consequent property in an attempt to find
+     * the assignment expression that corresponds to the given parameter.
+     *
+     * @param {Array} body
+     * @param {Object} param
+     * @returns {(Object|undefined)}
+     */
+    private _filterConsequentBody(body: any, param: any): any {
+        for (const statement of body) {
+            if (statement.expression.type === 'AssignmentExpression'
+                && statement.expression.left.name === param.name) {
+                return statement.expression;
+            }
         }
     }
 

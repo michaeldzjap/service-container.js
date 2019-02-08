@@ -1,6 +1,7 @@
 __tests__
 .idea
 .rpt2_cache
+coverage
 example
 src
 .eslintignore
