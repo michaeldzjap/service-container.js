@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/michaeldzjap/service-container.js.svg?branch=master)](https://travis-ci.org/michaeldzjap/service-container.js)
 ![dependencies](https://img.shields.io/david/michaeldzjap/service-container.js.svg)
 ![dev dependencies](https://img.shields.io/david/dev/michaeldzjap/service-container.js.svg)
+[![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://github.com/facebook/jest)
+[![codecov](https://codecov.io/gh/michaeldzjap/service-container.js/branch/master/graph/badge.svg)](https://codecov.io/gh/michaeldzjap/service-container.js)
 [![License](https://img.shields.io/npm/l/service-container.js.svg)](https://github.com/michaeldzjap/service-container.js/blob/master/LICENSE)
 
 # service-container.js

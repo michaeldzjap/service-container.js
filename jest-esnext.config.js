@@ -27,5 +27,6 @@ module.exports = {
         'ts-jest': {
             tsConfig: 'tsconfig.esnext-test.json'
         }
-    }
+    },
+    collectCoverage: true
 };

@@ -29,5 +29,6 @@ module.exports = {
         'ts-jest': {
             tsConfig: 'tsconfig.test.json'
         }
-    }
+    },
+    collectCoverage: true
 };
