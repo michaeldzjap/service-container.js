@@ -130,7 +130,7 @@ export const isInstance = <T>(target: any): target is Instance<T> => (
  * @param {*} b
  * @returns {boolean}
  */
-export const equals = (a: any, b: any): boolean => a === b
+export const equals = (a: any, b: any): boolean => a === b;
 
 /**
  * Determine the index of an element in the given array.
