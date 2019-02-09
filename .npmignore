@@ -8,6 +8,7 @@ src
 .eslintrc.json
 .gitignore
 .travis.yml
+CHANGELOG.md
 jest-es5.config.js
 jest-esnext.config.js
 jest.config.js

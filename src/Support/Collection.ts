@@ -10,7 +10,7 @@ import {
     isObject, isString, isUndefined, isNull, isInstance, findIndex, findKey,
     inArray, inObject, dataGet, value
 } from './helpers';
-import {Instantiable} from './types';
+import {Instantiable} from '../types/container';
 
 class Collection {
 
