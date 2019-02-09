@@ -1,14 +1,14 @@
 import Callable from '../../Container/Callable';
-import ContextualBindingBuilder from '../../Container/ContextualBindingBuilder';
-import IAliaser from './IAliaser';
-import IBinder from './IBinder';
-import IExtender from './IExtender';
-import IInstanceSharer from './IInstanceSharer';
-import IResolver from './IResolver';
-import ITagger from './ITagger';
+import ContextualBindingBuilder from './ContextualBindingBuilder';
+import Aliaser from './Aliaser';
+import Binder from './Binder';
+import Extender from './Extender';
+import InstanceSharer from './InstanceSharer';
+import Resolver from './Resolver';
+import Tagger from './Tagger';
 import {Identifier, Instantiable} from '../../types/container';
 
-interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IResolver, ITagger {
+interface Container extends Aliaser, Binder, Extender, InstanceSharer, Resolver, Tagger {
 
     /**
      * Unregister a binding with the container.
@@ -92,4 +92,4 @@ interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IRes
 
 }
 
-export default IContainer;
+export default Container;

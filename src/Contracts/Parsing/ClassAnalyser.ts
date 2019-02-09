@@ -1,7 +1,7 @@
 import IFunctionAnalyser from './IFunctionAnalyser';
 import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 
-interface IClassAnalyser {
+interface ClassAnalyser {
 
     /**
      * Determine if the class has a constructor.
@@ -46,4 +46,4 @@ interface IClassAnalyser {
 
 }
 
-export default IClassAnalyser;
+export default ClassAnalyser;

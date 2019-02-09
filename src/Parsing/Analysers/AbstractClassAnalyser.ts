@@ -1,4 +1,4 @@
-import IFunctionAnalyser from '../../Contracts/Parsing/IFunctionAnalyser';
+import FunctionAnalyser from '../../Contracts/Parsing/FunctionAnalyser';
 import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import {isUndefined} from '../../Support/helpers';
 
@@ -8,18 +8,18 @@ abstract class AbstractClassAnalyser {
      * Get the constructor analyser.
      *
      * @param {*} target
-     * @returns {(IFunctionAnalyser|undefined)}
+     * @returns {(FunctionAnalyser|undefined)}
      */
-    public abstract getConstructorAnalyser(target: any): IFunctionAnalyser | undefined;
+    public abstract getConstructorAnalyser(target: any): FunctionAnalyser | undefined;
 
     /**
      * Get the method analyser
      *
      * @param {*} target
      * @param {string} name
-     * @returns {(IFunctionAnalyser|undefined)}
+     * @returns {(FunctionAnalyser|undefined)}
      */
-    public abstract getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined;
+    public abstract getMethodAnalyser(target: any, name: string): FunctionAnalyser | undefined;
 
     /**
      * Get the constructor parameter.

@@ -88,7 +88,7 @@ export const isInstantiable = <T>(target: any): target is Instantiable<T> => {
  * @param {*} target
  * @returns {boolean}
  */
-export const isSymbol = (target: any): target is Symbol => (
+export const isSymbol = (target: any): target is symbol => (
     typeof target === 'symbol'
 );
 

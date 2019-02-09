@@ -1,6 +1,6 @@
 import {Identifier} from '../../types/container';
 
-interface IInstanceSharer {
+interface InstanceSharer {
 
     /**
      * Register an existing instance as shared in the container.
@@ -13,4 +13,4 @@ interface IInstanceSharer {
 
 }
 
-export default IInstanceSharer;
+export default InstanceSharer;

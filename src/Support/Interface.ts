@@ -5,6 +5,6 @@ export default class Interface {
      *
      * @var {symbol}
      */
-    public key?: Symbol;
+    public key?: symbol;
 
 }

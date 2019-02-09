@@ -1,6 +1,6 @@
 import {Instantiable} from '../../types/container';
 
-interface IBuilder {
+interface Builder {
 
     /**
      * Instantiate a concrete instance of the given type.
@@ -12,4 +12,4 @@ interface IBuilder {
 
 }
 
-export default IBuilder;
+export default Builder;

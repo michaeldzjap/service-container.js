@@ -41,7 +41,7 @@ abstract class AbstractParameterAnalyser {
      *
      * @var {Map}
      */
-    protected _keys?: Map<number, Symbol>;
+    protected _keys?: Map<number, symbol>;
 
     /**
      * Create a new parameter parser base instance.

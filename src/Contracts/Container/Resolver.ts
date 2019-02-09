@@ -1,6 +1,6 @@
 import {Identifier} from '../../types/container';
 
-interface IResolver {
+interface Resolver {
 
     /**
      * Determine if the given abstract type has been resolved.
@@ -30,4 +30,4 @@ interface IResolver {
 
 }
 
-export default IResolver;
+export default Resolver;

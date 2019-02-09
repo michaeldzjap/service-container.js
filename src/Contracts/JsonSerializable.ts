@@ -1,6 +1,6 @@
 import {Instance} from '../types/container';
 
-interface IJsonSerializable {
+interface JsonSerializable {
 
     /**
      * Convert class instance properties to something that is JSON serializable.
@@ -17,8 +17,8 @@ interface IJsonSerializable {
  * @param {Instance} instance
  * @returns {boolean}
  */
-export const isJsonSerializable = <T>(instance: Instance<T>): instance is IJsonSerializable => (
+export const isJsonSerializable = <T>(instance: Instance<T>): instance is JsonSerializable => (
     Reflect.has(instance, 'jsonSerialize')
 );
 
-export default IJsonSerializable;
+export default JsonSerializable;

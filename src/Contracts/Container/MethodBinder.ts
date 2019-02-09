@@ -1,6 +1,6 @@
 import {Instantiable} from '../../types/container';
 
-interface IMethodBinder {
+interface MethodBinder {
 
     /**
      * Determine if the container has a method binding.
@@ -30,4 +30,4 @@ interface IMethodBinder {
 
 }
 
-export default IMethodBinder;
+export default MethodBinder;

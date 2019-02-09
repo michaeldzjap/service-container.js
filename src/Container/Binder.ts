@@ -1,11 +1,11 @@
+import BinderContract from '../Contracts/Container/Binder';
 import BindingError from './BindingError';
 import ClassBinding from './ClassBinding';
 import Container from './Container';
-import IBinder from '../Contracts/Container/IBinder';
 import {isNullOrUndefined, isInstantiable} from '../Support/helpers';
 import {Binding, Identifier, Instantiable} from '../types/container';
 
-class Binder implements IBinder {
+class Binder implements BinderContract {
 
     /**
      * The underlying container instance.

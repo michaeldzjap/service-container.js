@@ -1,12 +1,12 @@
 import AbstractClassAnalyser from '../AbstractClassAnalyser';
+import ClassAnalyserContract from '../../../Contracts/Parsing/ClassAnalyser';
 import ConstructorAnalyser from './ConstructorAnalyser';
-import IClassAnalyser from '../../../Contracts/Parsing/IClassAnalyser';
-import IFunctionAnalyser from '../../../Contracts/Parsing/IFunctionAnalyser';
+import FunctionAnalyser from '../../../Contracts/Parsing/FunctionAnalyser';
 import MethodAnalyser from './MethodAnalyser';
 import ParsingError from '../../ParsingError';
 import {isUndefined} from '../../../Support/helpers';
 
-class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
+class ClassAnalyser extends AbstractClassAnalyser implements ClassAnalyserContract {
 
     /**
      * The ESTree-compatible abstract syntax tree representing a class.
@@ -18,16 +18,16 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
     /**
      * The constructor analyser instance.
      *
-     * @var {(IFunctionAnalyser|undefined)}
+     * @var {(FunctionAnalyser|undefined)}
      */
-    private _constructorAnalyser?: IFunctionAnalyser;
+    private _constructorAnalyser?: FunctionAnalyser;
 
     /**
      * The method analyser instances.
      *
      * @var {Map}
      */
-    private _methodAnalysers: Map<string, IFunctionAnalyser> = new Map;
+    private _methodAnalysers: Map<string, FunctionAnalyser> = new Map;
 
     /**
      * Create a new class analyser instance.
@@ -59,9 +59,9 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * Get the constructor analyser.
      *
      * @param {*} target
-     * @returns {(IFunctionAnalyser|undefined)}
+     * @returns {(FunctionAnalyser|undefined)}
      */
-    public getConstructorAnalyser(target: any): IFunctionAnalyser | undefined {
+    public getConstructorAnalyser(target: any): FunctionAnalyser | undefined {
         this._initialiseConstructorAnalyser(target);
 
         return this._constructorAnalyser;
@@ -72,9 +72,9 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      *
      * @param {*} target
      * @param {string} name
-     * @returns {(IFunctionAnalyser|undefined)}
+     * @returns {(FunctionAnalyser|undefined)}
      */
-    public getMethodAnalyser(target: any, name: string): IFunctionAnalyser | undefined {
+    public getMethodAnalyser(target: any, name: string): FunctionAnalyser | undefined {
         this._initialiseMethodAnalyser(target, name);
 
         return this._methodAnalysers.get(name);

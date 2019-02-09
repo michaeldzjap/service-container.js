@@ -1,9 +1,9 @@
+import AliaserContract from '../Contracts/Container/Aliaser';
 import Container from './Container';
-import IAliaser from '../Contracts/Container/IAliaser';
 import LogicError from './LogicError';
 import {Identifier} from '../types/container';
 
-class Aliaser implements IAliaser {
+class Aliaser implements AliaserContract {
 
     /**
      * The underlying container instance.

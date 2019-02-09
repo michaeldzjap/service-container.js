@@ -91,7 +91,7 @@ class InjectableService {
      * @returns {(ParameterDescriptor[]|undefined)}
      */
     private static _getParameters(target: any, propertyKey?: string | symbol):
-        ParameterDescriptor[] | undefined {
+    ParameterDescriptor[] | undefined {
         const ast = InjectableService._getAst(target, propertyKey);
         const analyser = (new ClassAnalyserManager(ast.body[0])).driver();
 

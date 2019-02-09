@@ -1,6 +1,6 @@
 import {Identifier} from '../../types/container';
 
-interface ITagger {
+interface Tagger {
 
     /**
      * Assign a set of tags to a given binding.
@@ -21,4 +21,4 @@ interface ITagger {
 
 }
 
-export default ITagger;
+export default Tagger;

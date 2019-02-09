@@ -17,6 +17,40 @@ export const accessible = (value: any): boolean => (
 );
 
 /**
+ * Set an object item to a given value using "dot" notation.
+ *
+ * If no key is given to the method, the entire object will be replaced.
+ *
+ * @param {Object} obj
+ * @param {?string} key
+ * @param {*} value
+ * @returns {*}
+ */
+export const set = (obj: object, key: string | null, value: unknown): object | unknown => {
+    if (key === null) return value;
+
+    const keys = key.split('.');
+
+    while (keys.length > 1) {
+        key = keys.shift() as string;
+
+        // If the key doesn't exist at this depth, we will just create an
+        // empty array to hold the next value, allowing us to create the
+        // arrays to hold final values at the correct depth. Then we'll keep
+        // digging into the array.
+        if (!obj.hasOwnProperty(key) || !isObject(obj[key])) {
+            obj[key] = {};
+        }
+
+        obj = obj[key];
+    }
+
+    obj[keys.shift() as string] = value;
+
+    return obj;
+};
+
+/**
  * Add an element to an object using "dot" notation if it doesn't exist.
  *
  * @param {Object} obj
@@ -32,6 +66,46 @@ export const add = (obj: object, key: string, value: any): object => {
     }
 
     return obj;
+};
+
+/**
+ * Collapse an array of arrays into a single array.
+ *
+ * @param {*[]} array
+ * @returns {*[]}
+ */
+const collapseArray = (array: unknown[]): unknown[] => {
+    let results: unknown[] = [];
+
+    for (let values of array) {
+        values = values instanceof Collection ? values.all() : values;
+
+        if (!Array.isArray(values)) continue;
+
+        results = [...results, ...values];
+    }
+
+    return results;
+};
+
+/**
+ * Collapse an object of objects into a single object.
+ *
+ * @param {Object} obj
+ * @returns {Object}
+ */
+const collapseObject = (obj: object): object => {
+    let results: object = {};
+
+    for (const key of Object.keys(obj)) {
+        const values = obj[key] instanceof Collection ? obj[key].all() : obj[key];
+
+        if (!isObject(values)) continue;
+
+        results = {...results, ...values};
+    }
+
+    return results;
 };
 
 /**
@@ -117,21 +191,6 @@ export const dot = (obj: object, prepend: string = ''): object => {
 };
 
 /**
- * Get all of the given object except for a specified array of keys.
- *
- * @param {Object} obj
- * @param {(string[]|string)} keys
- * @returns {Object}
- */
-export const except = (obj: object, keys: string[] | string): object => {
-    obj = {...obj};
-
-    forget(obj, keys);
-
-    return obj;
-};
-
-/**
  * Determine if the given key exists in the provided array.
  *
  * @param {(*[]|Object)} array
@@ -147,19 +206,77 @@ export const exists = (array: unknown[] | object, key: number | string): boolean
 };
 
 /**
- * Return the first element in an array or object passing a given truth test.
+ * If the given value is not an array and not null, wrap it in one.
  *
- * @param {(Array|Object)} items
- * @param {?(Function|undefined)} callback
- * @param {(*|undefined)} dflt
- * @returns {*}
+ * @param {*} value
+ * @returns {*[]}
  */
-export const first = (items: unknown[] | object, callback?: Function | null, dflt?: unknown): unknown => {
-    if (Array.isArray(items)) {
-        return firstArray(items, callback, dflt);
+export const wrap = (value: unknown): any[] => {
+    if (isNullOrUndefined(value)) {
+        return [];
     }
 
-    return firstObject(items, callback, dflt);
+    return Array.isArray(value) ? [...value] : [value];
+};
+
+/**
+ * Remove one or many object properties from a given object using "dot"
+ * notation.
+ *
+ * @param {Object} obj
+ * @param {?(string[]|string|undefined)} keys
+ * @returns {void}
+ */
+export const forget = (obj: object, keys?: string[] | string): void => {
+    const original = obj;
+
+    keys = wrap(keys) as string[];
+
+    if (keys.length === 0) return;
+
+    // eslint-disable-next-line no-labels
+    loop1:
+    for (const key of keys) {
+        // If the exact key exists in the top-level, remove it
+        if (exists(obj, key)) {
+            delete obj[key];
+
+            continue;
+        }
+
+        const parts = key.split('.');
+
+        // Clean up before each pass
+        obj = original;
+
+        while (parts.length > 1) {
+            const part = parts.shift() as string;
+
+            // eslint-disable-next-line max-depth
+            if (obj.hasOwnProperty(part) && isObject(obj[part])) {
+                obj = obj[part];
+            } else {
+                continue loop1;
+            }
+        }
+
+        delete obj[parts.shift() as string];
+    }
+};
+
+/**
+ * Get all of the given object except for a specified array of keys.
+ *
+ * @param {Object} obj
+ * @param {(string[]|string)} keys
+ * @returns {Object}
+ */
+export const except = (obj: object, keys: string[] | string): object => {
+    obj = {...obj};
+
+    forget(obj, keys);
+
+    return obj;
 };
 
 /**
@@ -211,6 +328,23 @@ const firstObject = (obj: object, callback?: Function | null, dflt?: unknown): u
 };
 
 /**
+ * Return the first element in an array or object passing a given truth test.
+ *
+ * @param {(Array|Object)} items
+ * @param {?(Function|undefined)} callback
+ * @param {(*|undefined)} dflt
+ * @returns {*}
+ */
+export const first = (items: unknown[] | object, callback?: Function | null,
+    dflt?: unknown): unknown => {
+    if (Array.isArray(items)) {
+        return firstArray(items, callback, dflt);
+    }
+
+    return firstObject(items, callback, dflt);
+};
+
+/**
  * Return the last element in an array passing a given truth test.
  *
  * @param {(Array|Object)} items
@@ -218,7 +352,8 @@ const firstObject = (obj: object, callback?: Function | null, dflt?: unknown): u
  * @param {(*|undefined)} dflt
  * @returns {*}
  */
-export const last = (items: unknown[] | object, callback?: Function | null, dflt?: unknown): any => {
+export const last = (items: unknown[] | object, callback?: Function | null,
+    dflt?: unknown): any => {
     if (isNullOrUndefined(callback)) {
         if (Array.isArray(items)) {
             return items.length ? items[items.length - 1] : value(dflt);
@@ -274,51 +409,6 @@ export const flatten = (array: unknown[] | object, depth: number = Infinity): un
     }
 
     return result;
-};
-
-/**
- * Remove one or many object properties from a given object using "dot"
- * notation.
- *
- * @param {Object} obj
- * @param {?(string[]|string|undefined)} keys
- * @returns {void}
- */
-export const forget = (obj: object, keys?: string[] | string): void => {
-    const original = obj;
-
-    keys = wrap(keys) as string[];
-
-    if (keys.length === 0) return;
-
-    // eslint-disable-next-line no-labels
-    loop1:
-    for (const key of keys) {
-        // If the exact key exists in the top-level, remove it
-        if (exists(obj, key)) {
-            delete obj[key];
-
-            continue;
-        }
-
-        const parts = key.split('.');
-
-        // Clean up before each pass
-        obj = original;
-
-        while (parts.length > 1) {
-            const part = parts.shift() as string;
-
-            // eslint-disable-next-line max-depth
-            if (obj.hasOwnProperty(part) && isObject(obj[part])) {
-                obj = obj[part];
-            } else {
-                continue loop1;
-            }
-        }
-
-        delete obj[parts.shift() as string];
-    }
 };
 
 /**
@@ -417,6 +507,22 @@ export const only = (obj: object, keys: unknown[] | string): object => {
 };
 
 /**
+ * Explode the "value" and "key" arguments passed to "pluck".
+ *
+ * @param {?(string[]|string)} value
+ * @param {(string[]|string|undefined)} key
+ * @returns {*}
+ */
+const explodePluckParameters = (value: string[] | string | null,
+    key?: string[] | string): any => {
+    value = isString(value) ? value.split('.') : value;
+
+    key = isNullOrUndefined(key) || Array.isArray(key) ? key : key.split('.');
+
+    return [value, key];
+};
+
+/**
  * Pluck an array of values from an array.
  *
  * @param {*[]} array
@@ -489,6 +595,35 @@ export const pull = (items: unknown[] | object, key: string | number, dflt?: unk
 };
 
 /**
+ * Return a new array that contains the given number of shuffled elements
+ * from the original array.
+ *
+ * @param {*[]} array
+ * @returns {*[]}
+ */
+const _shuffle = (array: unknown[]): any[] => {
+    array = [...array];
+
+    let currentIndex = array.length;
+    let temporaryValue: unknown;
+    let randomIndex: number;
+
+    // While there remain elements to shuffle
+    while (currentIndex !== 0) {
+        // Pick a remaining element
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
+};
+
+/**
  * Get one or a specified number of random values from an array.
  *
  * @param {*[]} array
@@ -521,55 +656,6 @@ export const random = (array: unknown[], number?: number): any => {
     for (const key of keys) results.push(array[key as number]);
 
     return results;
-};
-
-/**
- * Set an object item to a given value using "dot" notation.
- *
- * If no key is given to the method, the entire object will be replaced.
- *
- * @param {Object} obj
- * @param {?string} key
- * @param {*} value
- * @returns {*}
- */
-export const set = (obj: object, key: string | null, value: unknown): object | unknown => {
-    if (key === null) return value;
-
-    const keys = key.split('.');
-
-    while (keys.length > 1) {
-        key = keys.shift() as string;
-
-        // If the key doesn't exist at this depth, we will just create an
-        // empty array to hold the next value, allowing us to create the
-        // arrays to hold final values at the correct depth. Then we'll keep
-        // digging into the array.
-        if (!obj.hasOwnProperty(key) || !isObject(obj[key])) {
-            obj[key] = {};
-        }
-
-        obj = obj[key];
-    }
-
-    obj[keys.shift() as string] = value;
-
-    return obj;
-};
-
-/**
- * Shuffle the given array or object and return the result.
- *
- * @param {(Array|Object)} items
- * @param {(string|undefined)} seed
- * @returns {*[]}
- */
-export const shuffle = (items: unknown[] | object, seed?: string): unknown[] | object => {
-    if (Array.isArray(items)) {
-        return shuffleArray(items, seed);
-    }
-
-    return shuffleObject(items, seed);
 };
 
 /**
@@ -619,6 +705,21 @@ const shuffleObject = (obj: object, seed?: string): object => {
 
             return acc;
         }, {});
+};
+
+/**
+ * Shuffle the given array or object and return the result.
+ *
+ * @param {(Array|Object)} items
+ * @param {(string|undefined)} seed
+ * @returns {*[]}
+ */
+export const shuffle = (items: unknown[] | object, seed?: string): unknown[] | object => {
+    if (Array.isArray(items)) {
+        return shuffleArray(items, seed);
+    }
+
+    return shuffleObject(items, seed);
 };
 
 /**
@@ -704,103 +805,4 @@ export const where = (array: unknown[] | object, callback: any): unknown[] | obj
 
             return acc;
         }, {});
-};
-
-/**
- * If the given value is not an array and not null, wrap it in one.
- *
- * @param {*} value
- * @returns {*[]}
- */
-export const wrap = (value: unknown): any[] => {
-    if (isNullOrUndefined(value)) {
-        return [];
-    }
-
-    return Array.isArray(value) ? [...value] : [value];
-};
-
-/**
- * Return a new array that contains the given number of shuffled elements
- * from the original array.
- *
- * @param {*[]} array
- * @returns {*[]}
- */
-const _shuffle = (array: unknown[]): any[] => {
-    array = [...array];
-
-    let currentIndex = array.length;
-    let temporaryValue: unknown;
-    let randomIndex: number;
-
-    // While there remain elements to shuffle
-    while (currentIndex !== 0) {
-        // Pick a remaining element
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-};
-
-/**
- * Explode the "value" and "key" arguments passed to "pluck".
- *
- * @param {?(string[]|string)} value
- * @param {(string[]|string|undefined)} key
- * @returns {*}
- */
-const explodePluckParameters = (value: string[] | string | null,
-    key?: string[] | string): any => {
-    value = isString(value) ? value.split('.') : value;
-
-    key = isNullOrUndefined(key) || Array.isArray(key) ? key : key!.split('.');
-
-    return [value, key];
-};
-
-/**
- * Collapse an array of arrays into a single array.
- *
- * @param {*[]} array
- * @returns {*[]}
- */
-const collapseArray = (array: unknown[]): unknown[] => {
-    let results: unknown[] = [];
-
-    for (let values of array) {
-        values = values instanceof Collection ? values.all() : values;
-
-        if (!Array.isArray(values)) continue;
-
-        results = [...results, ...values];
-    }
-
-    return results;
-};
-
-/**
- * Collapse an object of objects into a single object.
- *
- * @param {Object} obj
- * @returns {Object}
- */
-const collapseObject = (obj: object): object => {
-    let results: object = {};
-
-    for (const key of Object.keys(obj)) {
-        const values = obj[key] instanceof Collection ? obj[key].all() : obj[key];
-
-        if (!isObject(values)) continue;
-
-        results = {...results, ...values};
-    }
-
-    return results;
 };

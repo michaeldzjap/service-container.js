@@ -2,10 +2,10 @@ import {
     collapse, crossJoin, except, first, flatten, last, pluck, prepend, pull,
     random, shuffle, where, wrap
 } from './Arr';
-import {isArrayable} from '../Contracts/IArrayable';
-import {isObjectable} from '../Contracts/IObjectable';
-import {isJsonable} from '../Contracts/IJsonable';
-import {isJsonSerializable} from '../Contracts/IJsonSerializable';
+import {isArrayable} from '../Contracts/Arrayable';
+import {isObjectable} from '../Contracts/Objectable';
+import {isJsonable} from '../Contracts/Jsonable';
+import {isJsonSerializable} from '../Contracts/JsonSerializable';
 import {
     isObject, isString, isUndefined, isNull, isInstance, findIndex, findKey,
     inArray, inObject, dataGet, value

@@ -1,9 +1,9 @@
 import Container from './Container';
-import IContextualBindingBuilder from '../Contracts/Container/IContextualBindingBuilder';
+import ContextualBindingBuilderContract from '../Contracts/Container/ContextualBindingBuilder';
 import {wrap} from '../Support/Arr';
 import {isUndefined} from '../Support/helpers';
 
-class ContextualBindingBuilder implements IContextualBindingBuilder {
+class ContextualBindingBuilder implements ContextualBindingBuilderContract {
 
     /**
      * The underlying container instance.
@@ -42,9 +42,9 @@ class ContextualBindingBuilder implements IContextualBindingBuilder {
      * Define the abstract target that depends on the context.
      *
      * @param {string} abstract
-     * @returns {ContextualBindingBuilder}
+     * @returns {this}
      */
-    public needs(abstract: string): ContextualBindingBuilder {
+    public needs(abstract: string): this {
         this._needs = abstract;
 
         return this;

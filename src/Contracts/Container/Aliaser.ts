@@ -1,6 +1,6 @@
 import {Identifier} from '../../types/container';
 
-interface IAliaser {
+interface Aliaser {
 
     /**
      * Alias a type to a different name.
@@ -13,4 +13,4 @@ interface IAliaser {
 
 }
 
-export default IAliaser;
+export default Aliaser;

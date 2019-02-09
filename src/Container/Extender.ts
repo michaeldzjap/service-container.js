@@ -1,8 +1,8 @@
 import Container from './Container';
-import IExtender from '../Contracts/Container/IExtender';
+import ExtenderContract from '../Contracts/Container/Extender';
 import {Identifier} from '../types/container';
 
-class Extender implements IExtender {
+class Extender implements ExtenderContract {
 
     /**
      * The underlying container instance.

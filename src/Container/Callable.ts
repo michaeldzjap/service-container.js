@@ -1,8 +1,8 @@
-import ICallable from '../Contracts/Container/ICallable';
+import CallableContract from '../Contracts/Container/Callable';
 import {isInstance, isInstantiable} from '../Support/helpers';
 import {Instantiable, Instance} from '../types/container';
 
-class Callable<T> implements ICallable<T> {
+class Callable<T> implements CallableContract<T> {
 
     /**
      * The class definition or instance to target.

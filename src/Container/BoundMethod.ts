@@ -108,7 +108,7 @@ class BoundMethod {
      * @returns {Array}
      */
     protected static _getMethodDependencies<T>(container: Container, callback: Callable<T>,
-        parameters: any[] | object = {}): Array<any> {
+        parameters: any[] | object = {}): any[] {
         const dependencies = {};
 
         if (Array.isArray(parameters)) {

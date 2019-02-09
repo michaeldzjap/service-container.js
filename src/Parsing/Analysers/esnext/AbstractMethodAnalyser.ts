@@ -1,9 +1,9 @@
-import IFunctionAnalyser from '../../../Contracts/Parsing/IFunctionAnalyser';
-import IParameterAnalyser from '../../../Contracts/Parsing/IParameterAnalyser';
+import FunctionAnalyser from '../../../Contracts/Parsing/FunctionAnalyser';
+import ParameterAnalyserContract from '../../../Contracts/Parsing/ParameterAnalyser';
 import ParameterAnalyser from './ParameterAnalyser';
 import {isUndefined} from '../../../Support/helpers';
 
-abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
+abstract class AbstractMethodAnalyser implements FunctionAnalyser {
 
     /**
      * The ESTree-compatible abstract syntax tree representing a function.
@@ -22,9 +22,9 @@ abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
     /**
      * The parameter analyser instance.
      *
-     * @var {IParameterAnalyser}
+     * @var {ParameterAnalyser}
      */
-    private _parameterAnalyser: IParameterAnalyser;
+    private _parameterAnalyser: ParameterAnalyserContract;
 
     /**
      * Create a new function analyser instance.
@@ -69,9 +69,9 @@ abstract class AbstractMethodAnalyser implements IFunctionAnalyser {
     /**
      * Get the parameter analyser instance.
      *
-     * @returns {IParameterAnalyser}
+     * @returns {ParameterAnalyser}
      */
-    public getParameterAnalyser(): IParameterAnalyser {
+    public getParameterAnalyser(): ParameterAnalyserContract {
         return this._parameterAnalyser;
     }
 

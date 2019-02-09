@@ -1,6 +1,6 @@
-import IParameterAnalyser from './IParameterAnalyser';
+import ParameterAnalyser from './ParameterAnalyser';
 
-interface IConstructorAnalyser {
+interface FunctionAnalyser {
 
     /**
      * Determine if the function has any parameters.
@@ -19,10 +19,10 @@ interface IConstructorAnalyser {
     /**
      * Get the parameter analyser instance.
      *
-     * @returns {(IParameterAnalyser|undefined)}
+     * @returns {(ParameterAnalyser|undefined)}
      */
-    getParameterAnalyser(): IParameterAnalyser | undefined;
+    getParameterAnalyser(): ParameterAnalyser | undefined;
 
 }
 
-export default IConstructorAnalyser;
+export default FunctionAnalyser;

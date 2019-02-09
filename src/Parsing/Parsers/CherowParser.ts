@@ -1,7 +1,7 @@
-import IParser from '../../Contracts/Parsing/IParser';
+import Parser from '../../Contracts/Parsing/Parser';
 import {parse} from 'cherow';
 
-class CherowParser implements IParser {
+class CherowParser implements Parser {
 
     /**
      * The cherow parser options.

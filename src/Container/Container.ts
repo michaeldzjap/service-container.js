@@ -3,11 +3,11 @@ import Binder from './Binder';
 import BoundMethod from './BoundMethod';
 import Builder from './Builder';
 import Callable from './Callable';
+import ContainerContract from '../Contracts/Container/Container';
 import ContextualBindingBuilder from './ContextualBindingBuilder';
 import ContextualBinder from './ContextualBinder';
 import EntryNotFoundError from './EntryNotFoundError';
 import Extender from './Extender';
-import IContainer from '../Contracts/Container/IContainer';
 import InstanceSharer from './InstanceSharer';
 import MethodBinder from './MethodBinder';
 import Resolver from './Resolver';
@@ -16,7 +16,7 @@ import {wrap} from '../Support/Arr';
 import {Binding, Identifier, Instantiable} from '../types/container';
 import {isInstantiable} from '../Support/helpers';
 
-class Container implements IContainer {
+class Container implements ContainerContract {
 
     /**
      * The current globally available container (if any).

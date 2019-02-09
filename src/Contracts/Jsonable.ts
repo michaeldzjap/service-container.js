@@ -1,6 +1,6 @@
 import {Instance} from '../types/container';
 
-interface IJsonable {
+interface Jsonable {
 
     /**
      * Convert class instance properties to JSON.
@@ -17,8 +17,8 @@ interface IJsonable {
  * @param {Instance} instance
  * @returns {boolean}
  */
-export const isJsonable = <T>(instance: Instance<T>): instance is IJsonable => (
+export const isJsonable = <T>(instance: Instance<T>): instance is Jsonable => (
     Reflect.has(instance, 'toJson')
 );
 
-export default IJsonable;
+export default Jsonable;

@@ -1,8 +1,8 @@
 import Container from './Container';
-import IInstanceSharer from '../Contracts/Container/IInstanceSharer';
+import InstanceSharerContract from '../Contracts/Container/InstanceSharer';
 import {Identifier} from '../types/container';
 
-class InstanceSharer implements IInstanceSharer {
+class InstanceSharer implements InstanceSharerContract {
 
     /**
      * The underlying container instance.

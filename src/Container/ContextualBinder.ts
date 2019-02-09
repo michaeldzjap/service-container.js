@@ -1,10 +1,10 @@
 import Container from './Container';
-import IContextualBinder from '../Contracts/Container/IContextualBinder';
+import ContextualBinderContract from '../Contracts/Container/ContextualBinder';
 import NestedMap from '../Support/NestedMap/.';
 import {isUndefined} from '../Support/helpers';
 import {Identifier} from '../types/container';
 
-class ContextualBinder implements IContextualBinder {
+class ContextualBinder implements ContextualBinderContract {
 
     /**
      * The underlying container instance.

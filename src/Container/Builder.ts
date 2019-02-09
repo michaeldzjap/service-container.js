@@ -1,6 +1,6 @@
 import BindingResolutionError from './BindingResolutionError';
+import BuilderContract from '../Contracts/Container/Builder';
 import Container from './Container';
-import IBuilder from '../Contracts/Container/IBuilder';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {last} from '../Support/Arr';
@@ -9,7 +9,7 @@ import {
 } from '../Support/helpers';
 import {Instantiable} from '../types/container';
 
-class Builder implements IBuilder {
+class Builder implements BuilderContract {
 
     /**
      * The underlying container instance.
@@ -30,7 +30,7 @@ class Builder implements IBuilder {
      *
      * @var {(*|Object)[]}
      */
-    protected _with: Array<any[] | object> = [];
+    protected _with: any | object[] = [];
 
     /**
      * Create a new class binding builder.

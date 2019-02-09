@@ -1,6 +1,6 @@
 import CherowParser from './Parsers/CherowParser';
-import IParser from '../Contracts/Parsing/IParser';
 import Manager from '../Support/Manager';
+import Parser from '../Contracts/Parsing/Parser';
 import {DEFAULT_DRIVER, DRIVERS} from '../constants/parser';
 
 class ParserManager extends Manager {
@@ -28,9 +28,9 @@ class ParserManager extends Manager {
      * Create a new driver insance.
      *
      * @param {string} driver
-     * @returns {IParser}
+     * @returns {Parser}
      */
-    protected _createDriver(driver: string): IParser {
+    protected _createDriver(driver: string): Parser {
         return super._handleDriverCreation(
             driver,
             {[DRIVERS.CHEROW]: this._createCherowParser.bind(this)}
@@ -42,7 +42,7 @@ class ParserManager extends Manager {
      *
      * @returns {CherowParser}
      */
-    private _createCherowParser(): IParser {
+    private _createCherowParser(): Parser {
         const options = {next: true, module: true, experimental: true};
 
         return new CherowParser(options);

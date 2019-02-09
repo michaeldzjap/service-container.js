@@ -1,4 +1,4 @@
-interface IParser {
+interface Parser {
 
     /**
      * Parse the given source.
@@ -10,4 +10,4 @@ interface IParser {
 
 }
 
-export default IParser;
+export default Parser;

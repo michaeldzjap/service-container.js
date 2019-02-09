@@ -1,6 +1,6 @@
 import {Identifier, Instantiable} from '../../types/container';
 
-interface IBinder {
+interface Binder {
 
     /**
      * Determine if the given abstract type has been bound.
@@ -34,4 +34,4 @@ interface IBinder {
 
 }
 
-export default IBinder;
+export default Binder;

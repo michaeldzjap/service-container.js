@@ -1,14 +1,14 @@
-import ContextualBindingBuilder from '../../Container/ContextualBindingBuilder';
+import ContextualBindingBuilderImpl from '../Container/ContextualBindingBuilder';
 
-interface IContextualBindingBuilder {
+interface ContextualBindingBuilder {
 
     /**
      * Define the abstract target that depends on the context.
      *
      * @param {string} abstract
-     * @returns {ContextualBindingBuilder}
+     * @returns {this}
      */
-    needs(abstract: string): ContextualBindingBuilder;
+    needs(abstract: string): ContextualBindingBuilderImpl;
 
     /**
      * Define the implementation for the contextual binding.
@@ -20,4 +20,4 @@ interface IContextualBindingBuilder {
 
 }
 
-export default IContextualBindingBuilder;
+export default ContextualBindingBuilder;

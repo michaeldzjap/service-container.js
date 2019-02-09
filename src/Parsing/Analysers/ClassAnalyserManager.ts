@@ -1,6 +1,6 @@
+import ClassAnalyser from '../../Contracts/Parsing/ClassAnalyser';
 import ES5ClassAnalyser from './es5/ClassAnalyser';
 import ESNextClassAnalyser from './esnext/ClassAnalyser';
-import IClassAnalyser from '../../Contracts/Parsing/IClassAnalyser';
 import Manager from '../../Support/Manager';
 import {TARGET} from '../../constants/.';
 
@@ -38,9 +38,9 @@ class ClassAnalyserManager extends Manager {
      * Create a new driver insance.
      *
      * @param {string} driver
-     * @returns {IClassAnalyser}
+     * @returns {ClassAnalyser}
      */
-    protected _createDriver(driver: string): IClassAnalyser {
+    protected _createDriver(driver: string): ClassAnalyser {
         return super._handleDriverCreation(
             driver,
             {
@@ -55,7 +55,7 @@ class ClassAnalyserManager extends Manager {
      *
      * @returns {ES5ClassAnalyser}
      */
-    private _createES5ClassAnalyser(): IClassAnalyser {
+    private _createES5ClassAnalyser(): ClassAnalyser {
         return new ES5ClassAnalyser(this._ast);
     }
 
@@ -64,7 +64,7 @@ class ClassAnalyserManager extends Manager {
      *
      * @returns {ESNextClassAnalyser}
      */
-    private _createESNextClassAnalyser(): IClassAnalyser {
+    private _createESNextClassAnalyser(): ClassAnalyser {
         return new ESNextClassAnalyser(this._ast);
     }
 

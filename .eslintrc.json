@@ -1,7 +1,8 @@
 {
     "root": true,
     "env": {
-        "shared-node-browser": true,
+        "browser": true,
+        "node": true,
         "commonjs": true,
         "es6": true,
         "jest/globals": true
@@ -223,6 +224,7 @@
         "no-template-curly-in-string": "error",
         "no-throw-literal": "error",
         "no-trailing-spaces": "warn",
+        "no-undef": "off",
         "no-undef-init": "error",
         "no-undefined": "error",
         "no-unmodified-loop-condition": "error",

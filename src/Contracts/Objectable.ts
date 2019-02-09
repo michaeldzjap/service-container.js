@@ -1,6 +1,6 @@
 import {Instance} from '../types/container';
 
-interface IObjectable {
+interface Objectable {
 
     /**
      * Convert class instance properties to a data object.
@@ -17,8 +17,8 @@ interface IObjectable {
  * @param {Instance} instance
  * @returns {boolean}
  */
-export const isObjectable = <T>(instance: Instance<T>): instance is IObjectable => (
+export const isObjectable = <T>(instance: Instance<T>): instance is Objectable => (
     Reflect.has(instance, 'toObject')
 );
 
-export default IObjectable;
+export default Objectable;

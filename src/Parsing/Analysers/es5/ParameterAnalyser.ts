@@ -1,9 +1,9 @@
-import IParameterAnalyser from '../../../Contracts/Parsing/IParameterAnalyser';
 import AbstractParameterAnalyser from '../AbstractParameterAnalyser';
+import ParameterAnalyserContract from '../../../Contracts/Parsing/ParameterAnalyser';
 import ParsingError from '../../ParsingError';
 import {isUndefined} from '../../../Support/helpers';
 
-class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterAnalyser {
+class ParameterAnalyser extends AbstractParameterAnalyser implements ParameterAnalyserContract {
 
     /**
      * The block statement belonging to the function that owns the parameters.

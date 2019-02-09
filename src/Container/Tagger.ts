@@ -1,9 +1,9 @@
 import Container from './Container';
-import ITagger from '../Contracts/Container/ITagger';
+import TaggerContract from '../Contracts/Container/Tagger';
 import {wrap} from '../Support/Arr';
 import {Identifier} from '../types/container';
 
-class Tagger implements ITagger {
+class Tagger implements TaggerContract {
 
     /**
      * The underlying container instance.

@@ -1,9 +1,9 @@
-import IFunctionAnalyser from '../../Contracts/Parsing/IFunctionAnalyser';
-import IParameterAnalyser from '../../Contracts/Parsing/IParameterAnalyser';
+import FunctionAnalyserContract from '../../Contracts/Parsing/FunctionAnalyser';
+import ParameterAnalyserContract from '../../Contracts/Parsing/ParameterAnalyser';
 import ParameterAnalyser from './es5/ParameterAnalyser';
 import ParsingError from '../ParsingError';
 
-class FunctionAnalyser implements IFunctionAnalyser {
+class FunctionAnalyser implements FunctionAnalyserContract {
 
     /**
      * The ESTree-compatible abstract syntax tree representing a function.
@@ -29,9 +29,9 @@ class FunctionAnalyser implements IFunctionAnalyser {
     /**
      * The parameter analyser instance.
      *
-     * @var {IParameterAnalyser}
+     * @var {ParameterAnalyser}
      */
-    private _parameterAnalyser: IParameterAnalyser;
+    private _parameterAnalyser: ParameterAnalyserContract;
 
     /**
      * Create a new function analyser instance.
@@ -76,9 +76,9 @@ class FunctionAnalyser implements IFunctionAnalyser {
     /**
      * Get the parameter analyser instance.
      *
-     * @returns {IParameterAnalyser}
+     * @returns {ParameterAnalyser}
      */
-    public getParameterAnalyser(): IParameterAnalyser {
+    public getParameterAnalyser(): ParameterAnalyserContract {
         return this._parameterAnalyser;
     }
 

@@ -1,6 +1,6 @@
 import ReflectionParameter from '../../Reflection/ReflectionParameter';
 
-interface IReflectionFunction {
+interface ReflectionFunction {
 
     /**
      * Get the name of the reflected function.
@@ -18,4 +18,4 @@ interface IReflectionFunction {
 
 }
 
-export default IReflectionFunction;
+export default ReflectionFunction;

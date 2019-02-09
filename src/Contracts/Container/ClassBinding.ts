@@ -1,6 +1,6 @@
 import {Identifier, Instantiable} from '../../types/container';
 
-interface IClassBinding {
+interface ClassBinding {
 
     /**
      * Get the Closure to be used when building a type.
@@ -13,4 +13,4 @@ interface IClassBinding {
 
 }
 
-export default IClassBinding;
+export default ClassBinding;

@@ -1,6 +1,6 @@
 import {Instantiable, Instance} from '../../types/container';
 
-interface ICallable<T> {
+interface Callable<T> {
 
     /**
      * The class definition or instance.
@@ -41,4 +41,4 @@ interface ICallable<T> {
 
 }
 
-export default ICallable;
+export default Callable;

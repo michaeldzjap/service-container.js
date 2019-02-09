@@ -1,8 +1,8 @@
-import IReflectionFunction from '../Contracts/Reflection/IReflectionFunction';
 import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
+import ReflectionFunction from '../Contracts/Reflection/ReflectionFunction';
 import ReflectionParameter from './ReflectionParameter';
 
-abstract class AbstractReflectionFunction implements IReflectionFunction {
+abstract class AbstractReflectionFunction implements ReflectionFunction {
 
     /**
      * The target the function belongs to.

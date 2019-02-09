@@ -1,6 +1,6 @@
 import {Instance} from '../types/container';
 
-interface IArrayable {
+interface Arrayable {
 
     /**
      * Convert class instance properties to an array.
@@ -17,8 +17,8 @@ interface IArrayable {
  * @param {Instance} instance
  * @returns {boolean}
  */
-export const isArrayable = <T>(instance: Instance<T>): instance is IArrayable => (
+export const isArrayable = <T>(instance: Instance<T>): instance is Arrayable => (
     Reflect.has(instance, 'toArray')
 );
 
-export default IArrayable;
+export default Arrayable;
