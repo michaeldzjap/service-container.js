@@ -2,7 +2,7 @@ import ES5ClassAnalyser from './es5/ClassAnalyser';
 import ESNextClassAnalyser from './esnext/ClassAnalyser';
 import IClassAnalyser from '../../Contracts/Parsing/IClassAnalyser';
 import Manager from '../../Support/Manager';
-import {TARGET} from '../../Constants/.';
+import {TARGET} from '../../constants/.';
 
 class ClassAnalyserManager extends Manager {
 

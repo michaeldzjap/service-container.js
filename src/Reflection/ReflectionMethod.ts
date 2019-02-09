@@ -3,7 +3,7 @@ import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ReflectionClass from './ReflectionClass';
 import ReflectionParameter from './ReflectionParameter';
 import {isNullOrUndefined} from '../Support/helpers';
-import {PARAM_TYPES} from '../Constants/metadata';
+import {PARAM_TYPES} from '../constants/metadata';
 
 class ReflectionMethod extends AbstractReflectionFunction {
 

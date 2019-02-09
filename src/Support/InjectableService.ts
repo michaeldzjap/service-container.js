@@ -2,7 +2,7 @@ import ParameterDescriptor from '../Descriptors/ParameterDescriptor';
 import ClassAnalyserManager from '../Parsing/Analysers/ClassAnalyserManager';
 import ParserManager from '../Parsing/ParserManager';
 import {isUndefined} from './helpers';
-import {PARAM_TYPES} from '../Constants/metadata';
+import {PARAM_TYPES} from '../constants/metadata';
 
 class InjectableService {
 

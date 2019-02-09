@@ -1,5 +1,3 @@
-import {FunctionDeclaration} from 'cherow/dist/types/estree';
-
 import AbstractClassAnalyser from '../AbstractClassAnalyser';
 import FunctionAnalyser from '../FunctionAnalyser';
 import IClassAnalyser from '../../../Contracts/Parsing/IClassAnalyser';
@@ -15,7 +13,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      *
      * @var {FunctionDeclaration}
      */
-    private _ast: FunctionDeclaration;
+    private _ast: any;
 
     /**
      * The constructor analyser instance.
@@ -37,7 +35,7 @@ class ClassAnalyser extends AbstractClassAnalyser implements IClassAnalyser {
      * @constructor
      * @param {FunctionDeclaration} ast
      */
-    public constructor(ast: FunctionDeclaration) {
+    public constructor(ast: any) {
         super();
 
         if (ast.type !== 'FunctionDeclaration') {

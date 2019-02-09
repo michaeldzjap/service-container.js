@@ -1,9 +1,3 @@
-import {
-    AssignmentExpression,
-    BlockStatement,
-    Statement
-} from 'cherow/dist/types/estree';
-
 import IParameterAnalyser from '../../../Contracts/Parsing/IParameterAnalyser';
 import AbstractParameterAnalyser from '../AbstractParameterAnalyser';
 import ParsingError from '../../ParsingError';
@@ -27,7 +21,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * @param {*} target
      * @param {(string|undefined)} name
      */
-    public constructor(ast: any, block: BlockStatement, target: any, name?: string) {
+    public constructor(ast: any, block: any, target: any, name?: string) {
         if (block.type !== 'BlockStatement') {
             throw new ParsingError('Invalid parameter AST provided.');
         }
@@ -43,9 +37,9 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * @param {Object} param
      * @returns {(AssignmentExpression|undefined)}
      */
-    protected _findAssignment(param: {type: string, name: string}): AssignmentExpression | undefined {
+    protected _findAssignment(param: {type: string, name: string}): any {
         const statements = this._block.body
-            .filter((_: Statement): boolean => _.type === 'IfStatement');
+            .filter((_: any): boolean => _.type === 'IfStatement');
 
         for (const statement of statements) {
             const expression = this._filterConsequentBody(
@@ -64,7 +58,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements IParameterA
      * @param {Object} param
      * @returns {(AssignmentExpression|undefined)}
      */
-    private _filterConsequentBody(body: any, param: {type: string, name: string}): AssignmentExpression | undefined {
+    private _filterConsequentBody(body: any, param: {type: string, name: string}): any {
         for (const statement of body) {
             if (statement.expression.type === 'AssignmentExpression'
                 && statement.expression.left.name === param.name) {

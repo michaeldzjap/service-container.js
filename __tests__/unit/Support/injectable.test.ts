@@ -1,6 +1,6 @@
 import injectable from '@src/Support/injectable';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
-import {PARAM_TYPES} from '@src/Constants/metadata';
+import {PARAM_TYPES} from '@src/constants/metadata';
 
 class SimpleStub {}
 

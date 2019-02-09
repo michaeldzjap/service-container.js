@@ -1,5 +1,5 @@
 import InterfaceFactory from '@src/Support/InterfaceFactory';
-import {INTERFACE_SYMBOLS} from '@src/Constants/metadata';
+import {INTERFACE_SYMBOLS} from '@src/constants/metadata';
 
 const IA = InterfaceFactory.make('IContract');
 interface IA {} // eslint-disable-line typescript/no-empty-interface

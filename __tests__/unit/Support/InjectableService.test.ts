@@ -8,7 +8,7 @@ import {
 } from '@helpers/Stubs/ParserStubs';
 import {defineMetadata} from '@helpers/defineMetadata';
 import {isUndefined} from '@src/Support/helpers';
-import {PARAM_TYPES} from '@src/Constants/metadata';
+import {PARAM_TYPES} from '@src/constants/metadata';
 
 const EXPECTED = [
     new ParameterDescriptor({name: 'a', type: Number, position: 0}),

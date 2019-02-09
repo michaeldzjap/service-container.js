@@ -1,10 +1,7 @@
 import CherowParser from './Parsers/CherowParser';
 import IParser from '../Contracts/Parsing/IParser';
 import Manager from '../Support/Manager';
-
-export enum Driver {
-    CHEROW = 'cherow'
-}
+import {DEFAULT_DRIVER, DRIVERS} from '../constants/parser';
 
 class ParserManager extends Manager {
 
@@ -24,7 +21,7 @@ class ParserManager extends Manager {
      * @returns {string}
      */
     public getDefaultDriver(): string {
-        return Driver.CHEROW;
+        return DEFAULT_DRIVER;
     }
 
     /**
@@ -36,7 +33,7 @@ class ParserManager extends Manager {
     protected _createDriver(driver: string): IParser {
         return super._handleDriverCreation(
             driver,
-            {[Driver.CHEROW]: this._createCherowParser.bind(this)}
+            {[DRIVERS.CHEROW]: this._createCherowParser.bind(this)}
         );
     }
 

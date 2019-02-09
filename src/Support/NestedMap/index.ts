@@ -1,6 +1,6 @@
 import ES5NestedMap from './ES5NestedMap';
 import ESNextNestedMap from './ESNextNestedMap';
-import {TARGET} from '../../Constants/.';
+import {TARGET} from '../../constants/.';
 
 export default ((): any => {
     switch (TARGET) {

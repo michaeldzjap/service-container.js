@@ -1,6 +1,6 @@
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {isUndefined} from '@src/Support/helpers';
-import {DESIGN_PARAM_TYPES} from '@src/Constants/metadata';
+import {DESIGN_PARAM_TYPES} from '@src/constants/metadata';
 
 /**
  * Define the type metadata if it not already exists.
