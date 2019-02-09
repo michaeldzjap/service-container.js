@@ -1,6 +1,6 @@
 import Callable from '@src/Container/Callable';
 import Container from '@src/Container/Container';
-import {IContainerContractStub} from '@helpers/Contracts/IContainerContractStub';
+import {ContainerContractStub} from '@helpers/Contracts/ContainerContractStub';
 import {
     ContainerConcreteStub,
     ContainerDefaultValueStub,
@@ -83,7 +83,7 @@ describe('Container', (): void => {
 
     test('abstract to concrete resolution', (): void => {
         const container = new Container;
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
         const instance = container.make(ContainerDependentStub);
 
         expect(instance.impl).toBeInstanceOf(ContainerImplementationStub);
@@ -91,7 +91,7 @@ describe('Container', (): void => {
 
     test('nested dependency resolution', (): void => {
         const container = new Container;
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
         const instance = container.make(ContainerNestedDependentStub);
 
         expect(instance.inner).toBeInstanceOf(ContainerDependentStub);
@@ -394,9 +394,9 @@ describe('Container', (): void => {
         const container = new Container;
 
         // eslint-disable-next-line require-jsdoc
-        const fn = (): void => container.make(IContainerContractStub.key, []);
+        const fn = (): void => container.make(ContainerContractStub.key, []);
 
-        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable.');
+        expect(fn).toThrow('Target [ContainerContractStub] is not instantiable.');
     });
 
     test('binding resolution error message includes build stack', (): void => {
@@ -405,7 +405,7 @@ describe('Container', (): void => {
         // eslint-disable-next-line require-jsdoc
         const fn = (): void => container.make(ContainerTestContextInjectOne, []);
 
-        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable while building [ContainerTestContextInjectOne].');
+        expect(fn).toThrow('Target [ContainerContractStub] is not instantiable while building [ContainerTestContextInjectOne].');
     });
 
     test('call with class references without method throws error', (): void => {
@@ -499,13 +499,13 @@ describe('Container', (): void => {
     test('container can inject different implementations depending on context', (): void => {
         let container = new Container;
 
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStub);
         container.when(ContainerTestContextInjectTwo)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         let one = container.make(ContainerTestContextInjectOne);
@@ -519,13 +519,13 @@ describe('Container', (): void => {
          */
         container = new Container;
 
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStub);
         container.when(ContainerTestContextInjectTwo)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give((container: Container): ContainerImplementationStubTwo => (
                 container.make(ContainerImplementationStubTwo)
             ));
@@ -540,10 +540,10 @@ describe('Container', (): void => {
     test('contextual binding works for existing instanced bindings', (): void => {
         const container = new Container;
 
-        container.instance(IContainerContractStub.key, new ContainerImplementationStub);
+        container.instance(ContainerContractStub.key, new ContainerImplementationStub);
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
@@ -554,10 +554,10 @@ describe('Container', (): void => {
         const container = new Container;
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
-        container.instance(IContainerContractStub.key, new ContainerImplementationStub);
+        container.instance(ContainerContractStub.key, new ContainerImplementationStub);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
             .toBeInstanceOf(ContainerImplementationStubTwo);
@@ -567,10 +567,10 @@ describe('Container', (): void => {
         const container = new Container;
 
         container.instance('stub', new ContainerImplementationStub);
-        container.alias('stub', IContainerContractStub.key);
+        container.alias('stub', ContainerContractStub.key);
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
@@ -581,11 +581,11 @@ describe('Container', (): void => {
         const container = new Container;
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         container.instance('stub', new ContainerImplementationStub);
-        container.alias('stub', IContainerContractStub.key);
+        container.alias('stub', ContainerContractStub.key);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
             .toBeInstanceOf(ContainerImplementationStubTwo);
@@ -595,11 +595,11 @@ describe('Container', (): void => {
         const container = new Container;
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         container.bind('stub', ContainerImplementationStub);
-        container.alias('stub', IContainerContractStub.key);
+        container.alias('stub', ContainerContractStub.key);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
             .toBeInstanceOf(ContainerImplementationStubTwo);
@@ -608,10 +608,10 @@ describe('Container', (): void => {
     test('contextual binding works for multiple classes', (): void => {
         const container = new Container;
 
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
 
         container.when([ContainerTestContextInjectTwo, ContainerTestContextInjectThree])
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         expect(container.make(ContainerTestContextInjectOne).impl)
@@ -626,10 +626,10 @@ describe('Container', (): void => {
         const container = new Container;
 
         container.instance('stub', new ContainerImplementationStub);
-        container.alias('stub', IContainerContractStub.key);
+        container.alias('stub', ContainerContractStub.key);
 
         container.when(ContainerTestContextInjectTwo)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerImplementationStubTwo);
 
         expect(container.make(ContainerTestContextInjectTwo).impl)
@@ -643,13 +643,13 @@ describe('Container', (): void => {
 
         const container = new Container;
 
-        container.instance(IContainerContractStub.key, new ContainerImplementationStub);
+        container.instance(ContainerContractStub.key, new ContainerImplementationStub);
         container.instance(ContainerTestContextInjectInstantiations, new ContainerTestContextInjectInstantiations);
 
         expect(ContainerTestContextInjectInstantiations.instantiations).toBe(1);
 
         container.when(ContainerTestContextInjectOne)
-            .needs(IContainerContractStub.key)
+            .needs(ContainerContractStub.key)
             .give(ContainerTestContextInjectInstantiations);
 
         container.make(ContainerTestContextInjectOne);
@@ -805,8 +805,8 @@ describe('Container', (): void => {
     test('contextual binding works with aliased targets', (): void => {
         const container = new Container;
 
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
-        container.alias(IContainerContractStub.key, 'interface-stub');
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+        container.alias(ContainerContractStub.key, 'interface-stub');
 
         container.alias(ContainerImplementationStub, 'stub-1');
 
@@ -849,8 +849,8 @@ describe('Container', (): void => {
 
     test('resolving with using an interface', (): void => {
         const container = new Container;
-        container.bind(IContainerContractStub.key, ContainerInjectVariableStubWithInterfaceImplementation);
-        const instance = container.make(IContainerContractStub.key, {something: 'Riley Martin'});
+        container.bind(ContainerContractStub.key, ContainerInjectVariableStubWithInterfaceImplementation);
+        const instance = container.make(ContainerContractStub.key, {something: 'Riley Martin'});
 
         expect(instance.something).toBe('Riley Martin');
     });
@@ -894,16 +894,16 @@ describe('Container', (): void => {
 
     test('can build without parameter stack with constructors', (): void => {
         const container = new Container;
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
 
         expect(container.build(ContainerDependentStub)).toBeInstanceOf(ContainerDependentStub);
     });
 
     test('container knows entry', (): void => {
         const container = new Container;
-        container.bind(IContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
 
-        expect(container.has(IContainerContractStub.key)).toBeTruthy();
+        expect(container.has(ContainerContractStub.key)).toBeTruthy();
     });
 
     test('container can bind any word', (): void => {
@@ -935,12 +935,12 @@ describe('Container', (): void => {
 
     test('bound entries throws container error when not resolvable', (): void => {
         const container = new Container;
-        container.bind('Riley Martin', IContainerContractStub.key);
+        container.bind('Riley Martin', ContainerContractStub.key);
 
         // eslint-disable-next-line require-jsdoc
         const fn = (): unknown => container.get('Riley Martin');
 
-        expect(fn).toThrow('Target [IContainerContractStub] is not instantiable.');
+        expect(fn).toThrow('Target [ContainerContractStub] is not instantiable.');
     });
 
     test('container can resolve classes', (): void => {

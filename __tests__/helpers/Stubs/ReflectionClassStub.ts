@@ -1,5 +1,5 @@
 import injectable from '@src/Support/injectable';
-import {IReflectionClassContractStub} from '@helpers/Contracts/IReflectionClassContractStub';
+import {ReflectionClassContractStub} from '@helpers/Contracts/ReflectionClassContractStub';
 
 export class DependencyStub {}
 
@@ -8,10 +8,10 @@ class ReflectionClassStub {
 
     private _dependency: DependencyStub;
     private _name: string;
-    private _impl: IReflectionClassContractStub;
+    private _impl: ReflectionClassContractStub;
 
     public constructor(stub: DependencyStub, name: string = 'Riley Martin',
-        @IReflectionClassContractStub impl: IReflectionClassContractStub) {
+        @ReflectionClassContractStub impl: ReflectionClassContractStub) {
         this._dependency = stub;
         this._name = name;
         this._impl = impl;

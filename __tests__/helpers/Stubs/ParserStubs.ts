@@ -1,4 +1,4 @@
-import {IParserContractStub} from '@helpers/Contracts/IParserContractStub';
+import {ParserContractStub} from '@helpers/Contracts/ParserContractStub';
 
 export class SimpleStub {}
 
@@ -6,11 +6,11 @@ export class ClassWithConstructorStub {
 
     private _a: number;
     private _b: string;
-    private _c: Array<number>;
-    private _d: IParserContractStub;
+    private _c: number[];
+    private _d: ParserContractStub;
 
-    public constructor(a: number, b: string = 'Hey now!', c: Array<number> = [1, 2, 3],
-        @IParserContractStub d: IParserContractStub) {
+    public constructor(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+        @ParserContractStub d: ParserContractStub) {
         this._a = a;
         this._b = b;
         this._c = c;
@@ -41,8 +41,8 @@ export class ClassWithoutBodyStub {}
 
 export class ClassWithPublicMethodStub {
 
-    public someMethod(a: number, b: string = 'Hey now!', c: Array<number> = [1, 2, 3],
-        @IParserContractStub d: IParserContractStub): void {
+    public someMethod(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+        @ParserContractStub d: ParserContractStub): void {
         //
     }
 
@@ -50,8 +50,8 @@ export class ClassWithPublicMethodStub {
 
 export class ClassWithPublicStaticMethodStub {
 
-    public static someMethod(a: number, b: string = 'Hey now!', c: Array<number> = [1, 2, 3],
-        @IParserContractStub d: IParserContractStub): void {
+    public static someMethod(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+        @ParserContractStub d: ParserContractStub): void {
         //
     }
 

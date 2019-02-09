@@ -1,18 +1,18 @@
 import injectable from '@src/Support/injectable';
-import {IContainerContractStub} from '@helpers/Contracts/IContainerContractStub';
+import {ContainerContractStub} from '@helpers/Contracts/ContainerContractStub';
 
 export class ContainerConcreteStub {}
 
-export class ContainerImplementationStub implements IContainerContractStub {}
+export class ContainerImplementationStub implements ContainerContractStub {}
 
-export class ContainerImplementationStubTwo implements IContainerContractStub {}
+export class ContainerImplementationStubTwo implements ContainerContractStub {}
 
 @injectable()
 export class ContainerDependentStub {
 
-    public impl: IContainerContractStub;
+    public impl: ContainerContractStub;
 
-    public constructor(@IContainerContractStub impl: IContainerContractStub) {
+    public constructor(@ContainerContractStub impl: ContainerContractStub) {
         this.impl = impl;
     }
 
@@ -69,7 +69,7 @@ export class ContainerMixedPrimitiveStub {
 
 export class ContainerTestCallStub {
 
-    public work(...args: Array<any>): Array<any> {
+    public work(...args: any[]): any[] {
         return args;
     }
 
@@ -88,9 +88,9 @@ export class ContainerTestCallStub {
 @injectable()
 export class ContainerTestContextInjectOne {
 
-    public impl: IContainerContractStub;
+    public impl: ContainerContractStub;
 
-    public constructor(@IContainerContractStub impl: IContainerContractStub) {
+    public constructor(@ContainerContractStub impl: ContainerContractStub) {
         this.impl = impl;
     }
 
@@ -99,9 +99,9 @@ export class ContainerTestContextInjectOne {
 @injectable()
 export class ContainerTestContextInjectTwo {
 
-    public impl: IContainerContractStub;
+    public impl: ContainerContractStub;
 
-    public constructor(@IContainerContractStub impl: IContainerContractStub) {
+    public constructor(@ContainerContractStub impl: ContainerContractStub) {
         this.impl = impl;
     }
 
@@ -110,9 +110,9 @@ export class ContainerTestContextInjectTwo {
 @injectable()
 export class ContainerTestContextInjectThree {
 
-    public impl: IContainerContractStub;
+    public impl: ContainerContractStub;
 
-    public constructor(@IContainerContractStub impl: IContainerContractStub) {
+    public constructor(@ContainerContractStub impl: ContainerContractStub) {
         this.impl = impl;
     }
 
@@ -139,7 +139,7 @@ export class ContainerInjectVariableStub {
 }
 
 @injectable()
-export class ContainerInjectVariableStubWithInterfaceImplementation implements IContainerContractStub {
+export class ContainerInjectVariableStubWithInterfaceImplementation implements ContainerContractStub {
 
     public something: unknown;
 
@@ -149,7 +149,7 @@ export class ContainerInjectVariableStubWithInterfaceImplementation implements I
 
 }
 
-export class ContainerTestContextInjectInstantiations implements IContainerContractStub {
+export class ContainerTestContextInjectInstantiations implements ContainerContractStub {
 
     public static instantiations: number;
 

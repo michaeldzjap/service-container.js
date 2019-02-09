@@ -1,9 +1,53 @@
 import Collection from '@src/Support/Collection';
-import IArrayable from '@src/Contracts/IArrayable';
-import IJsonable from '@src/Contracts/IJsonable';
-import IJsonSerializable from '@src/Contracts/IJsonSerializable';
-import IObjectable from '@src/Contracts/IObjectable';
+import Arrayable from '@src/Contracts/Arrayable';
+import Jsonable from '@src/Contracts/Jsonable';
+import JsonSerializable from '@src/Contracts/JsonSerializable';
+import Objectable from '@src/Contracts/Objectable';
 import {isString, reverse} from '@src/Support/helpers';
+
+class TestArrayableObject implements Arrayable {
+
+    public toArray(): number[] {
+        return [1, 2, 3];
+    }
+
+}
+
+class TestObjectableObject implements Objectable {
+
+    public toObject(): object {
+        return {foo: 'bar'};
+    }
+
+}
+
+class TestJsonableObject implements Jsonable {
+
+    public toJson(): string {
+        return '{"foo":"bar"}';
+    }
+
+}
+
+class TestJsonSerializeObject implements JsonSerializable {
+
+    public jsonSerialize(): object {
+        return {foo: 'bar'};
+    }
+
+}
+
+class TestCollectionMapIntoObject {
+
+    public value: string;
+
+    public constructor(value: string) {
+        this.value = value;
+    }
+
+}
+
+class TestCollectionSubclass extends Collection {}
 
 // eslint-disable-next-line max-statements
 describe('Collection', (): void => {
@@ -1713,47 +1757,3 @@ describe('Collection', (): void => {
             .toEqual([]);
     });
 });
-
-class TestArrayableObject implements IArrayable {
-
-    public toArray(): number[] {
-        return [1, 2, 3];
-    }
-
-}
-
-class TestObjectableObject implements IObjectable {
-
-    public toObject(): object {
-        return {foo: 'bar'};
-    }
-
-}
-
-class TestJsonableObject implements IJsonable {
-
-    public toJson(): string {
-        return '{"foo":"bar"}';
-    }
-
-}
-
-class TestJsonSerializeObject implements IJsonSerializable {
-
-    public jsonSerialize(): object {
-        return {foo: 'bar'};
-    }
-
-}
-
-class TestCollectionMapIntoObject {
-
-    public value: string;
-
-    public constructor(value: string) {
-        this.value = value;
-    }
-
-}
-
-class TestCollectionSubclass extends Collection {}
