@@ -1,7 +1,7 @@
 import isEqual from 'lodash.isequal';
 
 import {accessible, collapse, exists} from './Arr';
-import {Instantiable, Instance} from './types';
+import {Instantiable, Instance} from '../types/container';
 
 /**
  * Determine if the given value is undefined.
