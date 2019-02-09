@@ -8,11 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <details>
     <summary>Unreleased changes. Click to see more.</summary>
-    <p>
-        ### Changed
-
-        - `Collection` and `Arr` functionality are moved to a separate package.
-    </p>
+    - `Collection` and `Arr` functionality are moved to a separate package.
 </details>
 
 ## [0.1.2] - 2019-02-09
