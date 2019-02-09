@@ -1,4 +1,4 @@
-import {Instantiable} from '../../Support/types';
+import {Instantiable} from '../../types/container';
 
 interface IBuilder {
 

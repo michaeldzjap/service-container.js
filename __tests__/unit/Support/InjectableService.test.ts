@@ -1,4 +1,5 @@
 import InjectableService from '@src/Support/InjectableService';
+import Interface from '@src/Support/Interface';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {
     ClassWithConstructorStub,
@@ -7,7 +8,6 @@ import {
 } from '@helpers/Stubs/ParserStubs';
 import {defineMetadata} from '@helpers/defineMetadata';
 import {isUndefined} from '@src/Support/helpers';
-import {Interface} from '@src/Support/types';
 import {PARAM_TYPES} from '@src/Constants/metadata';
 
 const EXPECTED = [

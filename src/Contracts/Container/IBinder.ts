@@ -1,4 +1,4 @@
-import {Identifier, Instantiable} from '../../Support/types';
+import {Identifier, Instantiable} from '../../types/container';
 
 interface IBinder {
 

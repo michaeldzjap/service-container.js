@@ -1,10 +1,10 @@
+import Interface from '@src/Support/Interface';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import ReflectionClass from '@src/Reflection/ReflectionClass';
 import ReflectionParameter from '@src/Reflection/ReflectionParameter';
 import ReflectionType from '@src/Reflection/ReflectionType';
 import ReflectionClassStub, {DependencyStub} from '@helpers/Stubs/ReflectionClassStub';
-import {isNullOrUndefined} from '@src/Support/helpers';
-import {Interface} from '@src/Support/types';
+import {isUndefined} from '@src/Support/helpers';
 
 describe('ReflectionParameter', (): void => {
     const DATA_PROVIDER = [
@@ -41,7 +41,7 @@ describe('ReflectionParameter', (): void => {
         it(`returns the type of the reflected [${param.name}] parameter as a reflection class instance`, (): void => {
             const type = reflector.getClass();
 
-            if (!isNullOrUndefined(type)) {
+            if (!isUndefined(type)) {
                 expect(type).toBeInstanceOf(ReflectionClass);
                 expect(type.getName()).toBe(className);
             }

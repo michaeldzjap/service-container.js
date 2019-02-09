@@ -1,4 +1,5 @@
 import ES5ClassAnalyser from '@src/Parsing/Analysers/es5/ClassAnalyser';
+import Interface from '@src/Support/Interface';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {
     ClassWithConstructorStub,
@@ -8,7 +9,6 @@ import {
     ClassWithPublicStaticMethodStub
 } from '@helpers/Stubs/ParserStubs';
 import {defineMetadata} from '@helpers/defineMetadata';
-import {Interface} from '@src/Support/types';
 import * as ES5ClassWithConstructorStub from '@helpers/Stubs/es5/ClassWithConstructorStub.json';
 import * as ES5ClassWithoutConstructorStub from '@helpers/Stubs/es5/ClassWithoutConstructorStub.json';
 import * as ES5ClassWithoutBodyStub from '@helpers/Stubs/es5/ClassWithoutBodyStub.json';

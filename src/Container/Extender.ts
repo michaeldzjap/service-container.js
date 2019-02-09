@@ -1,6 +1,6 @@
 import Container from './Container';
 import IExtender from '../Contracts/Container/IExtender';
-import {Identifier} from '../Support/types';
+import {Identifier} from '../types/container';
 
 class Extender implements IExtender {
 

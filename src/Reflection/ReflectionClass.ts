@@ -1,7 +1,7 @@
+import Interface from '../Support/Interface';
 import ReflectionError from './ReflectionError';
 import ReflectionMethod from './ReflectionMethod';
-import {isSymbol, isString, isNullOrUndefined, getSymbolName} from '../Support/helpers';
-import {Interface} from '../Support/types';
+import {isSymbol, isString, getSymbolName} from '../Support/helpers';
 
 class ReflectionClass {
 
@@ -31,7 +31,7 @@ class ReflectionClass {
     }
 
     /**
-     * Create a new reflection instance from a symbol representing an interface.
+     * Create a new reflection instance from an interface instance.
      *
      * @param {Interface} contract
      * @returns {ReflectionClass}

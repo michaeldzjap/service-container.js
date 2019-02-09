@@ -2,7 +2,7 @@ import Callable from './Callable';
 import Container from './Container';
 import ReflectionMethod from '../Reflection/ReflectionMethod';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
-import {Identifier, Instantiable} from '../Support/types';
+import {Identifier, Instantiable} from '../types/container';
 import {isUndefined, isInstantiable} from '../Support/helpers';
 
 class BoundMethod {

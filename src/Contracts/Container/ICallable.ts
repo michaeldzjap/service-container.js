@@ -1,4 +1,4 @@
-import {Instantiable, Instance} from '../../Support/types';
+import {Instantiable, Instance} from '../../types/container';
 
 interface ICallable<T> {
 

@@ -2,7 +2,7 @@ import Container from './Container';
 import IContextualBinder from '../Contracts/Container/IContextualBinder';
 import NestedMap from '../Support/NestedMap/.';
 import {isUndefined} from '../Support/helpers';
-import {Identifier} from '../Support/types';
+import {Identifier} from '../types/container';
 
 class ContextualBinder implements IContextualBinder {
 

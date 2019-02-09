@@ -1,7 +1,7 @@
 import Container from './Container';
 import IAliaser from '../Contracts/Container/IAliaser';
 import LogicError from './LogicError';
-import {Identifier} from '../Support/types';
+import {Identifier} from '../types/container';
 
 class Aliaser implements IAliaser {
 

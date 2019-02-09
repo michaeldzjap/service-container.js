@@ -7,7 +7,7 @@ import {last} from '../Support/Arr';
 import {
     isUndefined, isInstantiable, isInstance, getSymbolName
 } from '../Support/helpers';
-import {Instantiable} from '../Support/types';
+import {Instantiable} from '../types/container';
 
 class Builder implements IBuilder {
 

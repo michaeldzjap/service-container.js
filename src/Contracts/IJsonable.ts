@@ -1,4 +1,4 @@
-import {Instance} from '../Support/types';
+import {Instance} from '../types/container';
 
 interface IJsonable {
 

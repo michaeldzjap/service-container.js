@@ -1,6 +1,6 @@
 import ICallable from '../Contracts/Container/ICallable';
 import {isInstance, isInstantiable} from '../Support/helpers';
-import {Instantiable, Instance} from '../Support/types';
+import {Instantiable, Instance} from '../types/container';
 
 class Callable<T> implements ICallable<T> {
 

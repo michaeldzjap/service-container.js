@@ -1,6 +1,6 @@
 import Container from './Container';
 import IMethodBinder from '../Contracts/Container/IMethodBinder';
-import {Instantiable} from '../Support/types';
+import {Instantiable} from '../types/container';
 
 class MethodBinder implements IMethodBinder {
 

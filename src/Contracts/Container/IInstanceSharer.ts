@@ -1,4 +1,4 @@
-import {Identifier} from '../../Support/types';
+import {Identifier} from '../../types/container';
 
 interface IInstanceSharer {
 

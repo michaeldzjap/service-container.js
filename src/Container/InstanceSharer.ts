@@ -1,6 +1,6 @@
 import Container from './Container';
 import IInstanceSharer from '../Contracts/Container/IInstanceSharer';
-import {Identifier} from '../Support/types';
+import {Identifier} from '../types/container';
 
 class InstanceSharer implements IInstanceSharer {
 

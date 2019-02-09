@@ -1,4 +1,5 @@
 import ESNextClassAnalyser from '@src/Parsing/Analysers/esnext/ClassAnalyser';
+import Interface from '@src/Support/Interface';
 import ParameterDescriptor from '@src/Descriptors/ParameterDescriptor';
 import {
     ClassWithConstructorStub,
@@ -8,7 +9,6 @@ import {
     ClassWithPublicStaticMethodStub
 } from '@helpers/Stubs/ParserStubs';
 import {defineMetadata} from '@helpers/defineMetadata';
-import {Interface} from '@src/Support/types';
 import * as ESNextClassWithConstructorStub from '@helpers/Stubs/esnext/ClassWithConstructorStub.json';
 import * as ESNextClassWithoutConstructorStub from '@helpers/Stubs/esnext/ClassWithoutConstructorStub.json';
 import * as ESNextClassWithoutBodyStub from '@helpers/Stubs/esnext/ClassWithoutBodyStub.json';

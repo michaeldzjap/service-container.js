@@ -6,7 +6,7 @@ import IExtender from './IExtender';
 import IInstanceSharer from './IInstanceSharer';
 import IResolver from './IResolver';
 import ITagger from './ITagger';
-import {Identifier, Instantiable} from '../../Support/types';
+import {Identifier, Instantiable} from '../../types/container';
 
 interface IContainer extends IAliaser, IBinder, IExtender, IInstanceSharer, IResolver, ITagger {
 

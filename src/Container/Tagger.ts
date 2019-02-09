@@ -1,7 +1,7 @@
 import Container from './Container';
 import ITagger from '../Contracts/Container/ITagger';
 import {wrap} from '../Support/Arr';
-import {Identifier} from '../Support/types';
+import {Identifier} from '../types/container';
 
 class Tagger implements ITagger {
 

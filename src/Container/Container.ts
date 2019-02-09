@@ -13,7 +13,7 @@ import MethodBinder from './MethodBinder';
 import Resolver from './Resolver';
 import Tagger from './Tagger';
 import {wrap} from '../Support/Arr';
-import {Binding, Identifier, Instantiable} from '../Support/types';
+import {Binding, Identifier, Instantiable} from '../types/container';
 import {isInstantiable} from '../Support/helpers';
 
 class Container implements IContainer {

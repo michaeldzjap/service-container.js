@@ -1,8 +1,8 @@
 import ExpressionCollector from './ExpressionCollector';
+import Interface from '../../Support/Interface';
 import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import ParsingError from '../ParsingError';
 import {isUndefined, getName} from '../../Support/helpers';
-import {Interface} from '../../Support/types';
 import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../Constants/metadata';
 
 abstract class AbstractParameterAnalyser {

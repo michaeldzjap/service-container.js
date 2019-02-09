@@ -3,7 +3,7 @@ import ClassBinding from './ClassBinding';
 import Container from './Container';
 import IBinder from '../Contracts/Container/IBinder';
 import {isNullOrUndefined, isInstantiable} from '../Support/helpers';
-import {Binding, Identifier, Instantiable} from '../Support/types';
+import {Binding, Identifier, Instantiable} from '../types/container';
 
 class Binder implements IBinder {
 
