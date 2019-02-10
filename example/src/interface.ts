@@ -1,30 +1,30 @@
 import {Container, InterfaceFactory, injectable} from '../../dist/service-container';
 
-const IContract = InterfaceFactory.make('IContract');
+const Contract = InterfaceFactory.make('Contract');
 
-// eslint-disable-next-line typescript/no-empty-interface
-interface IContract {
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface Contract {
     //
 }
 
 @injectable()
 class A {
 
-    private _impl: IContract;
+    private _impl: Contract;
 
-    public constructor(@IContract impl: IContract) {
+    public constructor(@Contract impl: Contract) {
         this._impl = impl;
     }
 
-    public get impl(): IContract {
+    public get impl(): Contract {
         return this._impl;
     }
 
 }
 
-class B implements IContract {}
+class B implements Contract {}
 
 const container = new Container;
 
-container.bind(IContract.key, B);
+container.bind(Contract.key, B);
 const a = container.make(A); // a.impl --> B {}

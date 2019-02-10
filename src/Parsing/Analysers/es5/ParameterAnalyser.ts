@@ -2,6 +2,7 @@ import AbstractParameterAnalyser from '../AbstractParameterAnalyser';
 import ParameterAnalyserContract from '../../../Contracts/Parsing/ParameterAnalyser';
 import ParsingError from '../../ParsingError';
 import {isUndefined} from '../../../Support/helpers';
+import {Param} from '../../../types/estree';
 
 class ParameterAnalyser extends AbstractParameterAnalyser implements ParameterAnalyserContract {
 
@@ -37,7 +38,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements ParameterAn
      * @param {Object} param
      * @returns {(AssignmentExpression|undefined)}
      */
-    protected _findAssignment(param: {type: string, name: string}): any {
+    protected _findAssignment(param: Param): any {
         const statements = this._block.body
             .filter((_: any): boolean => _.type === 'IfStatement');
 
@@ -58,7 +59,7 @@ class ParameterAnalyser extends AbstractParameterAnalyser implements ParameterAn
      * @param {Object} param
      * @returns {(AssignmentExpression|undefined)}
      */
-    private _filterConsequentBody(body: any, param: {type: string, name: string}): any {
+    private _filterConsequentBody(body: any, param: Param): any {
         for (const statement of body) {
             if (statement.expression.type === 'AssignmentExpression'
                 && statement.expression.left.name === param.name) {

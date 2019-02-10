@@ -1,22 +1,22 @@
 import InterfaceFactory from '@src/Support/InterfaceFactory';
 import {INTERFACE_SYMBOLS} from '@src/constants/metadata';
 
-const IA = InterfaceFactory.make('IContract');
-interface IA {} // eslint-disable-line typescript/no-empty-interface
+const AContract = InterfaceFactory.make('Contract');
+interface AContract {} // eslint-disable-line @typescript-eslint/no-empty-interface
 
-const IB = InterfaceFactory.make('IContract');
-interface IB {} // eslint-disable-line typescript/no-empty-interface
+const BContract = InterfaceFactory.make('Contract');
+interface BContract {} // eslint-disable-line @typescript-eslint/no-empty-interface
 
 describe('InterfaceFactory', (): void => {
     it('verifies that identically named interfaces have a unique identifier', (): void => {
-        expect(IA.key).not.toBe(IB.key);
+        expect(AContract.key).not.toBe(BContract.key);
     });
 
     it('generates the correct metadata when decorating a method parameter', (): void => {
         class A {
 
             // eslint-disable-next-line no-useless-constructor
-            public constructor(a: string, @IA b: IA) {
+            public constructor(a: string, @AContract b: AContract) {
                 //
             }
 
@@ -25,8 +25,8 @@ describe('InterfaceFactory', (): void => {
         const metadata = Reflect.getMetadata(INTERFACE_SYMBOLS, A);
 
         expect(metadata.has(1)).toBeTruthy();
-        expect(metadata.get(1)).toBe(IA.key);
-        expect(metadata.get(1)).not.toBe(IB.key);
+        expect(metadata.get(1)).toBe(AContract.key);
+        expect(metadata.get(1)).not.toBe(BContract.key);
     });
 
     it('fails when attempting to decorate a method parameter multiple times', (): void => {
@@ -34,14 +34,14 @@ describe('InterfaceFactory', (): void => {
             class A {
 
                 // eslint-disable-next-line no-useless-constructor
-                public constructor(@IA@IA a: IA) {
+                public constructor(@AContract@AContract a: AContract) {
                     //
                 }
 
             }
         } catch (e) {
             expect(e).toBeInstanceOf(Error);
-            expect(e.message).toBe('Cannot apply @IContract decorator to the same parameter multiple times.');
+            expect(e.message).toBe('Cannot apply @Contract decorator to the same parameter multiple times.');
         }
     });
 
@@ -50,14 +50,14 @@ describe('InterfaceFactory', (): void => {
             class A {
 
                 // eslint-disable-next-line no-useless-constructor
-                public constructor(@IA a: IA, @IA b: IA) {
+                public constructor(@AContract a: AContract, @AContract b: AContract) {
                     //
                 }
 
             }
         } catch (e) {
             expect(e).toBeInstanceOf(Error);
-            expect(e.message).toBe('Injecting the same [IContract] interface multiple times is redundant.');
+            expect(e.message).toBe('Injecting the same [Contract] interface multiple times is redundant.');
         }
     });
 });

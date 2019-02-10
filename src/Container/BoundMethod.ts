@@ -128,6 +128,8 @@ class BoundMethod {
         return (Object as any).values({...dependencies, ...parameters});
     }
 
+    /* eslint-disable  @typescript-eslint/no-non-null-assertion */
+
     /**
      * Get the dependency for the given call parameter.
      *
@@ -155,6 +157,8 @@ class BoundMethod {
             dependencies[parameter.getName()] = parameter.getDefaultValue();
         }
     }
+
+    /* eslint-enable  @typescript-eslint/no-non-null-assertion */
 
     /**
      * Get the proper reflection instance for the given callback.

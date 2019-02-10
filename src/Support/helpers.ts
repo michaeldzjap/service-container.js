@@ -269,6 +269,7 @@ export const value = (value: unknown): unknown => (
 export const dataGet = (target: any, key?: string[] | string | null, dflt?: unknown): any => {
     if (isNullOrUndefined(key)) return target;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     key = Array.isArray(key) ? [...key] : key!.split('.');
 
     let segment = key.shift();

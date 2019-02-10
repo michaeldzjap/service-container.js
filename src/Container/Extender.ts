@@ -53,6 +53,7 @@ class Extender implements ExtenderContract {
             this._container.rebound<T>(abstract);
         } else {
             this._extenders.has(abstract)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 ? this._extenders.get(abstract)!.push(closure)
                 : this._extenders.set(abstract, [closure]);
 

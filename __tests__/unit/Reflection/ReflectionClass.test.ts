@@ -29,7 +29,7 @@ describe('ReflectionClass', (): void => {
         [
             {className: 'DependencyStub', name: 'stub'},
             {className: 'String', name: 'name', value: 'Riley Martin'},
-            {className: 'IReflectionClassContractStub', name: 'impl'},
+            {className: 'ReflectionClassContractStub', name: 'impl'},
         ].forEach(({className, name, value}, i: number): void => {
             expect(parameters[i]).toBeInstanceOf(ReflectionParameter);
             expect(parameters[i].getType()).toBeInstanceOf(ReflectionType);
@@ -37,6 +37,7 @@ describe('ReflectionClass', (): void => {
             if (parameters[i].getType().isBuiltin()) {
                 expect(parameters[i].getClass()).toBeUndefined();
             } else {
+                // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
                 expect(parameters[i].getClass()!.getName()).toBe(className);
             }
 

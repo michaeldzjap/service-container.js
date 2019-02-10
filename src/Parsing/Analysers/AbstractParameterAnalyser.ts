@@ -4,6 +4,7 @@ import ParameterDescriptor from '../../Descriptors/ParameterDescriptor';
 import ParsingError from '../ParsingError';
 import {isUndefined, getName} from '../../Support/helpers';
 import {DESIGN_PARAM_TYPES, INTERFACE_SYMBOLS} from '../../constants/metadata';
+import {Param} from '../../types/estree';
 
 abstract class AbstractParameterAnalyser {
 
@@ -72,7 +73,7 @@ abstract class AbstractParameterAnalyser {
      */
     public all(): ParameterDescriptor[] {
         return this._ast
-            .map((param: any, i: number): ParameterDescriptor => (
+            .map((param: Param, i: number): ParameterDescriptor => (
                 this._makeDescriptor(param, this._types[i], i)
             ));
     }
@@ -121,12 +122,12 @@ abstract class AbstractParameterAnalyser {
     /**
      * Create a new parameter descriptor for the given parameter and type.
      *
-     * @param {Object} param
+     * @param {Param} param
      * @param {*} type
      * @param {number} position
      * @returns {ParameterDescriptor}
      */
-    protected _makeDescriptor(param: any, type: any, position: number): ParameterDescriptor {
+    protected _makeDescriptor(param: Param, type: any, position: number): ParameterDescriptor {
         const assignment = this._findAssignment(param);
 
         if (!isUndefined(assignment)) {

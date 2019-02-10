@@ -63,6 +63,7 @@ class ContextualBinder implements ContextualBinderContract {
         // contextual bindings on these.
         if (!manager.hasAbstractAlias(abstract)
             || (manager.hasAbstractAlias(abstract)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 && !manager.getAbstractAlias(abstract)!.length)) {
             return;
         }

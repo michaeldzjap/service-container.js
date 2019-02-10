@@ -41,6 +41,7 @@ class Tagger implements TaggerContract {
             if (!this._tags.has(tag)) this._tags.set(tag, []);
 
             for (const abstract of wrap(abstracts)) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 this._tags.get(tag)!.push(abstract);
             }
         }

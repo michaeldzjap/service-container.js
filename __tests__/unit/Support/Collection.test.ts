@@ -77,7 +77,10 @@ describe('Collection', (): void => {
     });
 
     test('first where', (): void => {
-        type Item = {material: string, type: string};
+        interface Item {
+            material: string;
+            type: string;
+        }
 
         const data = new Collection([
             {material: 'paper', type: 'book'},
@@ -242,9 +245,14 @@ describe('Collection', (): void => {
     });
 
     test('filter', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         let c = new Collection([{id: 1, name: 'Hey'}, {id: 2, name: 'Now'}]);
         expect(
-            c.filter((item: {id: number, name: string}): boolean => item.id === 2).all()
+            c.filter((item: Item): boolean => item.id === 2).all()
         ).toEqual([{id: 2, name: 'Now'}]);
 
         c = new Collection(['', 'Hey', '', 'Now']);
@@ -330,9 +338,14 @@ describe('Collection', (): void => {
     });
 
     test('values', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         const c = new Collection([{id: 1, name: 'Hey'}, {id: 2, name: 'Now'}]);
         expect(
-            c.filter((item: {id: number, name: string}): boolean => item.id === 2).values().all()
+            c.filter((item: Item): boolean => item.id === 2).values().all()
         ).toEqual([{id: 2, name: 'Now'}]);
     });
 
@@ -593,7 +606,13 @@ describe('Collection', (): void => {
             '3': {id: 3, first: 'Jeff', last: 'The Actor'},
         });
 
-        expect(c.unique((item: {id: number, first: string, last: string}): string => (
+        interface Item {
+            id: number;
+            first: string;
+            last: string;
+        }
+
+        expect(c.unique((item: Item): string => (
             `${item.first}${item.last}`
         )).all()).toEqual({
             '1': {id: 1, first: 'Eric', last: 'The Actor'},
@@ -601,7 +620,7 @@ describe('Collection', (): void => {
             '5': {id: 5, first: 'Eric', last: 'The Astronaut'},
         });
 
-        expect(c.unique((item: {id: number, first: string, last: string}, key: string): boolean => (
+        expect(c.unique((item: Item, key: string): boolean => (
             !!(parseInt(key) % 2)
         )).all()).toEqual({
             '1': {id: 1, first: 'Eric', last: 'The Actor'},
@@ -1045,17 +1064,25 @@ describe('Collection', (): void => {
     });
 
     test('flat map', (): void => {
+        interface Item {
+            name: string;
+            hobbies: string[];
+        }
+
         let c = new Collection([
             {name: 'riley', hobbies: ['space', 'aliens']},
             {name: 'eric', hobbies: ['jfsc', 'idol']},
         ]);
-        c = c.flatMap((person: {name: string, hobbies: string[]}): string[] => (
-            person.hobbies
-        ));
+        c = c.flatMap((person: Item): string[] => person.hobbies);
         expect(c.all()).toEqual(['space', 'aliens', 'jfsc', 'idol']);
     });
 
     test('map to dictionary', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         const c = new Collection([
             {id: 1, name: 'A'},
             {id: 2, name: 'B'},
@@ -1063,7 +1090,7 @@ describe('Collection', (): void => {
             {id: 4, name: 'B'},
         ]);
 
-        const groups = c.mapToDictionary((item: {id: string, name: string}, key: string): object => ({
+        const groups = c.mapToDictionary((item: Item): object => ({
             [item.name]: item.id
         }));
 
@@ -1083,6 +1110,11 @@ describe('Collection', (): void => {
     });
 
     test('map to groups', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         const c = new Collection([
             {id: 1, name: 'A'},
             {id: 2, name: 'B'},
@@ -1090,7 +1122,7 @@ describe('Collection', (): void => {
             {id: 4, name: 'B'},
         ]);
 
-        const groups = c.mapToGroups((item: {id: string, name: string}, key: string): object => ({
+        const groups = c.mapToGroups((item: Item): object => ({
             [item.name]: item.id
         }));
 
@@ -1110,36 +1142,51 @@ describe('Collection', (): void => {
     });
 
     test('map with keys', (): void => {
+        interface Wackpacker {
+            name: string;
+            lastname: string;
+        }
+
         let c = new Collection([
             {name: 'Riley', lastname: 'Martin'},
             {name: 'Eric', lastname: 'Lynch'},
             {name: 'Lester', lastname: 'Green'},
         ]);
-        c = c.mapWithKeys((wackpacker: {name: string, lastname: string}): object => ({
+        c = c.mapWithKeys((wackpacker: Wackpacker): object => ({
             [wackpacker.name]: wackpacker.lastname
         }));
         expect(c.all()).toEqual({Riley: 'Martin', Eric: 'Lynch', Lester: 'Green'});
     });
 
     test('map with keys integer keys', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         let c = new Collection([
             {id: 1, name: 'A'},
             {id: 3, name: 'B'},
             {id: 2, name: 'C'},
         ]);
-        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+        c = c.mapWithKeys((item: Item): object => ({
             [item.id.toString()]: item
         }));
         expect(c.keys().all()).toEqual(['1', '2', '3']);
     });
 
     test('map with keys multiple rows', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         let c = new Collection([
             {id: 1, name: 'A'},
             {id: 2, name: 'B'},
             {id: 3, name: 'C'},
         ]);
-        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+        c = c.mapWithKeys((item: Item): object => ({
             [item.id]: item.name, [item.name]: item.id
         }));
         expect(c.all()).toEqual({
@@ -1153,12 +1200,17 @@ describe('Collection', (): void => {
     });
 
     test('map with keys callback key', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         let c = new Collection({
             '3': {id: 1, name: 'A'},
             '5': {id: 3, name: 'B'},
             '4': {id: 2, name: 'C'},
         });
-        c = c.mapWithKeys((item: {id: number, name: string}, key: string): object => ({
+        c = c.mapWithKeys((item: Item, key: string): object => ({
             [key]: item.id
         }));
         expect(c.keys().all()).toEqual(['3', '4', '5']);
@@ -1174,12 +1226,17 @@ describe('Collection', (): void => {
     });
 
     test('map with keys overwriting keys', (): void => {
+        interface Item {
+            id: number;
+            name: string;
+        }
+
         let c = new Collection([
             {id: 1, name: 'A'},
             {id: 2, name: 'B'},
             {id: 1, name: 'C'},
         ]);
-        c = c.mapWithKeys((item: {id: number, name: string}): object => ({
+        c = c.mapWithKeys((item: Item): object => ({
             [item.id]: item.name
         }));
         expect(c.all()).toEqual({'1': 'C', '2': 'B'});
@@ -1229,6 +1286,11 @@ describe('Collection', (): void => {
     });
 
     test('group by closure where items have single group', (): void => {
+        interface Item {
+            rating: number;
+            url: string;
+        }
+
         const c = new Collection([
             {rating: 1, url: '1'},
             {rating: 1, url: '1'},
@@ -1236,9 +1298,7 @@ describe('Collection', (): void => {
         ]);
 
 
-        const result = c.groupBy((item: {rating: number, url: string}): number => (
-            item.rating
-        ));
+        const result = c.groupBy((item: Item): number => item.rating);
 
         expect(result.toPrimitive()).toEqual({
             '1': [{rating: 1, url: '1'}, {rating: 1, url: '1'}],
@@ -1247,15 +1307,18 @@ describe('Collection', (): void => {
     });
 
     test('group by closure where items have single group preserving keys', (): void => {
+        interface Item {
+            rating: number;
+            url: string;
+        }
+
         const c = new Collection({
             '10': {rating: 1, url: '1'},
             '20': {rating: 1, url: '1'},
             '30': {rating: 2, url: '2'},
         });
 
-        const result = c.groupBy((item: {rating: number, url: string}): number => (
-            item.rating
-        ), true);
+        const result = c.groupBy((item: Item): number => item.rating, true);
 
         const expected = {
             '1': {'10': {rating: 1, url: '1'}, '20': {rating: 1, url: '1'}},
@@ -1266,27 +1329,30 @@ describe('Collection', (): void => {
     });
 
     test('group by closure where items have multiple groups', (): void => {
+        interface Item {
+            user: number;
+            roles: string[];
+        }
+
         const c = new Collection([
-            {user: 1, roles: ['Role_1', 'Role_3']},
-            {user: 2, roles: ['Role_1', 'Role_2']},
-            {user: 3, roles: ['Role_1']},
+            {user: 1, roles: ['Role1', 'Role3']},
+            {user: 2, roles: ['Role1', 'Role2']},
+            {user: 3, roles: ['Role1']},
         ]);
 
-        const result = c.groupBy((item: {user: number, roles: string[]}): string[] => (
-            item.roles
-        ));
+        const result = c.groupBy((item: Item): string[] => item.roles);
 
         const expected = {
-            Role_1: [
-                {user: 1, roles: ['Role_1', 'Role_3']},
-                {user: 2, roles: ['Role_1', 'Role_2']},
-                {user: 3, roles: ['Role_1']},
+            Role1: [
+                {user: 1, roles: ['Role1', 'Role3']},
+                {user: 2, roles: ['Role1', 'Role2']},
+                {user: 3, roles: ['Role1']},
             ],
-            Role_2: [
-                {user: 2, roles: ['Role_1', 'Role_2']},
+            Role2: [
+                {user: 2, roles: ['Role1', 'Role2']},
             ],
-            Role_3: [
-                {user: 1, roles: ['Role_1', 'Role_3']},
+            Role3: [
+                {user: 1, roles: ['Role1', 'Role3']},
             ]
         };
 
@@ -1294,27 +1360,30 @@ describe('Collection', (): void => {
     });
 
     test('group by closure where items have multiple groups preserving keys', (): void => {
+        interface Item {
+            user: number;
+            roles: string[];
+        }
+
         const c = new Collection({
-            '10': {user: 1, roles: ['Role_1', 'Role_3']},
-            '20': {user: 2, roles: ['Role_1', 'Role_2']},
-            '30': {user: 3, roles: ['Role_1']},
+            '10': {user: 1, roles: ['Role1', 'Role3']},
+            '20': {user: 2, roles: ['Role1', 'Role2']},
+            '30': {user: 3, roles: ['Role1']},
         });
 
-        const result = c.groupBy((item: {user: number, roles: string[]}): string[] => (
-            item.roles
-        ), true);
+        const result = c.groupBy((item: Item): string[] => item.roles, true);
 
         const expected = {
-            Role_1: {
-                '10': {user: 1, roles: ['Role_1', 'Role_3']},
-                '20': {user: 2, roles: ['Role_1', 'Role_2']},
-                '30': {user: 3, roles: ['Role_1']},
+            Role1: {
+                '10': {user: 1, roles: ['Role1', 'Role3']},
+                '20': {user: 2, roles: ['Role1', 'Role2']},
+                '30': {user: 3, roles: ['Role1']},
             },
-            Role_2: {
-                '20': {user: 2, roles: ['Role_1', 'Role_2']},
+            Role2: {
+                '20': {user: 2, roles: ['Role1', 'Role2']},
             },
-            Role_3: {
-                '10': {user: 1, roles: ['Role_1', 'Role_3']},
+            Role3: {
+                '10': {user: 1, roles: ['Role1', 'Role3']},
             },
         };
 
@@ -1322,39 +1391,42 @@ describe('Collection', (): void => {
     });
 
     test('group by multi level and closure preserving keys', (): void => {
+        interface Item {
+            user: number;
+            skilllevel: number;
+            roles: string[];
+        }
+
         const c = new Collection({
-            '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
-            '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
-            '30': {user: 3, skilllevel: 2, roles: ['Role_1']},
-            '40': {user: 4, skilllevel: 2, roles: ['Role_2']},
+            '10': {user: 1, skilllevel: 1, roles: ['Role1', 'Role3']},
+            '20': {user: 2, skilllevel: 1, roles: ['Role1', 'Role2']},
+            '30': {user: 3, skilllevel: 2, roles: ['Role1']},
+            '40': {user: 4, skilllevel: 2, roles: ['Role2']},
         });
 
         const result = c.groupBy([
-            'skilllevel',
-            (item: {user: number, skilllevel: number, roles: string[]}): string[] => (
-                item.roles
-            )
+            'skilllevel', (item: Item): string[] => item.roles
         ], true);
 
         const expected = {
             '1': {
-                Role_1: {
-                    '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
-                    '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
+                Role1: {
+                    '10': {user: 1, skilllevel: 1, roles: ['Role1', 'Role3']},
+                    '20': {user: 2, skilllevel: 1, roles: ['Role1', 'Role2']},
                 },
-                Role_3: {
-                    '10': {user: 1, skilllevel: 1, roles: ['Role_1', 'Role_3']},
+                Role3: {
+                    '10': {user: 1, skilllevel: 1, roles: ['Role1', 'Role3']},
                 },
-                Role_2: {
-                    '20': {user: 2, skilllevel: 1, roles: ['Role_1', 'Role_2']},
+                Role2: {
+                    '20': {user: 2, skilllevel: 1, roles: ['Role1', 'Role2']},
                 }
             },
             '2': {
-                Role_1: {
-                    '30': {user: 3, skilllevel: 2, roles: ['Role_1']},
+                Role1: {
+                    '30': {user: 3, skilllevel: 2, roles: ['Role1']},
                 },
-                Role_2: {
-                    '40': {user: 4, skilllevel: 2, roles: ['Role_2']},
+                Role2: {
+                    '40': {user: 4, skilllevel: 2, roles: ['Role2']},
                 }
             }
         };
@@ -1363,6 +1435,11 @@ describe('Collection', (): void => {
     });
 
     test('key by attribute', (): void => {
+        interface Item {
+            rating: number;
+            name: string;
+        }
+
         const c = new Collection([
             {rating: 1, name: '1'},
             {rating: 2, name: '2'},
@@ -1376,9 +1453,7 @@ describe('Collection', (): void => {
             '3': {rating: 3, name: '3'},
         });
 
-        result = c.keyBy((item: {rating: number, name: string}): number => (
-            item.rating * 2
-        ));
+        result = c.keyBy((item: Item): number => item.rating * 2);
         expect(result.all()).toEqual({
             '2': {rating: 1, name: '1'},
             '4': {rating: 2, name: '2'},
@@ -1387,12 +1462,18 @@ describe('Collection', (): void => {
     });
 
     test('key by closure', (): void => {
+        interface Item {
+            firstname: string;
+            lastname: string;
+            locale: string;
+        }
+
         const c = new Collection([
             {firstname: 'Riley', lastname: 'Martin', locale: 'US'},
             {firstname: 'Eric', lastname: 'Lynch', locale: 'US'},
         ]);
 
-        const result = c.keyBy((item: {firstname: string, lastname: string}, key: string): string => (
+        const result = c.keyBy((item: Item, key: string): string => (
             `${key}-${item.firstname}${item.lastname}`.toLowerCase()
         ));
 
@@ -1438,10 +1519,15 @@ describe('Collection', (): void => {
         expect(c.contains('class')).toBeTruthy();
         expect(c.contains('foo')).toBeFalsy();
 
+        interface Item {
+            a: boolean;
+            b: boolean;
+        }
+
         c = new Collection([{a: false, b: false}, {a: true, b: false}]);
 
-        expect(c.contains((item: {a: boolean, b: boolean}): boolean => item.a)).toBeTruthy();
-        expect(c.contains((item: {a: boolean, b: boolean}): boolean => item.b)).toBeFalsy();
+        expect(c.contains((item: Item): boolean => item.a)).toBeTruthy();
+        expect(c.contains((item: Item): boolean => item.b)).toBeFalsy();
 
         c = new Collection([null, 1, 2]);
 

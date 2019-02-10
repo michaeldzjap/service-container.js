@@ -184,6 +184,7 @@ class Container implements ContainerContract {
     public isShared<T>(abstract: Identifier<T>): boolean {
         return this._instanceSharer.hasInstance<T>(abstract)
             || (this._binder.hasBinding<T>(abstract)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 && this._binder.getBinding<T>(abstract)!.shared);
     }
 

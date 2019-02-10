@@ -152,6 +152,7 @@ class Binder implements BinderContract {
         abstract = this._container.getAlias<T>(abstract);
 
         this._reboundCallbacks.has(abstract)
+            // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
             ? this._reboundCallbacks.get(abstract)!.push(callback)
             : this._reboundCallbacks.set(abstract, [callback]);
 

@@ -11,6 +11,7 @@ import {
     inArray, inObject, dataGet, value
 } from './helpers';
 import {Instantiable} from '../types/container';
+import {Item} from '../types/collection';
 
 class Collection {
 
@@ -1238,7 +1239,7 @@ class Collection {
      * @param {*} value
      * @returns {Collection}
      */
-    public push(value: unknown | {key: string, value: unknown}): this {
+    public push(value: unknown | Item): this {
         if (Array.isArray(this._items)) {
             this._items.push(value);
         } else if (isObject(value)) {
@@ -1543,8 +1544,6 @@ class Collection {
      * @returns {Collection}
      */
     public sortBy(callback: Function | string, descending: boolean = false): Collection {
-        type Item = {key: string | number, value: any};
-
         const results: Item[] = [];
 
         const fn = Collection._valueRetriever(callback);

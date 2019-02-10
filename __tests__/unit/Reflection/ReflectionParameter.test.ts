@@ -22,7 +22,7 @@ describe('ReflectionParameter', (): void => {
         },
         {
             param: new ParameterDescriptor({name: 'impl', type: Interface, position: 2}),
-            className: 'IReflectionClassContractStub',
+            className: 'ReflectionClassContractStub',
             name: 'impl',
             isNative: false
         }

@@ -57,6 +57,7 @@ class Aliaser implements AliaserContract {
         this._aliases.set(alias, abstract);
 
         this._abstractAliases.has(abstract)
+            // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
             ? this._abstractAliases.get(abstract)!.push(alias)
             : this._abstractAliases.set(abstract, [alias]);
     }

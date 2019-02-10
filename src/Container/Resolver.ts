@@ -176,6 +176,7 @@ class Resolver implements ResolverContract {
             this._globalResolvingCallbacks.push(abstract);
         } else if (!isUndefined(callback)) {
             this._resolvingCallbacks.has(abstract)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 ? this._resolvingCallbacks.get(abstract)!.push(callback)
                 : this._resolvingCallbacks.set(abstract, [callback]);
         }
@@ -198,6 +199,7 @@ class Resolver implements ResolverContract {
             this._globalAfterResolvingCallbacks.push(abstract);
         } else if (!isUndefined(callback)) {
             this._afterResolvingCallbacks.has(abstract)
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 ? this._afterResolvingCallbacks.get(abstract)!.push(callback)
                 : this._afterResolvingCallbacks.set(abstract, [callback]);
         }
@@ -221,6 +223,7 @@ class Resolver implements ResolverContract {
         // resolve it as is since the container should be able to resolve
         // concretes automatically.
         if (this._container.getBinder().hasBinding(abstract)) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return this._container.getBinder().getBinding(abstract)!.concrete;
         }
 
