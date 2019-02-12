@@ -1,3 +1,4 @@
+import {isObject} from '../Support/helpers';
 import {Instance} from '../types/container';
 
 interface Arrayable {
@@ -18,7 +19,7 @@ interface Arrayable {
  * @returns {boolean}
  */
 export const isArrayable = <T>(instance: Instance<T>): instance is Arrayable => (
-    Reflect.has(instance, 'toArray')
+    isObject(instance) && Reflect.has(instance, 'toArray')
 );
 
 export default Arrayable;

@@ -1,3 +1,4 @@
+import {isObject} from '../Support/helpers';
 import {Instance} from '../types/container';
 
 interface Objectable {
@@ -18,7 +19,7 @@ interface Objectable {
  * @returns {boolean}
  */
 export const isObjectable = <T>(instance: Instance<T>): instance is Objectable => (
-    Reflect.has(instance, 'toObject')
+    isObject(instance) && Reflect.has(instance, 'toObject')
 );
 
 export default Objectable;

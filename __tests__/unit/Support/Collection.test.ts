@@ -1833,6 +1833,24 @@ describe('Collection', (): void => {
         expect(c.avg()).toBeUndefined();
     });
 
+    test('json serialize', (): void => {
+        const c = new Collection([
+            new TestArrayableObject,
+            new TestObjectableObject,
+            new TestJsonableObject,
+            new TestJsonSerializeObject,
+            'baz',
+        ]);
+
+        expect(c.jsonSerialize()).toEqual([
+            [1, 2, 3],
+            {foo: 'bar'},
+            {foo: 'bar'},
+            {foo: 'bar'},
+            'baz',
+        ]);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);

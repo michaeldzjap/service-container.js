@@ -2022,6 +2022,33 @@ class Collection {
     }
 
     /**
+     * Convert the object into something JSON serializable.
+     *
+     * @returns {Array}
+     */
+    public jsonSerialize(): unknown[] {
+        return this._values().map((value: any): any => {
+            if (isJsonSerializable(value)) {
+                return value.jsonSerialize();
+            }
+
+            if (isJsonable(value)) {
+                return JSON.parse(value.toJson());
+            }
+
+            if (isArrayable(value)) {
+                return value.toArray();
+            }
+
+            if (isObjectable(value)) {
+                return value.toObject();
+            }
+
+            return value;
+        });
+    }
+
+    /**
      * Get an iterator for the items.
      *
      * @returns {Function}

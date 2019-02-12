@@ -1,3 +1,4 @@
+import {isObject} from '../Support/helpers';
 import {Instance} from '../types/container';
 
 interface Jsonable {
@@ -18,7 +19,7 @@ interface Jsonable {
  * @returns {boolean}
  */
 export const isJsonable = <T>(instance: Instance<T>): instance is Jsonable => (
-    Reflect.has(instance, 'toJson')
+    isObject(instance) && Reflect.has(instance, 'toJson')
 );
 
 export default Jsonable;

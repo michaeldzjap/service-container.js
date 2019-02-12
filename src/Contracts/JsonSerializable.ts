@@ -1,3 +1,4 @@
+import {isObject} from '../Support/helpers';
 import {Instance} from '../types/container';
 
 interface JsonSerializable {
@@ -5,9 +6,9 @@ interface JsonSerializable {
     /**
      * Convert class instance properties to something that is JSON serializable.
      *
-     * @returns {Object}
+     * @returns {(Array|Object)}
      */
-    jsonSerialize(): object;
+    jsonSerialize(): any[] | object;
 
 }
 
@@ -18,7 +19,7 @@ interface JsonSerializable {
  * @returns {boolean}
  */
 export const isJsonSerializable = <T>(instance: Instance<T>): instance is JsonSerializable => (
-    Reflect.has(instance, 'jsonSerialize')
+    isObject(instance) && Reflect.has(instance, 'jsonSerialize')
 );
 
 export default JsonSerializable;
