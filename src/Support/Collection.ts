@@ -701,6 +701,16 @@ class Collection {
     }
 
     /**
+     * Alias for the "avg" method.
+     *
+     * @param {(Function|string|undefined)} callback
+     * @returns {(number|undefined)}
+     */
+    public average(callback?: Function | string): number | undefined {
+        return this.avg(callback);
+    }
+
+    /**
      * Collapse the collection of items into a single array / object.
      *
      * @returns {Collection}
@@ -1297,6 +1307,16 @@ class Collection {
     }
 
     /**
+     * Pass the collection to the given callback and return the result.
+     *
+     * @param {Function} callback
+     * @returns {*}
+     */
+    public pipe(callback: Function): unknown {
+        return callback(this);
+    }
+
+    /**
      * Get and remove the last item from the collection.
      *
      * @returns {*}
@@ -1340,6 +1360,22 @@ class Collection {
         }
 
         return this;
+    }
+
+    /**
+     * Push all of the given items onto the collection.
+     *
+     * @param {(Array|Object|Collection)} source
+     * @returns {Collection}
+     */
+    public concat(source: unknown[] | object | Collection): Collection {
+        const result = new Collection(this);
+
+        for (const item of this._values(Collection._getArrayableItems(source))) {
+            result.push(item);
+        }
+
+        return result;
     }
 
     /**

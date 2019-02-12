@@ -1870,6 +1870,54 @@ describe('Collection', (): void => {
         expect(actual).toEqual(expected);
     });
 
+    test('concat with array and object', (): void => {
+        const expected = [
+            4, 5, 6, 'a', 'b', 'c', 'Riley', 'from', 'space', 'Riley', 'from',
+            'space',
+        ];
+
+        let c = new Collection([4, 5, 6]);
+        c = c.concat(['a', 'b', 'c']);
+        c = c.concat({who: 'Riley', preposition: 'from', where: 'space'});
+        const actual = c.concat({who: 'Riley', preposition: 'from', where: 'space'}).toPrimitive();
+
+        expect(actual).toEqual(expected);
+    });
+
+    test('concat with collection', (): void => {
+        const expected = [
+            4, 5, 6, 'a', 'b', 'c', 'Riley', 'from', 'space', 'Riley', 'from',
+            'space',
+        ];
+
+        let first = new Collection([4, 5, 6]);
+        const second = new Collection(['a', 'b', 'c']);
+        const third = new Collection({who: 'Riley', preposition: 'from', where: 'space'});
+        first = first.concat(second);
+        first = first.concat(third);
+        const actual = first.concat(third).toPrimitive();
+
+        expect(actual).toEqual(expected);
+    });
+
+    test('reduce', (): void => {
+        const c = new Collection([1, 2, 3]);
+        expect(c.reduce((carry: number, element: number): number => (
+            carry += element
+        ), 0)).toBe(6);
+    });
+
+    test('random throws an error using amount bigger than collection size', (): void => {
+        const c = new Collection([1, 2, 3]);
+        const fn = (): number => c.random(4); // eslint-disable-line require-jsdoc
+        expect(fn).toThrow('You requested 4 items, but there are only 3 items available.');
+    });
+
+    test('pipe', (): void => {
+        const c = new Collection([1, 2, 3]);
+        expect(c.pipe((c: Collection): number => c.sum())).toBe(6);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);
