@@ -1,7 +1,39 @@
-import {isInstantiable, getName} from '@src/Support/helpers';
+import {
+    isUndefined, isNull, isNullOrUndefined, isInstantiable, getName
+} from '@src/Support/helpers';
+
+class ClassStub {}
 
 describe('helpers', (): void => {
-    class ClassStub {}
+    [
+        {expected: true},
+        {value: null, expected: false},
+        {value: 'something', expected: false},
+    ].forEach(({value, expected}): void => {
+        it(`determines if the value [${value}] is undefined`, (): void => {
+            expect(isUndefined(value)).toBe(expected);
+        });
+    });
+
+    [
+        {expected: false},
+        {value: null, expected: true},
+        {value: 'something', expected: false},
+    ].forEach(({value, expected}): void => {
+        it(`determines if the value [${value}] is null`, (): void => {
+            expect(isNull(value)).toBe(expected);
+        });
+    });
+
+    [
+        {expected: true},
+        {value: null, expected: true},
+        {value: 'something', expected: false},
+    ].forEach(({value, expected}): void => {
+        it(`determines if the value [${value}] is null or undefined`, (): void => {
+            expect(isNullOrUndefined(value)).toBe(expected);
+        });
+    });
 
     [
         {target: (): void => {}, name: 'arrow function', expected: false},
