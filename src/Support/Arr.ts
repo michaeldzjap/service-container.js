@@ -74,7 +74,7 @@ export const add = (obj: object, key: string, value: any): object => {
  * @param {*[]} array
  * @returns {*[]}
  */
-const collapseArray = (array: unknown[]): unknown[] => {
+const _collapseArray = (array: unknown[]): unknown[] => {
     let results: unknown[] = [];
 
     for (let values of array) {
@@ -94,7 +94,7 @@ const collapseArray = (array: unknown[]): unknown[] => {
  * @param {Object} obj
  * @returns {Object}
  */
-const collapseObject = (obj: object): object => {
+const _collapseObject = (obj: object): object => {
     let results: object = {};
 
     for (const key of Object.keys(obj)) {
@@ -116,10 +116,10 @@ const collapseObject = (obj: object): object => {
  */
 export const collapse = (items: unknown[] | object): unknown[] | object => {
     if (Array.isArray(items)) {
-        return collapseArray(items);
+        return _collapseArray(items);
     }
 
-    return collapseObject(items);
+    return _collapseObject(items);
 };
 
 /**
@@ -287,7 +287,7 @@ export const except = (obj: object, keys: string[] | string): object => {
  * @param {(*|undefined)} dflt
  * @returns {*}
  */
-const firstArray = (array: unknown[], callback?: Function | null, dflt?: unknown): unknown => {
+const _firstArray = (array: unknown[], callback?: Function | null, dflt?: unknown): unknown => {
     if (isNullOrUndefined(callback)) {
         if (!array.length) return value(dflt);
 
@@ -311,7 +311,7 @@ const firstArray = (array: unknown[], callback?: Function | null, dflt?: unknown
  * @param {(*|undefined)} dflt
  * @returns {*}
  */
-const firstObject = (obj: object, callback?: Function | null, dflt?: unknown): unknown => {
+const _firstObject = (obj: object, callback?: Function | null, dflt?: unknown): unknown => {
     if (isNullOrUndefined(callback)) {
         const keys = Object.keys(obj);
 
@@ -338,10 +338,10 @@ const firstObject = (obj: object, callback?: Function | null, dflt?: unknown): u
 export const first = (items: unknown[] | object, callback?: Function | null,
     dflt?: unknown): unknown => {
     if (Array.isArray(items)) {
-        return firstArray(items, callback, dflt);
+        return _firstArray(items, callback, dflt);
     }
 
-    return firstObject(items, callback, dflt);
+    return _firstObject(items, callback, dflt);
 };
 
 /**
@@ -513,7 +513,7 @@ export const only = (obj: object, keys: unknown[] | string): object => {
  * @param {(string[]|string|undefined)} key
  * @returns {*}
  */
-const explodePluckParameters = (value: string[] | string | null,
+const _explodePluckParameters = (value: string[] | string | null,
     key?: string[] | string): any => {
     value = isString(value) ? value.split('.') : value;
 
@@ -531,7 +531,7 @@ const explodePluckParameters = (value: string[] | string | null,
  * @returns {(*[]|Object)}
  */
 export const pluck = (array: unknown[], value: string | string[] | null, key?: string | string[]): unknown[] | object => {
-    [value, key] = explodePluckParameters(value, key);
+    [value, key] = _explodePluckParameters(value, key);
 
     const results = isNullOrUndefined(key) ? [] : {};
 
@@ -665,7 +665,7 @@ export const random = (array: unknown[], number?: number): any => {
  * @param {(string|undefined)} seed
  * @returns {*[]}
  */
-const shuffleArray = (array: unknown[], seed?: string): unknown[] => {
+const _shuffleArray = (array: unknown[], seed?: string): unknown[] => {
     if (isUndefined(seed)) {
         return _shuffle(array);
     }
@@ -684,7 +684,7 @@ const shuffleArray = (array: unknown[], seed?: string): unknown[] => {
  * @param {(string|undefined)} seed
  * @returns {Object}
  */
-const shuffleObject = (obj: object, seed?: string): object => {
+const _shuffleObject = (obj: object, seed?: string): object => {
     if (isUndefined(seed)) {
         const keys = _shuffle(Object.keys(obj));
 
@@ -716,10 +716,10 @@ const shuffleObject = (obj: object, seed?: string): object => {
  */
 export const shuffle = (items: unknown[] | object, seed?: string): unknown[] | object => {
     if (Array.isArray(items)) {
-        return shuffleArray(items, seed);
+        return _shuffleArray(items, seed);
     }
 
-    return shuffleObject(items, seed);
+    return _shuffleObject(items, seed);
 };
 
 /**
