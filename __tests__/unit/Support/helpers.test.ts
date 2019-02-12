@@ -1,8 +1,27 @@
 import {
-    isUndefined, isNull, isNullOrUndefined, isInstantiable, getName
+    isUndefined, isNull, isNullOrUndefined, isObject, isInstantiable, getName
 } from '@src/Support/helpers';
 
+interface DataItem {
+    target: any;
+    name: string;
+    expected: boolean;
+}
+
 class ClassStub {}
+
+const DATA = [
+    {target: (): void => {}, name: 'arrow function'},
+    {target: function (): void {}, name: 'unnamed function'}, // eslint-disable-line object-shorthand, no-empty-function
+    {target(): void {}, name: 'named function'}, // eslint-disable-line no-empty-function
+    {target: ClassStub, name: 'class definition'},
+    {target: new ClassStub, name: 'class instance'},
+    {target: String, name: 'built in class definition'},
+    {target: {a: 1}, name: 'object instance'},
+    {target: [1, 2, 3], name: 'array instance'},
+    {target: 1, name: 'number'},
+    {target: 'hey now!', name: 'string'},
+];
 
 describe('helpers', (): void => {
     [
@@ -36,19 +55,22 @@ describe('helpers', (): void => {
     });
 
     [
-        {target: (): void => {}, name: 'arrow function', expected: false},
-        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function
-        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function
-        {target: ClassStub, name: 'class definition', expected: true},
-        {target: String, name: 'built in class definition', expected: true},
-        {target: {a: 1}, name: 'object instance', expected: false},
-        {target: [1, 2, 3], name: 'array instance', expected: false},
-        {target: 1, name: 'number', expected: false},
-    ].forEach(({target, name, expected}): void => {
-        it(`determines if the target [${name}] is a class definition`, (): void => {
-            const result = isInstantiable(target);
+        false, false, false, false, true, false, true, true, false, false,
+    ].map((expected: boolean, index: number): DataItem => ({
+        ...DATA[index], expected
+    })).forEach(({target, name, expected}): void => {
+        it(`determines if the target [${name}] is an object`, (): void => {
+            expect(isObject(target)).toBe(expected);
+        });
+    });
 
-            expect(result).toBe(expected);
+    [
+        false, false, false, true, false, true, false, false, false, false,
+    ].map((expected: boolean, index: number): DataItem => ({
+        ...DATA[index], expected
+    })).forEach(({target, name, expected}): void => {
+        it(`determines if the target [${name}] is instantiable`, (): void => {
+            expect(isInstantiable(target)).toBe(expected);
         });
     });
 

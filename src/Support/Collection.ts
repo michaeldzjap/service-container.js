@@ -1280,12 +1280,12 @@ class Collection {
      * @returns {Collection}
      */
     public unique(key?: string | Function, strict: boolean = false): Collection {
-        const callback = Collection._valueRetriever(key);
+        const fn = Collection._valueRetriever(key);
 
         const exists: string[] = [];
 
         return this.reject((item: unknown, key: string): boolean | undefined => {
-            const id = callback(item, key);
+            const id = fn(item, key);
 
             if (inArray(id, exists, strict)) {
                 return true;
