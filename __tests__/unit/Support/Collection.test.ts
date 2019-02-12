@@ -1225,6 +1225,15 @@ describe('Collection', (): void => {
         expect(c.get(1).value).toEqual('second');
     });
 
+    test('nth', (): void => {
+        const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
+
+        expect(c.nth(4).all()).toEqual(['a', 'e']);
+        expect(c.nth(4, 1).all()).toEqual(['b', 'f']);
+        expect(c.nth(4, 2).all()).toEqual(['c']);
+        expect(c.nth(4, 3).all()).toEqual(['d']);
+    });
+
     test('map with keys overwriting keys', (): void => {
         interface Item {
             id: number;
@@ -1750,13 +1759,78 @@ describe('Collection', (): void => {
         expect(c.all()).toEqual([1, 2, 3, 4, 5]);
     });
 
-    test('nth', (): void => {
-        const c = new Collection(['a', 'b', 'c', 'd', 'e', 'f']);
+    test('getting max items from collection', (): void => {
+        interface Item {
+            foo: number;
+        }
 
-        expect(c.nth(4).all()).toEqual(['a', 'e']);
-        expect(c.nth(4, 1).all()).toEqual(['b', 'f']);
-        expect(c.nth(4, 2).all()).toEqual(['c']);
-        expect(c.nth(4, 3).all()).toEqual(['d']);
+        let c = new Collection([{foo: 10}, {foo: 20}]);
+        expect(c.max((item: Item): number => item.foo)).toBe(20);
+        expect(c.max('foo')).toBe(20);
+
+        c = new Collection([1, 2, 3, 4, 5]);
+        expect(c.max()).toBe(5);
+
+        c = new Collection;
+        expect(c.max()).toBeUndefined();
+    });
+
+    test('getting min items from collection', (): void => {
+        interface Item {
+            foo: number;
+        }
+
+        let c = new Collection([{foo: 10}, {foo: 20}]);
+        expect(c.min((item: Item): number => item.foo)).toBe(10);
+        expect(c.min('foo')).toBe(10);
+
+        c = new Collection([{foo: 10}, {foo: 20}, {foo: null}]);
+        expect(c.min('foo')).toBe(10);
+
+        c = new Collection([1, 2, 3, 4, 5]);
+        expect(c.min()).toBe(1);
+
+        c = new Collection([1, null, 3, 4, 5]);
+        expect(c.min()).toBe(1);
+
+        c = new Collection([0, 1, 2, 3, 4]);
+        expect(c.min()).toBe(0);
+
+        c = new Collection;
+        expect(c.min()).toBeUndefined();
+    });
+
+    test('only', (): void => {
+        const c = new Collection({first: 'Riley', last: 'Martin', email: 'riley.martin@space.com'});
+
+        expect(c.only().all()).toEqual(c.all());
+        expect(c.only(['first', 'missing']).all()).toEqual({first: 'Riley'});
+        expect(c.only('first', 'missing').all()).toEqual({first: 'Riley'});
+        expect(c.only(new Collection(['first', 'missing'])).all()).toEqual({first: 'Riley'});
+
+        expect(c.only(['first', 'email']).all()).toEqual({first: 'Riley', email: 'riley.martin@space.com'});
+        expect(c.only('first', 'email').all()).toEqual({first: 'Riley', email: 'riley.martin@space.com'});
+        expect(c.only(new Collection(['first', 'email'])).all()).toEqual({first: 'Riley', email: 'riley.martin@space.com'});
+    });
+
+    test('getting avg items from collection', (): void => {
+        interface Item {
+            foo: number;
+        }
+
+        let c = new Collection([{foo: 10}, {foo: 20}]);
+        expect(c.avg((item: Item): number => item.foo)).toBe(15);
+        expect(c.avg('foo')).toBe(15);
+
+        c = new Collection([{foo: 10}, {foo: 20}, {foo: null}]);
+        expect(c.avg((item: Item): number => item.foo)).toBe(15);
+        expect(c.avg('foo')).toBe(15);
+
+        c = new Collection([1, 2, 3, 4, 5]);
+        expect(c.avg()).toBe(3);
+
+        c = new Collection;
+        expect(c.avg()).toBeUndefined();
     });
 
     test('slice offset', (): void => {

@@ -1,14 +1,14 @@
 import {
-    collapse, crossJoin, except, first, flatten, last, pluck, prepend, pull,
-    random, shuffle, where, wrap
+    collapse, crossJoin, except, first, flatten, last, only, pluck, prepend,
+    pull, random, shuffle, where, wrap
 } from './Arr';
 import {isArrayable} from '../Contracts/Arrayable';
 import {isObjectable} from '../Contracts/Objectable';
 import {isJsonable} from '../Contracts/Jsonable';
 import {isJsonSerializable} from '../Contracts/JsonSerializable';
 import {
-    isObject, isString, isUndefined, isNull, isInstance, findIndex, findKey,
-    inArray, inObject, dataGet, value
+    isObject, isString, isUndefined, isNull, isNullOrUndefined, isInstance,
+    findIndex, findKey, inArray, inObject, dataGet, value
 } from './helpers';
 import {Instantiable} from '../types/container';
 import {Item} from '../types/collection';
@@ -199,12 +199,12 @@ class Collection {
      * @param {(string|Function|undefined)} value
      * @returns {Function}
      */
-    protected static _valueRetriever<T>(value?: string | Function): Function {
+    protected static _valueRetriever(value?: string | Function): Function {
         if (Collection._useAsCallable(value)) {
             return value;
         }
 
-        return (item: T): T => dataGet(item, value);
+        return (item: any): any => dataGet(item, value);
     }
 
     /**
@@ -682,6 +682,25 @@ class Collection {
     }
 
     /**
+     * Get the average value of a given key.
+     *
+     * @param {(Function|string|undefined)} callback
+     * @returns {(number|undefined)}
+     */
+    public avg(callback?: Function | string): number | undefined {
+        const fn = Collection._valueRetriever(callback);
+
+        const items = this.map((value: unknown): unknown => fn(value))
+            .filter((value: unknown): boolean => !isNullOrUndefined(value));
+
+        const count = items.count();
+
+        if (count) {
+            return items.sum() / count;
+        }
+    }
+
+    /**
      * Collapse the collection of items into a single array / object.
      *
      * @returns {Collection}
@@ -1032,6 +1051,23 @@ class Collection {
     }
 
     /**
+     * Get the max value of a given key.
+     *
+     * @param {(Function|string|undefined)} callback
+     * @returns {*}
+     */
+    public max(callback?: Function | string): unknown {
+        const fn = Collection._valueRetriever(callback);
+
+        return this.filter((value: unknown): boolean => !isNullOrUndefined(value))
+            .reduce((result: boolean, item: unknown): boolean => {
+                const value = fn(item);
+
+                return (isNullOrUndefined(result) || value > result) ? value : result;
+            });
+    }
+
+    /**
      * Merge the collection with the given items.
      *
      * @param {(Array|Object|Collection)} items
@@ -1122,6 +1158,22 @@ class Collection {
     }
 
     /**
+     * Get the min value of a given key.
+     *
+     * @param {(Function|string|undefined)} callback
+     * @returns {*}
+     */
+    public min(callback?: Function | string): unknown {
+        const fn = Collection._valueRetriever(callback);
+
+        return this.map((value: unknown): unknown => fn(value))
+            .filter((value: unknown): boolean => !isNullOrUndefined(value))
+            .reduce((result: boolean, value: any): unknown => (
+                (isNullOrUndefined(result) || value < result) ? value : result
+            ));
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param {number} step
@@ -1142,6 +1194,28 @@ class Collection {
         }
 
         return new Collection(result);
+    }
+
+    /**
+     * Get the items with the specified keys.
+     *
+     * @param {...Array} keys
+     * @returns {Collection}
+     */
+    public only(...keys: any): Collection {
+        if (!keys.length) {
+            return new Collection(this._shallowCopy());
+        }
+
+        if (keys.length === 1 && keys[0] instanceof Collection) {
+            keys = keys[0].all();
+        }
+
+        if (keys.length === 1) {
+            keys = keys[0];
+        }
+
+        return new Collection(only(this._items, keys));
     }
 
     /**
