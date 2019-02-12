@@ -1851,6 +1851,25 @@ describe('Collection', (): void => {
         ]);
     });
 
+    test('combine with object', (): void => {
+        const expected = {'1': 4, '2': 5, '3': 6};
+
+        const c = new Collection(Object.keys(expected));
+        const actual = c.combine((Object as any).values(expected)).toPrimitive();
+
+        expect(actual).toEqual(expected);
+    });
+
+    test('combine with collection', (): void => {
+        const expected = {'1': 4, '2': 5, '3': 6};
+
+        const keys = new Collection(Object.keys(expected));
+        const values = new Collection((Object as any).values(expected));
+        const actual = keys.combine(values).toPrimitive();
+
+        expect(actual).toEqual(expected);
+    });
+
     test('slice offset', (): void => {
         const c = new Collection([1, 2, 3, 4, 5, 6, 7, 8]);
         expect(c.slice(3).all()).toEqual([4, 5, 6, 7, 8]);

@@ -1105,6 +1105,25 @@ class Collection {
     }
 
     /**
+     * Create a collection by using this collection for keys and another for its
+     * values.
+     *
+     * @param {(Array|Object|Collection)} values
+     * @returns {Collection}
+     */
+    public combine(values: unknown[] | object | Collection): Collection {
+        const keys = this._values();
+        const items = this._values(Collection._getArrayableItems(values));
+        const result = {};
+
+        for (let i = 0; i < keys.length; i++) {
+            result[keys[i]] = items[i];
+        }
+
+        return new Collection(result);
+    }
+
+    /**
      * Union the collection with the given items.
      *
      * @param {(Object|Collection|undefined)} items
