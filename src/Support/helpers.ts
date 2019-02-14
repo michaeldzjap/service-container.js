@@ -52,6 +52,16 @@ export const isString = (value: any): value is string => (
 );
 
 /**
+ * Determine if the given target is a symbol.
+ *
+ * @param {*} target
+ * @returns {boolean}
+ */
+export const isSymbol = (target: any): target is symbol => (
+    typeof target === 'symbol'
+);
+
+/**
  * Determine if the given value is a map.
  *
  * @param {*} value
@@ -59,6 +69,36 @@ export const isString = (value: any): value is string => (
  */
 export const isMap = (value: any): value is Map<unknown, unknown> => (
     value instanceof Map
+);
+
+/**
+ * Determine if the given target is a function.
+ *
+ * @param {*} target
+ * @returns {boolean}
+ */
+export const isFunction = (target: any): target is Function => (
+    typeof target === 'function'
+);
+
+/**
+ * Determine if the given target has a prototype.
+ *
+ * @param {*} target
+ * @returns {boolean}
+ */
+const hasPrototype = (target: object | Function): boolean => (
+    target.hasOwnProperty('prototype')
+);
+
+/**
+ * Determine if the given target has a constructor.
+ *
+ * @param {*} target
+ * @returns {boolean}
+ */
+const hasConstructor = (target: object | Function): target is object => (
+    !isUndefined(target.constructor)
 );
 
 /**
@@ -83,48 +123,18 @@ export const isInstantiable = <T>(target: any): target is Instantiable<T> => {
 };
 
 /**
- * Determine if the given target is a symbol.
- *
- * @param {*} target
- * @returns {boolean}
- */
-export const isSymbol = (target: any): target is symbol => (
-    typeof target === 'symbol'
-);
-
-/**
- * Determine if the given target has a prototype.
- *
- * @param {*} target
- * @returns {boolean}
- */
-export const hasPrototype = (target: object | Function): target is Function => (
-    target.hasOwnProperty('prototype')
-);
-
-/**
- * Determine if the given target has a constructor.
- *
- * @param {*} target
- * @returns {boolean}
- */
-export const hasConstructor = (target: object | Function): target is object => (
-    !isUndefined(target.constructor)
-);
-
-/**
  * Determine if the given target is an instance.
  *
  * @param {*} target
  * @returns {boolean}
  */
 export const isInstance = <T>(target: any): target is Instance<T> => (
-    isObject(target) && !hasPrototype(target) && hasConstructor(target)
+    !Array.isArray(target) && isObject(target) && !hasPrototype(target) && hasConstructor(target)
         && target.constructor.name !== 'Object'
 );
 
 /**
- * Check if two inputs are identically equal.
+ * Check if two inputs are strictly equal.
  *
  * @param {*} a
  * @param {*} b
@@ -146,12 +156,12 @@ export const findIndex = (item: unknown, array: any[], strict: boolean = false):
     }
 
     return array.findIndex((_: unknown): boolean => {
-        if (!isObject(item) || !isObject(_) || !Array.isArray(item)
-            || !Array.isArray(_)) {
-            return item == _; // eslint-disable-line eqeqeq
+        if (isObject(item) && isObject(_) || (Array.isArray(item)
+            && Array.isArray(_))) {
+            return isEqual(_, item);
         }
 
-        return isEqual(_, item);
+        return item == _; // eslint-disable-line eqeqeq
     });
 };
 
@@ -171,12 +181,12 @@ export const findKey = (item: unknown, obj: object, strict: boolean = false): st
     }
 
     return keys.find((key: string): boolean => {
-        if (!isObject(item) || !isObject(obj[key]) || !Array.isArray(item)
-            || !Array.isArray(obj[key])) {
-            return item == obj[key]; // eslint-disable-line eqeqeq
+        if (isObject(item) && isObject(obj[key]) || (Array.isArray(item)
+            && Array.isArray(obj[key]))) {
+            return isEqual(obj[key], item);
         }
 
-        return isEqual(obj[key], item);
+        return item == obj[key]; // eslint-disable-line eqeqeq
     });
 };
 
@@ -215,7 +225,7 @@ export const inObject = (item: any, obj: object, strict: boolean = false): boole
  * @returns {(string|undefined)}
  */
 export const getName = (target: object | Function): string | undefined => {
-    if (hasPrototype(target)) return target.name;
+    if (isFunction(target) && hasPrototype(target)) return target.name;
 
     return target.constructor.name;
 };
@@ -230,7 +240,7 @@ export const getSymbolName = (target: symbol): string => {
     const result = /Symbol\(([^)]+)\)/.exec(target.toString());
 
     if (isNullOrUndefined(result)) {
-        throw new Error('Could not determine interface name.');
+        throw new Error('Could not determine name.');
     }
 
     return result[1];
