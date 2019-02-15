@@ -219,18 +219,6 @@ export const inObject = (item: any, obj: object, strict: boolean = false): boole
 );
 
 /**
- * Attempt to get the name of an object or function.
- *
- * @param {(Object|Function)} target
- * @returns {(string|undefined)}
- */
-export const getName = (target: object | Function): string | undefined => {
-    if (isFunction(target) && hasPrototype(target)) return target.name;
-
-    return target.constructor.name;
-};
-
-/**
  * Strip off the "Symbol()" part of a stringified symbol.
  *
  * @param {symbol} target
@@ -244,6 +232,20 @@ export const getSymbolName = (target: symbol): string => {
     }
 
     return result[1];
+};
+
+/**
+ * Attempt to get the name of an object or function.
+ *
+ * @param {*} target
+ * @returns {(string|undefined)}
+ */
+export const getName = (target: any): string | undefined => {
+    if (isFunction(target) && hasPrototype(target)) return target.name;
+
+    if (isSymbol(target)) return getSymbolName(target);
+
+    return target.constructor.name;
 };
 
 /**
@@ -264,9 +266,9 @@ export const reverse = (str: string): string => (
  * @param {*} value
  * @returns {*}
  */
-export const value = (value: unknown): unknown => (
-    value instanceof Function ? value() : value
-);
+export const value = (value: unknown): unknown => {
+    return value instanceof Function ? value() : value;
+};
 
 /**
  * Get an item from an array or object using "dot" notation.

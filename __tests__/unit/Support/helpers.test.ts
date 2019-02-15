@@ -1,7 +1,7 @@
 import {
     isUndefined, isNull, isNullOrUndefined, isObject, isString, isSymbol, isMap,
     isFunction, isInstantiable, isInstance, equals, findIndex, findKey, inArray,
-    inObject, getName
+    inObject, getSymbolName, getName, reverse, value, dataGet
 } from '@src/Support/helpers';
 
 interface DataItem {
@@ -30,6 +30,7 @@ const DATA = [
     {target: Symbol('hey now!'), name: 'symbol class instance'},
 ];
 
+// eslint-disable-next-line max-statements
 describe('helpers', (): void => {
     [
         {expected: true},
@@ -267,6 +268,12 @@ describe('helpers', (): void => {
         expect(inObject(obj, items, true)).toBeTruthy();
     });
 
+    it('returns the name of the symbol', (): void => {
+        const name = getSymbolName(Symbol('a symbol'));
+
+        expect(name).toBe('a symbol');
+    });
+
     [
         {target: ClassStub},
         {target: ClassStub.prototype},
@@ -276,5 +283,33 @@ describe('helpers', (): void => {
 
             expect(name).toBe('ClassStub');
         });
+    });
+
+    it('reverses the given string', (): void => {
+        expect(reverse('reverse me')).toBe('em esrever');
+    });
+
+    [
+        {target: 'Hey now!'},
+        {target: (): string => 'Hey now!'},
+        {target: function (): string { return 'Hey now!'; }}, // eslint-disable-line object-shorthand
+        {target(): string { return 'Hey now!'; }},
+    ].forEach(({target}): void => {
+        expect(value(target)).toBe('Hey now!');
+    });
+
+    test('data get', (): void => {
+        const obj = {users: {name: ['Riley', 'Martin']}};
+        const arr = [{users: [{name: 'Riley'}]}];
+        const dottedArr = {users: {'first.name': 'Riley', 'middle.name': null}};
+
+        expect(dataGet(obj, 'users.name.0')).toBe('Riley');
+        expect(dataGet(arr, '0.users.0.name')).toBe('Riley');
+        expect(dataGet(arr, '0.users.3')).toBeUndefined();
+        expect(dataGet(arr, '0.users.3', 'Not found')).toBe('Not found');
+        expect(dataGet(arr, '0.users.3', (): string => 'Not found')).toBe('Not found');
+        expect(dataGet(dottedArr, ['users', 'first.name'])).toBe('Riley');
+        expect(dataGet(dottedArr, ['users', 'middle.name'])).toBeNull();
+        expect(dataGet(dottedArr, ['users', 'last.name'], 'Not found')).toBe('Not found');
     });
 });

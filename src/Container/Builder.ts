@@ -4,9 +4,7 @@ import Container from './Container';
 import ReflectionClass from '../Reflection/ReflectionClass';
 import ReflectionParameter from '../Reflection/ReflectionParameter';
 import {last} from '../Support/Arr';
-import {
-    isUndefined, isInstantiable, isInstance, getSymbolName
-} from '../Support/helpers';
+import {isUndefined, isInstantiable, getName} from '../Support/helpers';
 import {Instantiable} from '../types/container';
 
 class Builder implements BuilderContract {
@@ -49,19 +47,7 @@ class Builder implements BuilderContract {
      * @returns {string}
      */
     private static _formatName<T>(concrete: T): string {
-        if (typeof concrete === 'symbol') {
-            return getSymbolName(concrete);
-        }
-
-        if (isInstantiable(concrete)) {
-            return concrete.name;
-        }
-
-        if (isInstance(concrete)) {
-            return concrete.constructor.name;
-        }
-
-        return 'undefined';
+        return getName(concrete) || 'undefined';
     }
 
     /**
