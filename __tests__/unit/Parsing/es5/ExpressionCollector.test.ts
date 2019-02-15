@@ -10,10 +10,26 @@ import * as failingObjectExpression from '@helpers/Stubs/es5/failingObjectExpres
 
 describe('ExpressionCollector', (): void => {
     [
-        {ast: simpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'simple', expected: [1, 2, 3]},
-        {ast: nestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'nested', expected: [[[1]], [[1, 2]], [[1, 2, 3]]]},
-        {ast: mixedSimpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'mixed simple', expected: [1, '2', {a: 1, b: 2, c: 3}]},
-        {ast: mixedNestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'mixed nested', expected: [[[1, '2', {a: 1, b: 2, c: 3}]]]},
+        {
+            ast: simpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'simple',
+            expected: [1, 2, 3]
+        },
+        {
+            ast: nestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'nested',
+            expected: [[[1]], [[1, 2]], [[1, 2, 3]]]
+        },
+        {
+            ast: mixedSimpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'mixed simple',
+            expected: [1, '2', {a: 1, b: 2, c: 3}]
+        },
+        {
+            ast: mixedNestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'mixed nested',
+            expected: [[[1, '2', {a: 1, b: 2, c: 3}]]]
+        },
     ].forEach(({ast, label, expected}): void => {
         // eslint-disable-next-line max-nested-callbacks
         it(`collects all the elements in a [${label}] array expression`, (): void => {
@@ -33,8 +49,16 @@ describe('ExpressionCollector', (): void => {
     });
 
     [
-        {ast: simpleObjectExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'simple', expected: {a: 1, b: 2, c: 3}},
-        {ast: nestedObjectExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right, label: 'nested', expected: {a: {b: {c: 1}}, d: {e: [1, 2, 3]}, f: [[1, 2, 3]]}},
+        {
+            ast: simpleObjectExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'simple',
+            expected: {a: 1, b: 2, c: 3}
+        },
+        {
+            ast: nestedObjectExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
+            label: 'nested',
+            expected: {a: {b: {c: 1}}, d: {e: [1, 2, 3]}, f: [[1, 2, 3]]}
+        },
     ].forEach(({ast, label, expected}): void => {
         it(`collects all the properties of a [${label}] object expression`, (): void => {
             const result = ExpressionCollector.collectProperties(ast);
