@@ -13,25 +13,24 @@ describe('ExpressionCollector', (): void => {
         {
             ast: simpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
             label: 'simple',
-            expected: [1, 2, 3]
+            expected: [1, 2, 3],
         },
         {
             ast: nestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
             label: 'nested',
-            expected: [[[1]], [[1, 2]], [[1, 2, 3]]]
+            expected: [[[1]], [[1, 2]], [[1, 2, 3]]],
         },
         {
             ast: mixedSimpleArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
             label: 'mixed simple',
-            expected: [1, '2', {a: 1, b: 2, c: 3}]
+            expected: [1, '2', {a: 1, b: 2, c: 3}],
         },
         {
             ast: mixedNestedArrayExpression.body[0].expression.right.body.body[0].consequent.body[0].expression.right,
             label: 'mixed nested',
-            expected: [[[1, '2', {a: 1, b: 2, c: 3}]]]
+            expected: [[[1, '2', {a: 1, b: 2, c: 3}]]],
         },
     ].forEach(({ast, label, expected}): void => {
-        // eslint-disable-next-line max-nested-callbacks
         it(`collects all the elements in a [${label}] array expression`, (): void => {
             const result = ExpressionCollector.collectElements(ast);
 

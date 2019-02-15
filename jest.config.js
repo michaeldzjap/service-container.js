@@ -19,8 +19,8 @@ module.exports = {
         '<rootDir>/node_modules/',
         '<rootDir>/__tests__/helpers/',
         '<rootDir>/__tests__/setup.ts',
-        '<rootDir>/__tests__/unit/Parsing/es5/*',
-        '<rootDir>/__tests__/unit/Parsing/esnext',
+        '<rootDir>/__tests__/unit/Parsing/es5/',
+        '<rootDir>/__tests__/unit/Parsing/esnext/',
     ],
     transform: {
         '^.+\\.(ts|tsx)$': 'ts-jest'
