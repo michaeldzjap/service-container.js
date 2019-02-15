@@ -1,41 +1,9 @@
 import Collection from '@src/Support/Collection';
-import Arrayable from '@src/Contracts/Arrayable';
-import Jsonable from '@src/Contracts/Jsonable';
-import JsonSerializable from '@src/Contracts/JsonSerializable';
-import Objectable from '@src/Contracts/Objectable';
+import {
+    ArrayableObjectStub, ObjectableObjectStub, JsonableObjectStub,
+    JsonSerializeObjectStub
+} from '@helpers/Stubs/ConvertibleStubs';
 import {isString, reverse} from '@src/Support/helpers';
-
-class TestArrayableObject implements Arrayable {
-
-    public toArray(): number[] {
-        return [1, 2, 3];
-    }
-
-}
-
-class TestObjectableObject implements Objectable {
-
-    public toObject(): object {
-        return {foo: 'bar'};
-    }
-
-}
-
-class TestJsonableObject implements Jsonable {
-
-    public toJson(): string {
-        return '{"foo":"bar"}';
-    }
-
-}
-
-class TestJsonSerializeObject implements JsonSerializable {
-
-    public jsonSerialize(): object {
-        return {foo: 'bar'};
-    }
-
-}
 
 class TestCollectionMapIntoObject {
 
@@ -178,19 +146,19 @@ describe('Collection', (): void => {
             Collection, '_getArrayableItems'
         ) as PropertyDescriptor;
 
-        let items: any = new TestArrayableObject;
+        let items: any = new ArrayableObjectStub;
         const array = method.value(items);
         expect(array).toEqual([1, 2, 3]);
 
-        items = new TestObjectableObject;
+        items = new ObjectableObjectStub;
         let obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
 
-        items = new TestJsonableObject;
+        items = new JsonableObjectStub;
         obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
 
-        items = new TestJsonSerializeObject;
+        items = new JsonSerializeObjectStub;
         obj = method.value(items);
         expect(obj).toEqual({foo: 'bar'});
 
@@ -925,25 +893,25 @@ describe('Collection', (): void => {
     });
 
     test('wrap with arrayable', (): void => {
-        const o = new TestArrayableObject;
+        const o = new ArrayableObjectStub;
         const c = Collection.wrap(o);
         expect(c.all()).toEqual([o]);
     });
 
     test('wrap with objectable', (): void => {
-        const o = new TestObjectableObject;
+        const o = new ObjectableObjectStub;
         const c = Collection.wrap(o);
         expect(c.all()).toEqual([o]);
     });
 
     test('wrap with jsonable', (): void => {
-        const o = new TestJsonableObject;
+        const o = new JsonableObjectStub;
         const c = Collection.wrap(o);
         expect(c.all()).toEqual([o]);
     });
 
     test('wrap with json serialize', (): void => {
-        const o = new TestJsonSerializeObject;
+        const o = new JsonSerializeObjectStub;
         const c = Collection.wrap(o);
         expect(c.all()).toEqual([o]);
     });
@@ -1835,10 +1803,10 @@ describe('Collection', (): void => {
 
     test('json serialize', (): void => {
         const c = new Collection([
-            new TestArrayableObject,
-            new TestObjectableObject,
-            new TestJsonableObject,
-            new TestJsonSerializeObject,
+            new ArrayableObjectStub,
+            new ObjectableObjectStub,
+            new JsonableObjectStub,
+            new JsonSerializeObjectStub,
             'baz',
         ]);
 
