@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details>
     <summary>Unreleased changes. Click to see more.</summary>
     <ul>
-        <li>Don't bundle _reflect-metadata_, but require it as an external dependency.</li>
         <li>`Collection` and `Arr` functionality are moved to a separate package.</li>
 </details>
+
+## [0.2.0] - 2019-02-20
+
+### Changed
+
+- _reflect-metadata_ is no longer bundled alongside _service-container.js_. Instead it is now necessary to install and import it yourself.
 
 ## [0.1.2] - 2019-02-09
 
