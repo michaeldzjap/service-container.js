@@ -17,6 +17,22 @@ This project offers almost completely the same functionality as the original _La
 
 Documentation for this project is rather minimal at this point. However, almost all tests from the rather extensive test suite of the original _Laravel_ version have been ported. This should give a good indication of what is possible. There is also an _example_ folder with some preliminary, basic examples.
 
+## Installation
+
+This package is available through _npm_:
+
+```
+npm install --save service-container.js
+```
+
+In addition, it is necessary to install the _reflect-metadata_ package:
+
+```
+npm install --save reflect-metadata
+```
+
+and import it as soon as possible in the entry point of your app (e.g. index.ts or app.ts).
+
 ## Considerations
 Below are some important things to consider when trying out this project for yourself.
 
@@ -64,6 +80,10 @@ Yes, this is possible, albeit using a slight workaround (see the examples).
 - Do I have to use _TypeScript_?
 
 Yes, at the moment this project only works with _TypeScript_.
+
+- Why is _reflect-metadata_ not just imported in the source for _service-container_ itself?
+
+Because _reflect-metadata_ affects things at a global scope and therefore, it should only be imported once and only once. Hence, importing _reflect-metadata_ internally would be fine if _service-container.js_ is your only dependency that requires its use. However, if you use _service-container.js_ in conjunction with another package / library that requires _reflect-metadata_ you would run into trouble.
 
 ## Examples
 To run the examples you'll have to perform the following steps:
