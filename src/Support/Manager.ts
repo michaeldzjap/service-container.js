@@ -4,6 +4,14 @@ import {DriverCreators} from '../types/support';
 abstract class Manager {
 
     /**
+     * An optional dependency (e.g. application instance) which you might want
+     * to use in one of the (custom) driver creator methods.
+     *
+     * @var {*}
+     */
+    protected _dependency?: unknown;
+
+    /**
      * The registered custom driver creators.
      *
      * @var {Map}
@@ -23,6 +31,16 @@ abstract class Manager {
      * @returns {string}
      */
     public abstract getDefaultDriver(): string;
+
+    /**
+     * Create a new manager instance.
+     *
+     * @constructor
+     * @param {(*|undefined)} dependency
+     */
+    public constructor(dependency?: unknown) {
+        this._dependency = dependency;
+    }
 
     /**
      * Get the given driver instance.
@@ -87,7 +105,7 @@ abstract class Manager {
      * Handle actual driver creation.
      *
      * @param {string} driver
-     * @param {DriverCreator} creators
+     * @param {DriverCreators} creators
      * @returns {*}
      *
      * @throws {Error}
@@ -112,7 +130,7 @@ abstract class Manager {
      */
     private _callCustomCreator<T>(driver: string): T {
         // @ts-ignore
-        return this._customCreators.get(driver)();
+        return this._customCreators.get(driver)(this._dependency);
     }
 
 }
