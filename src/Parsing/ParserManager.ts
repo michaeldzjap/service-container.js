@@ -2,6 +2,7 @@ import CherowParser from './Parsers/CherowParser';
 import Manager from '../Support/Manager';
 import Parser from '../Contracts/Parsing/Parser';
 import {DEFAULT_DRIVER, DRIVERS} from '../constants/parser';
+import {DriverCreators} from '../types/support';
 
 class ParserManager extends Manager {
 
@@ -30,11 +31,19 @@ class ParserManager extends Manager {
      * @param {string} driver
      * @returns {Parser}
      */
-    protected _createDriver(driver: string): Parser {
-        return super._handleDriverCreation(
-            driver,
-            {[DRIVERS.CHEROW]: this._createCherowParser.bind(this)}
-        );
+    protected _createDriver<Parser>(driver: string): Parser {
+        return super._handleDriverCreation(driver, this._getDriverCreators());
+    }
+
+    /**
+     * Get all the driver creators.
+     *
+     * @returns {DriverCreators}
+     */
+    protected _getDriverCreators(): DriverCreators {
+        return {
+            [DRIVERS.CHEROW]: this._createCherowParser.bind(this),
+        };
     }
 
     /**

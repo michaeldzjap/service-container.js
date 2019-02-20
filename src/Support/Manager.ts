@@ -1,4 +1,5 @@
 import {isUndefined} from './helpers';
+import {DriverCreators} from '../types/support';
 
 abstract class Manager {
 
@@ -27,7 +28,7 @@ abstract class Manager {
      * Get the given driver instance.
      *
      * @param {(string|undefined)} driver
-     * @returns {IParser}
+     * @returns {*}
      *
      * @throws {Error}
      */
@@ -46,6 +47,19 @@ abstract class Manager {
     }
 
     /**
+     * Register a custom driver creator closure.
+     *
+     * @param {string} driver
+     * @param {Function} callback
+     * @returns {this}
+     */
+    public extend(driver: string, callback: Function): this {
+        this._customCreators.set(driver, callback);
+
+        return this;
+    }
+
+    /**
      * Get all of the created drivers.
      *
      * @returns {Map}
@@ -60,20 +74,27 @@ abstract class Manager {
      * @param {string} driver
      * @returns {*}
      */
-    protected abstract _createDriver(driver: string): any;
+    protected abstract _createDriver<T>(driver: string): T;
+
+    /**
+     * Get all the driver creators.
+     *
+     * @returns {DriverCreators}
+     */
+    protected abstract _getDriverCreators(): DriverCreators;
 
     /**
      * Handle actual driver creation.
      *
      * @param {string} driver
-     * @param {Object} creators
+     * @param {DriverCreator} creators
      * @returns {*}
      *
      * @throws {Error}
      */
-    protected _handleDriverCreation(driver: string, creators: object): any {
+    protected _handleDriverCreation<T>(driver: string, creators: DriverCreators): T {
         if (this._customCreators.has(driver)) {
-            return this._callCustomCreator(driver);
+            return this._callCustomCreator<T>(driver);
         }
 
         if (creators.hasOwnProperty(driver)) {
@@ -89,10 +110,10 @@ abstract class Manager {
      * @param {string} driver
      * @returns {*}
      */
-    private _callCustomCreator(driver: string): any {
-        return (this._customCreators.get(driver) as Function)();
+    private _callCustomCreator<T>(driver: string): T {
+        // @ts-ignore
+        return this._customCreators.get(driver)();
     }
-
 
 }
 
