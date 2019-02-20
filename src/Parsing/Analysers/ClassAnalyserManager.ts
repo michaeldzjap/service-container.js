@@ -2,6 +2,7 @@ import ClassAnalyser from '../../Contracts/Parsing/ClassAnalyser';
 import ES5ClassAnalyser from './es5/ClassAnalyser';
 import ESNextClassAnalyser from './esnext/ClassAnalyser';
 import Manager from '../../Support/Manager';
+import {DriverCreators} from '../../types/support';
 import {TARGET} from '../../constants/.';
 
 class ClassAnalyserManager extends Manager {
@@ -40,14 +41,20 @@ class ClassAnalyserManager extends Manager {
      * @param {string} driver
      * @returns {ClassAnalyser}
      */
-    protected _createDriver(driver: string): ClassAnalyser {
-        return super._handleDriverCreation(
-            driver,
-            {
-                es5: this._createES5ClassAnalyser.bind(this),
-                esnext: this._createESNextClassAnalyser.bind(this)
-            }
-        );
+    protected _createDriver<ClassAnalyser>(driver: string): ClassAnalyser {
+        return super._handleDriverCreation(driver, this._getDriverCreators());
+    }
+
+    /**
+     * Get all the driver creators.
+     *
+     * @returns {DriverCreators}
+     */
+    protected _getDriverCreators(): DriverCreators {
+        return {
+            es5: this._createES5ClassAnalyser.bind(this),
+            esnext: this._createESNextClassAnalyser.bind(this),
+        };
     }
 
     /**
