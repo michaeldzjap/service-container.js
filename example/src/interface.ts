@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {Container, InterfaceFactory, injectable} from '../../dist/service-container';
 
 const Contract = InterfaceFactory.make('Contract');

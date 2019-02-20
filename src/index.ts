@@ -1,5 +1,3 @@
-import 'reflect-metadata';
-
 import Callable from './Container/Callable';
 import Container from './Container/Container';
 import InterfaceFactory from './Support/InterfaceFactory';

@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {Container} from '../../dist/service-container';
 
 const container = new Container;

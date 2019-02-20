@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import {Container, injectable} from '../../dist/service-container';
 
 class B {}
