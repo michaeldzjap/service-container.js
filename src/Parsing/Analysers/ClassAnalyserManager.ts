@@ -42,7 +42,7 @@ class ClassAnalyserManager extends Manager {
      * @returns {ClassAnalyser}
      */
     protected _createDriver<ClassAnalyser>(driver: string): ClassAnalyser {
-        return super._handleDriverCreation(driver, this._getDriverCreators());
+        return this._handleDriverCreation(driver, this._getDriverCreators());
     }
 
     /**

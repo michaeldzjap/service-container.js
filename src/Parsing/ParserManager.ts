@@ -32,7 +32,7 @@ class ParserManager extends Manager {
      * @returns {Parser}
      */
     protected _createDriver<Parser>(driver: string): Parser {
-        return super._handleDriverCreation(driver, this._getDriverCreators());
+        return this._handleDriverCreation(driver, this._getDriverCreators());
     }
 
     /**
