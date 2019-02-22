@@ -1,5 +1,5 @@
 module.exports = {
-    moduleFileExtensions: ['ts', 'tsx', 'js'],
+    preset: 'ts-jest',
     moduleNameMapper: {
         '^@helpers/(.*)$': '<rootDir>/__tests__/helpers/$1',
         '^@src/(.*)$': '<rootDir>/src/$1',
@@ -13,16 +13,13 @@ module.exports = {
         '<rootDir>/__tests__/setup.ts'
     ],
     testMatch: [
-        '<rootDir>/__tests__/unit/Parsing/esnext/*.+(ts|tsx)',
+        '<rootDir>/__tests__/unit/Parsing/esnext/*.[jt]s?(x)',
     ],
     testPathIgnorePatterns: [
         '<rootDir>/node_modules/',
         '<rootDir>/__tests__/helpers/',
         '<rootDir>/__tests__/setup.ts',
     ],
-    transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest'
-    },
     globals: {
         'ts-jest': {
             tsConfig: 'tsconfig.esnext-test.json'
