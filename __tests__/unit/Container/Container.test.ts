@@ -916,7 +916,7 @@ describe('Container', (): void => {
     test('container can dynamically set service', (): void => {
         const container = new Container;
 
-        expect(container.has(name)).toBeFalsy();
+        expect(container.has('name')).toBeFalsy();
 
         container.set('name', 'Riley Martin');
 
