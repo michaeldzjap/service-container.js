@@ -1,5 +1,6 @@
 module.exports = {
     preset: 'ts-jest',
+    testEnvironment: 'node',
     moduleNameMapper: {
         '^@helpers/(.*)$': '<rootDir>/__tests__/helpers/$1',
         '^@src/(.*)$': '<rootDir>/src/$1',
