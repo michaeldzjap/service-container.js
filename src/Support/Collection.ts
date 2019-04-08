@@ -280,7 +280,7 @@ class Collection {
         }
 
         if (Array.isArray(this._items)) {
-            const values = (Object as any).values(result);
+            const values = Object.values(result);
             const diff = this._items.filter((value: unknown, index: number): boolean => {
                 if (isUndefined(callback)) {
                     return !values.includes(value);
@@ -294,7 +294,7 @@ class Collection {
 
         // If both comparables are objects, keep keys
 
-        const values = (Object as any).values(result);
+        const values = Object.values(result);
         const diff = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
                 if (
@@ -393,7 +393,7 @@ class Collection {
         return this.each((chunk: unknown[] | Collection, key: string): boolean | undefined => {
             let c: any = Collection.unwrap(chunk);
             c = [
-                ...(Array.isArray(c) ? c : (Object as any).values(c)),
+                ...(Array.isArray(c) ? c : Object.values(c)),
                 key
             ];
 
@@ -507,7 +507,7 @@ class Collection {
         }
 
         if (Array.isArray(this._items)) {
-            const values = (Object as any).values(result);
+            const values = Object.values(result);
 
             return new Collection(this._items.filter((value: unknown): boolean => (
                 values.includes(value)
@@ -516,7 +516,7 @@ class Collection {
 
         // If both comparables are objects, keep keys
 
-        const values = (Object as any).values(result);
+        const values = Object.values(result);
         const intersect = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
                 if (values.includes(this._items[key])) {
@@ -789,7 +789,7 @@ class Collection {
             this._items, ...lists.map((_: unknown): unknown[] => {
                 const items = Collection._getArrayableItems(_);
 
-                return Array.isArray(items) ? items : (Object as any).values(items);
+                return Array.isArray(items) ? items : Object.values(items);
             })
         ));
     }
@@ -1100,15 +1100,11 @@ class Collection {
 
         if (!Array.isArray(this._items) && Array.isArray(result)) {
 
-            return new Collection([
-                ...(Object as any).values(this._items), ...result
-            ]);
+            return new Collection([...Object.values(this._items), ...result]);
         }
 
         if (Array.isArray(this._items) && !Array.isArray(result)) {
-            return new Collection([
-                ...this._items, ...(Object as any).values(result)
-            ]);
+            return new Collection([...this._items, ...Object.values(result)]);
         }
 
         return new Collection({...this._items, ...result});
@@ -1982,7 +1978,7 @@ class Collection {
         return new Collection(
             Array.isArray(this._items)
                 ? [...this._items]
-                : (Object as any).values(this._items)
+                : Object.values(this._items)
         );
     }
 
@@ -2166,7 +2162,7 @@ class Collection {
     private _values(items?: unknown[] | object): any[] {
         items = isUndefined(items) ? this._items : items;
 
-        return Array.isArray(items) ? items : (Object as any).values(items);
+        return Array.isArray(items) ? items : Object.values(items);
     }
 
 }

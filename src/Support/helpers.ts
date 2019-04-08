@@ -215,7 +215,7 @@ export const inArray = (item: any, array: any[], strict: boolean = false): boole
  * @returns {boolean}
  */
 export const inObject = (item: any, obj: object, strict: boolean = false): boolean => (
-    inArray(item, (Object as any).values(obj), strict)
+    inArray(item, Object.values(obj), strict)
 );
 
 /**

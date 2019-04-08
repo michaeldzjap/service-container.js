@@ -166,7 +166,7 @@ export const divide = (array: unknown[] | object): unknown[] => {
         ];
     }
 
-    return [Object.keys(array), (Object as any).values(array)];
+    return [Object.keys(array), Object.values(array)];
 };
 
 /**
@@ -391,7 +391,7 @@ export const last = (items: unknown[] | object, callback?: Function | null,
 export const flatten = (array: unknown[] | object, depth: number = Infinity): unknown[] => {
     let result: unknown[] = [];
 
-    const arr = Array.isArray(array) ? array : (Object as any).values(array);
+    const arr = Array.isArray(array) ? array : Object.values(array);
 
     for (let item of arr) {
         item = item instanceof Collection ? item.all() : item;
@@ -401,7 +401,7 @@ export const flatten = (array: unknown[] | object, depth: number = Infinity): un
         } else if (depth === 1) {
             result = [
                 ...result,
-                ...(Array.isArray(item) ? item : (Object as any).values(item))
+                ...(Array.isArray(item) ? item : Object.values(item))
             ];
         } else {
             result = [...result, ...flatten(item, depth - 1)];

@@ -125,7 +125,7 @@ class BoundMethod {
             );
         }
 
-        return (Object as any).values({...dependencies, ...parameters});
+        return Object.values({...dependencies, ...parameters});
     }
 
     /* eslint-disable  @typescript-eslint/no-non-null-assertion */
