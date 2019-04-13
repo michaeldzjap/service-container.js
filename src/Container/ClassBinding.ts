@@ -35,7 +35,7 @@ class ClassBinding implements ClassBindingContract {
                 return this._container.build<V>(concrete);
             }
 
-            return this._container.make(concrete, parameters);
+            return this._container.resolve(concrete, parameters, false);
         };
     }
 

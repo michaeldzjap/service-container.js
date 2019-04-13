@@ -51,9 +51,15 @@ class Aliaser implements AliaserContract {
      *
      * @param {Identifier} abstract
      * @param {Identifier} alias
+     *
+     * @throws {LogicError}
      * @returns {void}
      */
     public alias<U, V>(abstract: Identifier<U>, alias: Identifier<V>): void {
+        if (alias === abstract) {
+            throw new LogicError(`[${String(abstract)}] is aliased to itself.`);
+        }
+
         this._aliases.set(alias, abstract);
 
         this._abstractAliases.has(abstract)
@@ -67,16 +73,10 @@ class Aliaser implements AliaserContract {
      *
      * @param {Identifier} abstract
      * @returns {Identifier}
-     *
-     * @throws {LogicError}
      */
     public getAlias<T>(abstract: Identifier<T>): Identifier<any> {
         if (!this._aliases.has(abstract)) {
             return abstract;
-        }
-
-        if (this._aliases.get(abstract) === abstract) {
-            throw new LogicError(`[${String(abstract)}] is aliased to itself.`);
         }
 
         return this.getAlias<T>(this._aliases.get(abstract));

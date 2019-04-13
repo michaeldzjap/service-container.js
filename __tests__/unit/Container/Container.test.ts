@@ -660,6 +660,7 @@ describe('Container', (): void => {
         expect(ContainerTestContextInjectInstantiations.instantiations).toBe(1);
     });
 
+    // eslint-disable-next-line max-statements
     test('container tags', (): void => {
         let container = new Container;
         container.tag(ContainerImplementationStub, ['foo', 'bar']);
@@ -667,21 +668,86 @@ describe('Container', (): void => {
 
         expect(container.tagged('bar')).toHaveLength(1);
         expect(container.tagged('foo')).toHaveLength(2);
-        expect(container.tagged('foo')[0]).toBeInstanceOf(ContainerImplementationStub);
-        expect(container.tagged('bar')[0]).toBeInstanceOf(ContainerImplementationStub);
-        expect(container.tagged('foo')[1]).toBeInstanceOf(ContainerImplementationStubTwo);
+
+        let fooResults = [];
+        for (const foo of container.tagged('foo')) {
+            fooResults.push(foo);
+        }
+
+        const barResults = [];
+        for (const bar of container.tagged('bar')) {
+            barResults.push(bar);
+        }
+
+        expect(fooResults[0]).toBeInstanceOf(ContainerImplementationStub);
+        expect(barResults[0]).toBeInstanceOf(ContainerImplementationStub);
+        expect(fooResults[1]).toBeInstanceOf(ContainerImplementationStubTwo);
 
         container = new Container;
         container.tag([ContainerImplementationStub, ContainerImplementationStubTwo], ['foo']);
 
         expect(container.tagged('foo')).toHaveLength(2);
-        expect(container.tagged('foo')[0]).toBeInstanceOf(ContainerImplementationStub);
-        expect(container.tagged('foo')[1]).toBeInstanceOf(ContainerImplementationStubTwo);
+
+        fooResults = [];
+        for (const foo of container.tagged('foo')) {
+            fooResults.push(foo);
+        }
+
+        expect(fooResults[0]).toBeInstanceOf(ContainerImplementationStub);
+        expect(fooResults[1]).toBeInstanceOf(ContainerImplementationStubTwo);
 
         expect(container.tagged('this_tag_does_not_exist')).toHaveLength(0);
     });
 
-    test('forget instance forget instance', (): void => {
+    test('tagged services are lazy loaded', (): void => {
+        const stub = new ContainerImplementationStub;
+        const makeMock = jest.fn().mockReturnValue(stub);
+        const {make} = Container.prototype;
+        Container.prototype.make = makeMock;
+        const container = new Container;
+
+        container.tag(ContainerImplementationStub, ['foo']);
+        container.tag(ContainerImplementationStubTwo, ['foo']);
+
+        const results = [];
+        for (const foo of container.tagged('foo')) {
+            results.push(foo);
+            break;
+        }
+
+        expect(makeMock).toHaveBeenCalledTimes(1);
+        expect(makeMock).toHaveReturnedWith(stub);
+        expect(container.tagged('foo')).toHaveLength(2);
+        expect(results[0]).toBeInstanceOf(ContainerImplementationStub);
+
+        Container.prototype.make = make;
+    });
+
+    test('lazy loaded tagged services cannot be looped over multiple times', (): void => {
+        const container = new Container;
+        container.tag(ContainerImplementationStub, ['foo']);
+        container.tag(ContainerImplementationStubTwo, ['foo']);
+
+        const services = container.tagged('foo');
+
+        let results = [];
+        for (const foo of services) {
+            results.push(foo);
+        }
+
+        expect(results[0]).toBeInstanceOf(ContainerImplementationStub);
+        expect(results[1]).toBeInstanceOf(ContainerImplementationStubTwo);
+
+        results = [];
+        for (const foo of services) {
+            results.push(foo);
+        }
+
+        expect(results[0]).toBeUndefined();
+        expect(results[1]).toBeUndefined();
+    });
+
+    test('forget instance forgets instance', (): void => {
         const container = new Container;
         const containerConcreteStub = new ContainerConcreteStub;
         container.instance(ContainerConcreteStub, containerConcreteStub);
@@ -693,7 +759,7 @@ describe('Container', (): void => {
         expect(container.isShared(ContainerConcreteStub)).toBeFalsy();
     });
 
-    test('forget instances forget all instances', (): void => {
+    test('forget instances forgets all instances', (): void => {
         const container = new Container;
         const containerConcreteStub1 = new ContainerConcreteStub;
         const containerConcreteStub2 = new ContainerConcreteStub;
@@ -759,10 +825,9 @@ describe('Container', (): void => {
 
     test('it throws error when abstract is same as alias', (): void => {
         const container = new Container;
-        container.alias('name', 'name');
 
         // eslint-disable-next-line require-jsdoc
-        const fn = (): unknown => container.getAlias('name');
+        const fn = (): unknown => container.alias('name', 'name');
 
         expect(fn).toThrow('[name] is aliased to itself.');
     });
@@ -832,6 +897,371 @@ describe('Container', (): void => {
         const instance = container.make('foo');
 
         expect(instance.name).toBe('Riley Martin');
+    });
+
+    test('resolving callbacks are called once for implementation', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+    });
+
+    test('global resolving callbacks are called once for implementation', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving((): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+    });
+
+    test('resolving callbacks are called once for singleton concretes', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(3);
+    });
+
+    test('resolving callbacks can still be added after the first resolution', (): void => {
+        const container = new Container;
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+    });
+
+    test('resolving callbacks are canceled when interface gets bound to some other concrete', (): void => {
+        const container = new Container;
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        let callCounter = 0;
+        container.resolving(ContainerImplementationStub, (): void => {
+            callCounter++;
+        });
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStubTwo);
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+    });
+
+    test('resolving callbacks are called once for string abstractions', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving('foo', (): void => {
+            callCounter++;
+        });
+
+        container.bind('foo', ContainerImplementationStub);
+
+        container.make('foo');
+        expect(callCounter).toBe(1);
+
+        container.make('foo');
+        expect(callCounter).toBe(2);
+    });
+
+    test('resolving callbacks for concretes are called once for string abstractions', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerImplementationStub, (): void => {
+            callCounter++;
+        });
+
+        container.bind('foo', ContainerImplementationStub);
+        container.bind('bar', ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+
+        container.make('foo');
+        expect(callCounter).toBe(2);
+
+        container.make('bar');
+        expect(callCounter).toBe(3);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(4);
+    });
+
+    test('resolving callbacks are called once for implementation 2', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, (): ContainerImplementationStub => (
+            new ContainerImplementationStub
+        ));
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(3);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(4);
+    });
+
+    test('rebinding does not affect resolving callbacks', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+        container.bind(ContainerContractStub.key, (): ContainerImplementationStub => (
+            new ContainerImplementationStub
+        ));
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(3);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(4);
+    });
+
+    test('parameters passed into resolving callbacks', (): void => {
+        const container = new Container;
+
+        container.resolving(ContainerContractStub.key, (obj: ContainerImplementationStubTwo, app: Container): void => {
+            expect(obj).toBeInstanceOf(ContainerImplementationStubTwo);
+            expect(container).toEqual(app);
+        });
+
+        container.afterResolving(ContainerContractStub.key, (obj: ContainerImplementationStubTwo, app: Container): void => {
+            expect(obj).toBeInstanceOf(ContainerImplementationStubTwo);
+            expect(container).toEqual(app);
+        });
+
+        container.afterResolving((obj: ContainerImplementationStubTwo, app: Container): void => {
+            expect(obj).toBeInstanceOf(ContainerImplementationStubTwo);
+            expect(container).toEqual(app);
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStubTwo);
+        container.make(ContainerContractStub.key);
+    });
+
+    test('resolving callbacks are called when rebind happens for resolved abstract', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStubTwo);
+        expect(callCounter).toBe(2);
+
+        container.make(ContainerImplementationStubTwo);
+        expect(callCounter).toBe(3);
+
+        container.bind(ContainerContractStub.key, (): ContainerImplementationStubTwo => (
+            new ContainerImplementationStubTwo
+        ));
+        expect(callCounter).toBe(4);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(5);
+    });
+
+    test('rebinding does not affect multiple resolving callbacks', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.resolving(ContainerImplementationStubTwo, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        // It should call the callback for interface
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        // It should call the callback for interface
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+
+        // eslint-disable-next-line require-jsdoc
+        const fn = (): void => {
+            container.make(ContainerImplementationStubTwo);
+        };
+
+        // This should throw since it is impossible to determine if a class that
+        // is not explicitly bounded to a contract / interface is implementing
+        // this contract / interface
+        expect(fn).toThrow('Impossible to determine if instance of [ContainerImplementationStubTwo] implements [ContainerContractStub].');
+    });
+
+    test('resolving callbacks are called for interfaces', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerContractStub.key);
+
+        expect(callCounter).toBe(1);
+    });
+
+    test('resolving callbacks are called for concretes when attached on interface', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerImplementationStub, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+    });
+
+    test('resolving callbacks are called for concretes when attached on concretes', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerImplementationStub, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+    });
+
+    test('resolving callbacks are called for concretes with no binding', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerImplementationStub, (): void => {
+            callCounter++;
+        });
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(2);
+    });
+
+    test('resolving callbacks are not called for interfaces with no binding', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.resolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        // eslint-disable-next-line require-jsdoc
+        const fn = (): void => {
+            container.make(ContainerImplementationStub);
+        };
+
+        // This should throw since it is impossible to determine if a class that
+        // is not explicitly bounded to a contract / interface is implementing
+        // this contract / interface
+        expect(fn).toThrow('Impossible to determine if instance of [ContainerImplementationStub] implements [ContainerContractStub].');
+    });
+
+    test('after resolving callbacks are called once for implementation', (): void => {
+        const container = new Container;
+
+        let callCounter = 0;
+        container.afterResolving(ContainerContractStub.key, (): void => {
+            callCounter++;
+        });
+
+        container.bind(ContainerContractStub.key, ContainerImplementationStub);
+
+        container.make(ContainerImplementationStub);
+        expect(callCounter).toBe(1);
+
+        container.make(ContainerContractStub.key);
+        expect(callCounter).toBe(2);
     });
 
     test('resolving with array of parameters', (): void => {

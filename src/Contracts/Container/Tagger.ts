@@ -15,9 +15,9 @@ interface Tagger {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {Array}
+     * @returns {(Array|IterableIterator)}
      */
-    tagged(tag: string): any[];
+    tagged(tag: string): any[] | IterableIterator<any>;
 
 }
 

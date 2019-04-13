@@ -1,5 +1,6 @@
 import Container from './Container';
 import TaggerContract from '../Contracts/Container/Tagger';
+import Generator from './Generator';
 import {wrap} from '../Support/Arr';
 import {Identifier} from '../types/container';
 
@@ -51,18 +52,23 @@ class Tagger implements TaggerContract {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {Array}
+     * @returns {(Array|IterableIterator)}
      */
-    public tagged(tag: string): any[] {
-        const results: any[] = [];
-
-        if (this._tags.has(tag)) {
-            for (const abstract of (this._tags as any).get(tag)) {
-                results.push(this._container.make(abstract));
-            }
+    public tagged(tag: string): any[] | IterableIterator<any> {
+        if (!this._tags.has(tag)) {
+            return [];
         }
 
-        return results;
+        return (
+            new Generator(
+                (function *generator(this: Tagger): IterableIterator<any> {
+                    for (const abstract of (this._tags as any).get(tag)) {
+                        yield this._container.make(abstract);
+                    }
+                }).bind(this),
+                (this._tags as any).get(tag).length
+            )
+        ).getIterator();
     }
 
 }

@@ -1,7 +1,9 @@
 import Container from './Container';
 import ResolverContract from '../Contracts/Container/Resolver';
 import {empty} from '../Support/Arr';
-import {equals, isUndefined, isInstantiable, isString} from '../Support/helpers';
+import {
+    equals, isUndefined, isInstantiable, isString, isSymbol, getSymbolName,
+} from '../Support/helpers';
 import {Identifier} from '../types/container';
 
 class Resolver implements ResolverContract {
@@ -63,9 +65,11 @@ class Resolver implements ResolverContract {
      *
      * @param {Identifier} abstract
      * @param {(Array|Object)} [parameters=[]]
+     * @param {boolean} [raiseEvents=true]
      * @returns {*}
      */
-    public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
+    public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = [],
+        raiseEvents: boolean = true): any {
         abstract = this._container.getAlias<T>(abstract);
 
         const needsContextualBuild = !empty(parameters)
@@ -112,7 +116,9 @@ class Resolver implements ResolverContract {
                 .addSharedInstance<T>(abstract, object);
         }
 
-        this._fireResolvingCallbacks<T>(abstract, object);
+        if (raiseEvents) {
+            this._fireResolvingCallbacks<T>(abstract, object);
+        }
 
         // Before returning, we will also set the resolved flag to "true" and
         // pop off the parameter overrides for this build. After those two
@@ -167,7 +173,7 @@ class Resolver implements ResolverContract {
      * @returns {void}
      */
     public resolving<T>(abstract: Identifier<T> | Function, callback?: Function): void {
-        if (isString(abstract) || isInstantiable(abstract)) {
+        if (isString(abstract) || isInstantiable(abstract) || isSymbol(abstract)) {
             abstract = this._container.getAlias<T>(abstract);
         }
 
@@ -258,7 +264,9 @@ class Resolver implements ResolverContract {
 
         this._resolvingCallbacks.forEach(
             (callbacks: Function[], type: any): void => {
-                if (type === abstract || object instanceof type) {
+                if (type === abstract
+                    || (isSymbol(type) && this._compareToBinding(object, type))
+                    || object instanceof type) {
                     this._fireCallbackArray(object, callbacks);
                 }
             }
@@ -282,7 +290,9 @@ class Resolver implements ResolverContract {
 
         this._afterResolvingCallbacks.forEach(
             (callbacks: Function[], type: any): void => {
-                if (type === abstract || object instanceof type) {
+                if (type === abstract
+                    || (isSymbol(type) && this._compareToBinding(object, type))
+                    || object instanceof type) {
                     this._fireCallbackArray(object, callbacks);
                 }
             }
@@ -298,7 +308,7 @@ class Resolver implements ResolverContract {
      */
     protected _fireCallbackArray(object: object, callbacks: Function[]): void {
         for (const callback of callbacks) {
-            callback(object, this);
+            callback(object, this._container);
         }
     }
 
@@ -318,6 +328,33 @@ class Resolver implements ResolverContract {
         }
 
         return [];
+    }
+
+    /**
+     * Check if the given object implements the given contract.
+     *
+     * Here Laravel checks if the object implements a given contract, i.e. in
+     * PHP you can do: "$object instanceof \Some\Interface::class". Obviously,
+     * since interfaces do not exist at runtime in JavaScript this is not an
+     * option for us. The only thing we can do is to check that the class name
+     * of the object is the same as the class name of the resolved binding
+     * associated with the given contract.
+     *
+     * @param {*} object
+     * @param {Symbol} contract
+     * @returns {boolean}
+     */
+    private _compareToBinding(object: object, contract: symbol): boolean {
+        const result = this._container.getBinder().hasBinding(contract)
+            && object.constructor.name
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                === this._container.getBinder().getBinding(contract)!.concrete().constructor.name;
+
+        if (!result) {
+            throw new Error(`Impossible to determine if instance of [${object.constructor.name}] implements [${getSymbolName(contract)}].`);
+        }
+
+        return result;
     }
 
 }

@@ -316,9 +316,9 @@ class Container implements ContainerContract {
      * Resolve all of the bindings for a given tag.
      *
      * @param {string} tag
-     * @returns {Array}
+     * @returns {(Array|IterableIterator)}
      */
-    public tagged(tag: string): any[] {
+    public tagged(tag: string): any[] | IterableIterator<any> {
         return this._tagger.tagged(tag);
     }
 
@@ -401,7 +401,20 @@ class Container implements ContainerContract {
      * @returns {*}
      */
     public make<T>(abstract: Identifier<T>, parameters: any[] | object = []): any {
-        return this._resolver.resolve<T>(abstract, parameters);
+        return this.resolve<T>(abstract, parameters);
+    }
+
+    /**
+     * Resolve the given type from the container.
+     *
+     * @param {Identifier} abstract
+     * @param {(Array|Object)} [parameters=[]]
+     * @param {boolean} [raiseEvents=true]
+     * @returns {*}
+     */
+    public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = [],
+        raiseEvents: boolean = true): any {
+        return this._resolver.resolve<T>(abstract, parameters, raiseEvents);
     }
 
     /**
