@@ -904,7 +904,7 @@ describe('Container', (): void => {
 
         let callCounter = 0;
         container.resolving(ContainerContractStub.key, (): void => {
-            callCounter++
+            callCounter++;
         });
 
         container.bind(ContainerContractStub.key, ContainerImplementationStub);
