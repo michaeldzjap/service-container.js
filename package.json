@@ -7,7 +7,7 @@
   "files": [
     "dist"
   ],
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "lint": "./node_modules/.bin/eslint --ext .ts ./",
     "test": "NODE_ENV=test jest",
