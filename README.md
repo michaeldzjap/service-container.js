@@ -43,7 +43,7 @@ This project should work in both browser and _node_ environments targeting _ES5_
 In order to be able to inject any dependencies defined in a class constructor you need to decorate the relevant class definition like so:
 
 ```ts
-import {injectable} from 'service-container';
+import {injectable} from 'service-container.js';
 
 @injectable()
 class MyClass {
