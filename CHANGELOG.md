@@ -10,10 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     <summary>Unreleased changes. Click to see more.</summary>
     <ul>
         <li>`Collection` and `Arr` functionality are moved to a separate package.</li>
-        <li>Tagged services are now lazy loaded.</li>
-        <li>More elaborate testing of resolving logic is added.</li>
-        <li>Add the ability to bind a resolving callback to an interface (Unlike _Laravel_, this only works if a service is explicitly bound to an interface)</li>
 </details>
+
+## [0.3.0] - 2019-04-14
+
+### Added
+
+- More elaborate testing of resolving logic is added.
+- The ability to bind a resolving callback to an interface. Unlike _Laravel_, this only works if a service is explicitly bound to an interface.
+
+### Changed
+
+- Tagged services are now lazy loaded.
 
 ## [0.2.0] - 2019-02-20
 
