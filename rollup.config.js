@@ -15,23 +15,22 @@ const base = {
         ...Object.keys(pkg.peerDependencies || {}),
     ],
     watch: {
-        include: 'src/**'
+        include: 'src/**',
     },
     plugins: [
         eslint(),
         json({compact: true}),
         resolve({
-            jsnext: true,
-            main: true,
-            browser: true
+            mainFields: ['module', 'main', 'jsnext'],
+            browser: true,
         }),
         commonjs(),
         typescript({
             typescript: require('typescript'),
-            rollupCommonJSResolveHack: true
+            rollupCommonJSResolveHack: true,
         }),
         sourceMaps(),
-    ]
+    ],
 };
 
 export default [
@@ -39,14 +38,14 @@ export default [
         ...base,
         ...{
             output: {file: pkg.main, format: 'cjs', sourcemap: true},
-            plugins: [...base.plugins, uglify()]
-        }
+            plugins: [...base.plugins, uglify()],
+        },
     },
     {
         ...base,
         ...{
             output: {file: pkg.module, format: 'es', sourcemap: true},
-            plugins: [...base.plugins, terser()]
-        }
-    }
+            plugins: [...base.plugins, terser()],
+        },
+    },
 ];
