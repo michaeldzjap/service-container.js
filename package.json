@@ -38,16 +38,16 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/lodash.isequal": "^4.5.5",
-    "@types/node": "^11.13.4",
-    "@typescript-eslint/eslint-plugin": "^1.6.0",
-    "@typescript-eslint/parser": "^1.6.0",
+    "@types/node": "^11.13.7",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
     "eslint": "^5.16.0",
     "eslint-plugin-jest": "^22.4.1",
     "jest": "^24.7.1",
     "lodash.isequal": "^4.5.0",
     "rand-seed": "^0.1.1",
     "reflect-metadata": "^0.1.13",
-    "rollup": "^1.10.0",
+    "rollup": "^1.10.1",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-eslint": "^5.1.0",
     "rollup-plugin-json": "^4.0.0",
@@ -58,7 +58,7 @@
     "rollup-plugin-uglify": "^6.0.2",
     "ts-jest": "^24.0.2",
     "tsconfig-paths": "^3.8.0",
-    "typescript": "^3.4.3"
+    "typescript": "^3.4.5"
   },
   "dependencies": {
     "cherow": "^1.6.9"
