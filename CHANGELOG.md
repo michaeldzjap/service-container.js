@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         <li>`Collection` and `Arr` functionality are moved to a separate package.</li>
 </details>
 
+## [0.3.2] - 2019-05-24
+
+## Changed
+
+- Fresh build after updating dependencies.
+
 ## [0.3.1] - 2019-04-14
 
 ### Fixed
