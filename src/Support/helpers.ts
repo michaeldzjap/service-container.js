@@ -88,7 +88,7 @@ export const isFunction = (target: any): target is Function => (
  * @returns {boolean}
  */
 const hasPrototype = (target: object | Function): boolean => (
-    target.hasOwnProperty('prototype')
+    Object.prototype.hasOwnProperty.call(target, 'prototype')
 );
 
 /**

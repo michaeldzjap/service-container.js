@@ -141,11 +141,11 @@ class BoundMethod {
      */
     protected static _addDependencyForCallParameter(container: Container,
         parameter: ReflectionParameter, parameters: object, dependencies: object): void {
-        if (parameters.hasOwnProperty(parameter.getName())) {
+        if (Object.prototype.hasOwnProperty.call(parameters, parameter.getName())) {
             dependencies[parameter.getName()] = parameters[parameter.getName()];
 
             delete parameters[parameter.getName()];
-        } else if (parameter.getClass() && parameters.hasOwnProperty(parameter.getClass()!.getName())) {
+        } else if (parameter.getClass() && Object.prototype.hasOwnProperty.call(parameters, parameter.getClass()!.getName())) {
             dependencies[parameter.getClass()!.getName()] = parameters[parameter.getClass()!.getName()];
 
             delete parameters[parameter.getClass()!.getName()];

@@ -115,7 +115,7 @@ abstract class Manager {
             return this._callCustomCreator<T>(driver);
         }
 
-        if (creators.hasOwnProperty(driver)) {
+        if (Object.prototype.hasOwnProperty.call(creators, driver)) {
             return creators[driver]();
         }
 

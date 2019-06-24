@@ -122,7 +122,7 @@ class Collection {
             const retrieved = dataGet(item, key);
 
             const strings = [retrieved, value].filter((value: any): boolean => (
-                isString(value) || (isObject(value) && value.hasOwnProperty('toString'))
+                isString(value) || (isObject(value) && Object.prototype.hasOwnProperty.call(value, 'toString'))
             ));
 
             if (strings.length < 2
@@ -327,7 +327,7 @@ class Collection {
         const result = Collection._getArrayableItems(items);
         const diff = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
-                if (isUndefined(callback) && !result.hasOwnProperty(key)
+                if (isUndefined(callback) && !Object.prototype.hasOwnProperty.call(result, key)
                     || (!isUndefined(callback) && !callback(this._items[key], key, this._items, result))) {
                     acc[key] = this._items[key];
                 }
@@ -353,7 +353,8 @@ class Collection {
         const result = Collection._getArrayableItems(items);
         const diff = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
-                if (!result.hasOwnProperty(key) || result[key] !== this._items[key]) {
+                if (!Object.prototype.hasOwnProperty.call(result, key)
+                    || result[key] !== this._items[key]) {
                     acc[key] = this._items[key];
                 }
 
@@ -458,7 +459,7 @@ class Collection {
         }
 
         for (const key of keys) {
-            if (!(Array.isArray(this._items) ? (key >= 0 && key < this._items.length) : this._items.hasOwnProperty(key))) {
+            if (!(Array.isArray(this._items) ? (key >= 0 && key < this._items.length) : Object.prototype.hasOwnProperty.call(this._items, key))) {
                 return false;
             }
         }
@@ -543,7 +544,7 @@ class Collection {
         const result = Collection._getArrayableItems(items);
         const intersect = Object.keys(this._items)
             .reduce((acc: object, key: string): object => {
-                if (result.hasOwnProperty(key)) {
+                if (Object.prototype.hasOwnProperty.call(result, key)) {
                     acc[key] = this._items[key];
                 }
 
@@ -981,7 +982,7 @@ class Collection {
 
             const value = pair[key];
 
-            if (!dictionary.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(dictionary, key)) {
                 dictionary[key] = [];
             }
 
@@ -1153,7 +1154,9 @@ class Collection {
             // Add the items of the right-hand object if the key does not exist
             // as an index in the left-hand array
             for (const key of Object.keys(items)) {
-                if (!union.hasOwnProperty(key)) union[key] = items[key];
+                if (!Object.prototype.hasOwnProperty.call(union, key)) {
+                    union[key] = items[key];
+                }
             }
         } else if (!Array.isArray(this._items) && Array.isArray(items)) {
             const lkeys = Object.keys(this._items);
@@ -1872,7 +1875,7 @@ class Collection {
             for (let groupKey of groupKeys) {
                 groupKey = typeof groupKey === 'boolean' ? (groupKey === true ? 1 : 0) : groupKey;
 
-                if (!results.hasOwnProperty(groupKey)) {
+                if (!Object.prototype.hasOwnProperty.call(results, groupKey)) {
                     results[groupKey] = new Collection(preserveKeys ? {} : []);
                 }
 
@@ -1936,7 +1939,7 @@ class Collection {
         }
 
         if (isObject(this._items) && typeof key === 'string') {
-            return this._items.hasOwnProperty(key);
+            return Object.prototype.hasOwnProperty.call(this._items, key);
         }
 
         return false;

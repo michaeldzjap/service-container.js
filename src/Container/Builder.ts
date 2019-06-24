@@ -174,7 +174,7 @@ class Builder implements BuilderContract {
 
         return Array.isArray(override)
             ? false
-            : override.hasOwnProperty(dependency.getName());
+            : Object.prototype.hasOwnProperty.call(override, dependency.getName());
     }
 
     /**

@@ -463,7 +463,7 @@ describe('Collection', (): void => {
             c1.diffKeys(
                 c2,
                 (value: string, key: string, left: object, right: object): boolean => (
-                    right.hasOwnProperty(key.toUpperCase())
+                    Object.prototype.hasOwnProperty.call(right, key.toUpperCase())
                 )
             ).all()
         ).toEqual({firstWord: 'Hey'});

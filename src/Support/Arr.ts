@@ -38,7 +38,7 @@ export const set = (obj: object, key: string | null, value: unknown): object | u
         // empty array to hold the next value, allowing us to create the
         // arrays to hold final values at the correct depth. Then we'll keep
         // digging into the array.
-        if (!obj.hasOwnProperty(key) || !isObject(obj[key])) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key) || !isObject(obj[key])) {
             obj[key] = {};
         }
 
@@ -61,7 +61,7 @@ export const set = (obj: object, key: string | null, value: unknown): object | u
 export const add = (obj: object, key: string, value: any): object => {
     obj = {...obj};
 
-    if (!obj.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) {
         set(obj, key, value);
     }
 
@@ -202,7 +202,7 @@ export const exists = (array: unknown[] | object, key: number | string): boolean
         return key >= 0 && key < array.length;
     }
 
-    return array.hasOwnProperty(key);
+    return Object.prototype.hasOwnProperty.call(array, key);
 };
 
 /**
@@ -253,7 +253,7 @@ export const forget = (obj: object, keys?: string[] | string): void => {
             const part = parts.shift() as string;
 
             // eslint-disable-next-line max-depth
-            if (obj.hasOwnProperty(part) && isObject(obj[part])) {
+            if (Object.prototype.hasOwnProperty.call(obj, part) && isObject(obj[part])) {
                 obj = obj[part];
             } else {
                 continue loop1;
@@ -429,7 +429,7 @@ export const get = (obj: object, key?: string, dflt?: unknown): unknown => {
     if (exists(obj, key)) return obj[key];
 
     if (key.indexOf('.') < 0) {
-        return obj.hasOwnProperty(key) ? obj[key] : value(dflt);
+        return Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : value(dflt);
     }
 
     for (const segment of key.split('.')) {
