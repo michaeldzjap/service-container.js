@@ -1844,10 +1844,11 @@ describe('Collection', (): void => {
             'space',
         ];
 
+        const obj: object = {who: 'Riley', preposition: 'from', where: 'space'};
         let c = new Collection([4, 5, 6]);
         c = c.concat(['a', 'b', 'c']);
-        c = c.concat({who: 'Riley', preposition: 'from', where: 'space'});
-        const actual = c.concat({who: 'Riley', preposition: 'from', where: 'space'}).toPrimitive();
+        c = c.concat(obj);
+        const actual = c.concat(obj).toPrimitive();
 
         expect(actual).toEqual(expected);
     });
