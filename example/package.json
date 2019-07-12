@@ -16,8 +16,8 @@
   "devDependencies": {
     "reflect-metadata": "^0.1.13",
     "ts-loader": "^6.0.4",
-    "typescript": "^3.5.2",
-    "webpack": "^4.35.0",
+    "typescript": "^3.5.3",
+    "webpack": "^4.35.3",
     "webpack-cli": "^3.3.5"
   }
 }
