@@ -69,7 +69,7 @@ class Resolver implements ResolverContract {
      * @returns {*}
      */
     public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = [],
-        raiseEvents: boolean = true): any {
+        raiseEvents = true): any {
         abstract = this._container.getAlias<T>(abstract);
 
         const needsContextualBuild = !empty(parameters)

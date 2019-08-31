@@ -23,7 +23,7 @@ class Callable<T> implements CallableContract<T> {
      *
      * @var {boolean}
      */
-    private _isStatic: boolean = false;
+    private _isStatic = false;
 
     /**
      * Create a new callable instance.
@@ -33,7 +33,7 @@ class Callable<T> implements CallableContract<T> {
      * @param {(string|undefined)} method
      * @param {boolean} [isStatic=false]
      */
-    public constructor(target: Instantiable<T> | Instance<T>, method?: string, isStatic: boolean = false) {
+    public constructor(target: Instantiable<T> | Instance<T>, method?: string, isStatic = false) {
         this._target = target;
         this._method = method;
         this._isStatic = isStatic;

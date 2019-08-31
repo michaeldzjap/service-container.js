@@ -40,7 +40,6 @@ class InjectableService {
      */
     private static _avoidMultipleDefinition(target: any, propertyKey?: string | symbol): void {
         if (isUndefined(propertyKey)) {
-            // @ts-ignore
             if (Reflect.hasOwnMetadata(PARAM_TYPES, target)) {
                 InjectableService._throwError();
             }
@@ -48,7 +47,6 @@ class InjectableService {
             return;
         }
 
-        // @ts-ignore
         if (Reflect.hasOwnMetadata(PARAM_TYPES, target, propertyKey)) {
             InjectableService._throwError();
         }
@@ -77,13 +75,11 @@ class InjectableService {
     private static _defineMetadata(parameters: ParameterDescriptor[] | undefined,
         target: any, propertyKey?: string | symbol): void {
         if (isUndefined(propertyKey)) {
-            // @ts-ignore
             Reflect.defineMetadata(PARAM_TYPES, parameters, target);
 
             return;
         }
 
-        // @ts-ignore
         Reflect.defineMetadata(PARAM_TYPES, parameters, target, propertyKey);
     }
 

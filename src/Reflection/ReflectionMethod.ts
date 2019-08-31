@@ -115,7 +115,6 @@ class ReflectionMethod extends AbstractReflectionFunction {
      */
     private _getTypes(): ParameterDescriptor[] | undefined {
         if (this.isConstructor()) {
-            // @ts-ignore
             return Reflect.getMetadata(PARAM_TYPES, this._target);
         }
 
@@ -124,11 +123,9 @@ class ReflectionMethod extends AbstractReflectionFunction {
         }
 
         if (this.isStatic()) {
-            // @ts-ignore
             return Reflect.getMetadata(PARAM_TYPES, this._target, this._name);
         }
 
-        // @ts-ignore
         return Reflect.getMetadata(
             PARAM_TYPES, this._target.prototype, this._name
         );

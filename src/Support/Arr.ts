@@ -176,7 +176,7 @@ export const divide = (array: unknown[] | object): unknown[] => {
  * @param {string} prepend
  * @returns {Object}
  */
-export const dot = (obj: object, prepend: string = ''): object => {
+export const dot = (obj: object, prepend = ''): object => {
     let results = {};
 
     for (const key of Object.keys(obj)) {
@@ -388,7 +388,7 @@ export const last = (items: unknown[] | object, callback?: Function | null,
  * @param {number} depth
  * @returns {*[]}
  */
-export const flatten = (array: unknown[] | object, depth: number = Infinity): unknown[] => {
+export const flatten = (array: unknown[] | object, depth = Infinity): unknown[] => {
     let result: unknown[] = [];
 
     const arr = Array.isArray(array) ? array : Object.values(array);

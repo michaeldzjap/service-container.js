@@ -29,7 +29,7 @@ class ES5NestedMap<U, V> {
             return this;
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -44,7 +44,7 @@ class ES5NestedMap<U, V> {
             }
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return this;
     }
@@ -63,7 +63,7 @@ class ES5NestedMap<U, V> {
             return this._map.get(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -76,7 +76,7 @@ class ES5NestedMap<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
     }
 
     /**
@@ -93,7 +93,7 @@ class ES5NestedMap<U, V> {
             return this._map.has(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -106,7 +106,7 @@ class ES5NestedMap<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return false;
     }
@@ -125,7 +125,7 @@ class ES5NestedMap<U, V> {
             return this._map.delete(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -138,7 +138,7 @@ class ES5NestedMap<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return false;
     }

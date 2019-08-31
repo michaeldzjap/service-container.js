@@ -45,7 +45,7 @@ export class ContainerDefaultValueStub {
     public stub: ContainerConcreteStub;
     public dflt: string;
 
-    public constructor(stub: ContainerConcreteStub, dflt: string = 'Riley Martin') {
+    public constructor(stub: ContainerConcreteStub, dflt = 'Riley Martin') {
         this.stub = stub;
         this.dflt = dflt;
     }
@@ -74,7 +74,7 @@ export class ContainerTestCallStub {
     }
 
     @injectable()
-    public inject(stub: ContainerConcreteStub, dflt: string = 'Riley Martin'): [ContainerConcreteStub, string] {
+    public inject(stub: ContainerConcreteStub, dflt = 'Riley Martin'): [ContainerConcreteStub, string] {
         return [stub, dflt];
     }
 
@@ -121,7 +121,7 @@ export class ContainerTestContextInjectThree {
 export class ContainerStaticMethodStub {
 
     @injectable()
-    public static inject(stub: ContainerConcreteStub, dflt: string = 'Riley Martin'): [ContainerConcreteStub, string] {
+    public static inject(stub: ContainerConcreteStub, dflt = 'Riley Martin'): [ContainerConcreteStub, string] {
         return [stub, dflt];
     }
 

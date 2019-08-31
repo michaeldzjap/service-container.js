@@ -79,7 +79,7 @@ class Binder implements BinderContract {
      * @returns {void}
      */
     public bindIf<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
-        shared: boolean = false): void {
+        shared = false): void {
         if (!this.bound<U>(abstract)) {
             this.bind<U, V>(abstract, concrete, shared);
         }
@@ -94,7 +94,7 @@ class Binder implements BinderContract {
      * @returns {void}
      */
     public bind<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
-        shared: boolean = false): void {
+        shared = false): void {
         // If no concrete type was given, we will simply set the concrete type
         // to the abstract type. After that, the concrete type to be registered
         // as shared without being forced to state their classes in both of the

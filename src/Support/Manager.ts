@@ -129,8 +129,12 @@ abstract class Manager {
      * @returns {*}
      */
     private _callCustomCreator<T>(driver: string): T {
+        /* eslint-disable @typescript-eslint/ban-ts-ignore */
+
         // @ts-ignore
         return this._customCreators.get(driver)(this._dependency);
+
+        /* eslint-enable @typescript-eslint/ban-ts-ignore */
     }
 
 }

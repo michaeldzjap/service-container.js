@@ -22,7 +22,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             return this;
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -37,7 +37,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             }
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return this;
     }
@@ -56,7 +56,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             return super.get(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -69,7 +69,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
     }
 
     /**
@@ -86,7 +86,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             return super.has(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -99,7 +99,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return false;
     }
@@ -118,7 +118,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             return super.delete(keys[0]);
         }
 
-        /* eslint-disable consistent-this */
+        /* eslint-disable consistent-this, @typescript-eslint/no-this-alias */
 
         let target = this;
         for (const key of keys) {
@@ -131,7 +131,7 @@ class ESNextNestedMap<U, V> extends Map<U, V> {
             target = target.get(key);
         }
 
-        /* eslint-enable consistent-this */
+        /* eslint-enable consistent-this, @typescript-eslint/no-this-alias */
 
         return false;
     }

@@ -207,7 +207,7 @@ class Container implements ContainerContract {
      * @returns {void}
      */
     public bind<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
-        shared: boolean = false): void {
+        shared = false): void {
         this._binder.bind<U, V>(abstract, concrete, shared);
     }
 
@@ -264,7 +264,7 @@ class Container implements ContainerContract {
      * @returns {void}
      */
     public bindIf<U, V>(abstract: Identifier<U>, concrete?: Instantiable<V> | Function,
-        shared: boolean = false): void {
+        shared = false): void {
         this._binder.bindIf<U, V>(abstract, concrete, shared);
     }
 
@@ -413,7 +413,7 @@ class Container implements ContainerContract {
      * @returns {*}
      */
     public resolve<T>(abstract: Identifier<T>, parameters: any[] | object = [],
-        raiseEvents: boolean = true): any {
+        raiseEvents = true): any {
         return this._resolver.resolve<T>(abstract, parameters, raiseEvents);
     }
 

@@ -150,7 +150,7 @@ export const equals = (a: any, b: any): boolean => a === b;
  * @param {boolean} [strict=false]
  * @returns {number}
  */
-export const findIndex = (item: unknown, array: any[], strict: boolean = false): number => {
+export const findIndex = (item: unknown, array: any[], strict = false): number => {
     if (strict) {
         return array.findIndex((_: unknown): boolean => _ === item);
     }
@@ -173,7 +173,7 @@ export const findIndex = (item: unknown, array: any[], strict: boolean = false):
  * @param {boolean} [strict=false]
  * @returns {(number|undefined)}
  */
-export const findKey = (item: unknown, obj: object, strict: boolean = false): string | undefined => {
+export const findKey = (item: unknown, obj: object, strict = false): string | undefined => {
     const keys = Object.keys(obj);
 
     if (strict) {
@@ -198,7 +198,7 @@ export const findKey = (item: unknown, obj: object, strict: boolean = false): st
  * @param {boolean} [strict=false]
  * @returns {boolean}
  */
-export const inArray = (item: any, array: any[], strict: boolean = false): boolean => {
+export const inArray = (item: any, array: any[], strict = false): boolean => {
     if (strict) {
         return array.includes(item);
     }
@@ -214,7 +214,7 @@ export const inArray = (item: any, array: any[], strict: boolean = false): boole
  * @param {boolean} [strict=false]
  * @returns {boolean}
  */
-export const inObject = (item: any, obj: object, strict: boolean = false): boolean => (
+export const inObject = (item: any, obj: object, strict = false): boolean => (
     inArray(item, Object.values(obj), strict)
 );
 

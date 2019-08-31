@@ -5,6 +5,10 @@
         "moduleResolution": "node",
         "target": "es5",
         "module": "esnext",
+        "types": [
+            "node",
+            "reflect-metadata"
+        ],
         "lib": ["es5", "es6", "es7", "dom"],
         "strict": true,
         "suppressImplicitAnyIndexErrors": true,

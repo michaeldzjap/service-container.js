@@ -35,17 +35,13 @@ class InterfaceFactory {
      */
     private static _initializeMetadata(target: any, propertyName?: string): void {
         if (!isUndefined(propertyName)
-            // @ts-ignore
             && !Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target, propertyName)) {
-            // @ts-ignore
             Reflect.defineMetadata(INTERFACE_SYMBOLS, new Map, target, propertyName);
 
             return;
         }
 
-        // @ts-ignore
         if (!Reflect.hasOwnMetadata(INTERFACE_SYMBOLS, target)) {
-            // @ts-ignore
             Reflect.defineMetadata(INTERFACE_SYMBOLS, new Map, target);
         }
     }
@@ -64,9 +60,7 @@ class InterfaceFactory {
     private static _checkMetadata({name, key}: {name: string, key: string | symbol}, target: any, // eslint-disable-line
         propertyKey: string | undefined, position: number): void {
         const metadata = isUndefined(propertyKey)
-            // @ts-ignore
             ? Reflect.getMetadata(INTERFACE_SYMBOLS, target)
-            // @ts-ignore
             : Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey);
 
         if (metadata.has(position)) {
@@ -91,14 +85,12 @@ class InterfaceFactory {
     private static _defineMetadata(identifier: {name: string, key: string | symbol}, target: any, // eslint-disable-line
         propertyKey: string | undefined, position: number): void {
         if (propertyKey) {
-            // @ts-ignore
             Reflect.getMetadata(INTERFACE_SYMBOLS, target, propertyKey)
                 .set(position, identifier.key);
 
             return;
         }
 
-        // @ts-ignore
         Reflect.getMetadata(INTERFACE_SYMBOLS, target)
             .set(position, identifier.key);
     }

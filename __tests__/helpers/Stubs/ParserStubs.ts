@@ -9,7 +9,7 @@ export class ClassWithConstructorStub {
     private _c: number[];
     private _d: ParserContractStub;
 
-    public constructor(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+    public constructor(a: number, b = 'Hey now!', c: number[] = [1, 2, 3],
         @ParserContractStub d: ParserContractStub) {
         this._a = a;
         this._b = b;
@@ -41,7 +41,7 @@ export class ClassWithoutBodyStub {}
 
 export class ClassWithPublicMethodStub {
 
-    public someMethod(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+    public someMethod(a: number, b = 'Hey now!', c: number[] = [1, 2, 3],
         @ParserContractStub d: ParserContractStub): void {
         //
     }
@@ -50,7 +50,7 @@ export class ClassWithPublicMethodStub {
 
 export class ClassWithPublicStaticMethodStub {
 
-    public static someMethod(a: number, b: string = 'Hey now!', c: number[] = [1, 2, 3],
+    public static someMethod(a: number, b = 'Hey now!', c: number[] = [1, 2, 3],
         @ParserContractStub d: ParserContractStub): void {
         //
     }

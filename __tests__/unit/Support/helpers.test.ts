@@ -14,8 +14,8 @@ class ClassStub {}
 
 const DATA = [
     {target: (): void => {}, name: 'arrow function'},
-    {target: function (): void {}, name: 'unnamed function'}, // eslint-disable-line object-shorthand, no-empty-function
-    {target(): void {}, name: 'named function'}, // eslint-disable-line no-empty-function
+    {target: function (): void {}, name: 'unnamed function'}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
+    {target(): void {}, name: 'named function'}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
     {target: ClassStub, name: 'class definition'},
     {target: new ClassStub, name: 'class instance'},
     {target: {a: 1}, name: 'object instance'},
@@ -64,8 +64,8 @@ describe('helpers', (): void => {
 
     [
         {target: (): void => {}, name: 'arrow function', expected: false},
-        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function
-        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function
+        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
+        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: false},
         {target: new ClassStub, name: 'class instance', expected: true},
         {target: {a: 1}, name: 'object instance', expected: true},
@@ -117,8 +117,8 @@ describe('helpers', (): void => {
 
     [
         {target: (): void => {}, name: 'arrow function', expected: true},
-        {target: function (): void {}, name: 'unnamed function', expected: true}, // eslint-disable-line object-shorthand, no-empty-function
-        {target(): void {}, name: 'named function', expected: true}, // eslint-disable-line no-empty-function
+        {target: function (): void {}, name: 'unnamed function', expected: true}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
+        {target(): void {}, name: 'named function', expected: true}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: {a: 1}, name: 'object instance', expected: false},
     ].forEach(({target, name, expected}): void => {
         it(`determines if the target [${name}] is a function`, (): void => {
@@ -128,8 +128,8 @@ describe('helpers', (): void => {
 
     [
         {target: (): void => {}, name: 'arrow function', expected: false},
-        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function
-        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function
+        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
+        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: true},
         {target: new ClassStub, name: 'class instance', expected: false},
         {target: {a: 1}, name: 'object instance', expected: false},
@@ -146,8 +146,8 @@ describe('helpers', (): void => {
 
     [
         {target: (): void => {}, name: 'arrow function', expected: false},
-        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function
-        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function
+        {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
+        {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: false},
         {target: new ClassStub, name: 'class instance', expected: true},
         {target: {a: 1}, name: 'object instance', expected: false},

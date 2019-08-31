@@ -243,7 +243,7 @@ class Collection {
      * @param {boolean} [strict=false]
      * @returns {boolean}
      */
-    private static _includes(values: unknown[], item: unknown, strict: boolean = false): boolean {
+    private static _includes(values: unknown[], item: unknown, strict = false): boolean {
         return strict
             ? values.includes(item)
             : !isUndefined(values.find((_: unknown): boolean => item == _)); // eslint-disable-line eqeqeq
@@ -605,7 +605,7 @@ class Collection {
      * @param {boolean} strict
      * @returns {Collection}
      */
-    public whereIn(key: string, values: unknown[], strict: boolean = false): Collection {
+    public whereIn(key: string, values: unknown[], strict = false): Collection {
         const items = Collection._getArrayableItems(values) as unknown[];
 
         return this.filter((item: unknown): boolean => (
@@ -644,7 +644,7 @@ class Collection {
      * @param {boolean} strict
      * @returns {Collection}
      */
-    public whereNotIn(key: string, values: unknown[], strict: boolean = false): Collection {
+    public whereNotIn(key: string, values: unknown[], strict = false): Collection {
         const items = Collection._getArrayableItems(values) as unknown[];
 
         return this.reject((item: unknown): boolean => (
@@ -824,7 +824,7 @@ class Collection {
      * @param {number} depth
      * @returns {Collection}
      */
-    public flatten(depth: number = Infinity): Collection {
+    public flatten(depth = Infinity): Collection {
         return new Collection(flatten(this._items, depth));
     }
 
@@ -1208,7 +1208,7 @@ class Collection {
      * @param {(number|undefined)} offset
      * @returns {Collection}
      */
-    public nth(step: number, offset: number = 0): Collection {
+    public nth(step: number, offset = 0): Collection {
         const result = [];
 
         let position = 0;
@@ -1278,7 +1278,7 @@ class Collection {
      * @param {(boolean)} [strict=false]
      * @returns {Collection}
      */
-    public unique(key?: string | Function, strict: boolean = false): Collection {
+    public unique(key?: string | Function, strict = false): Collection {
         const fn = Collection._valueRetriever(key);
 
         const exists: string[] = [];
@@ -1494,7 +1494,7 @@ class Collection {
      * @param {boolean} [strict=false]
      * @returns {(number|string|boolean)}
      */
-    public search(value: Function | unknown, strict: boolean = false): number | string | boolean {
+    public search(value: Function | unknown, strict = false): number | string | boolean {
         if (!Collection._useAsCallable(value)) {
             const key = Array.isArray(this._items)
                 ? findIndex(value, this._items, strict)
@@ -1671,7 +1671,7 @@ class Collection {
      * @param {boolean} [descending=false]
      * @returns {Collection}
      */
-    public sortBy(callback: Function | string, descending: boolean = false): Collection {
+    public sortBy(callback: Function | string, descending = false): Collection {
         const results: Item[] = [];
 
         const fn = Collection._valueRetriever(callback);
@@ -1741,7 +1741,7 @@ class Collection {
      * @param {boolean} [descending=false]
      * @returns {Collection}
      */
-    public sortKeys(descending: boolean = false): Collection {
+    public sortKeys(descending = false): Collection {
         if (Array.isArray(this._items)) {
             return new Collection([...this._items]);
         }
@@ -1845,7 +1845,7 @@ class Collection {
      * @returns {Collection}
      */
     public groupBy(groupBy: [string, Function] | [Function] | Function | string,
-        preserveKeys: boolean = false): Collection {
+        preserveKeys = false): Collection {
         let nextGroups: [string, Function] | [Function] | null = null;
 
         if (Array.isArray(groupBy)) {

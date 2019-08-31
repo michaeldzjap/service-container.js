@@ -10,7 +10,7 @@ class ReflectionClassStub {
     private _name: string;
     private _impl: ReflectionClassContractStub;
 
-    public constructor(stub: DependencyStub, name: string = 'Riley Martin',
+    public constructor(stub: DependencyStub, name = 'Riley Martin',
         @ReflectionClassContractStub impl: ReflectionClassContractStub) {
         this._dependency = stub;
         this._name = name;

@@ -98,11 +98,9 @@ abstract class AbstractParameterAnalyser {
      */
     private _fetchMetadata(key: string): any {
         if (!isUndefined(this._name) && this._name !== 'constructor') {
-            // @ts-ignore
             return Reflect.getMetadata(key, this._target, this._name);
         }
 
-        // @ts-ignore
         return Reflect.getMetadata(key, this._target);
     }
 
