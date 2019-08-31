@@ -8,17 +8,17 @@ class SimpleStub {}
 class InjectableStub {
 
     // eslint-disable-next-line no-useless-constructor
-    public constructor(a: number, b: string = 'Hey now!', c: SimpleStub) {
+    public constructor(a: number, b = 'Hey now!', c: SimpleStub) {
         //
     }
 
     @injectable()
-    public static someMethod(a: number, b: string = 'Hey now!', c: SimpleStub): void {
+    public static someMethod(a: number, b = 'Hey now!', c: SimpleStub): void {
         //
     }
 
     @injectable()
-    public someMethod(a: number, b: string = 'Hey now!', c: SimpleStub): void {
+    public someMethod(a: number, b = 'Hey now!', c: SimpleStub): void {
         //
     }
 
