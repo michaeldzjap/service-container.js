@@ -26,7 +26,7 @@ class InjectableStub {
 
 const EXPECTED = [
     new ParameterDescriptor({name: 'a', type: Number, position: 0}),
-    new ParameterDescriptor({name: 'b', type: String, position: 1, value: 'Hey now!'}),
+    new ParameterDescriptor({name: 'b', type: Object, position: 1, value: 'Hey now!'}),
     new ParameterDescriptor({name: 'c', type: SimpleStub, position: 2}),
 ];
 

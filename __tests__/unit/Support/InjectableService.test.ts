@@ -12,7 +12,7 @@ import {PARAM_TYPES} from '@src/constants/metadata';
 
 const EXPECTED = [
     new ParameterDescriptor({name: 'a', type: Number, position: 0}),
-    new ParameterDescriptor({name: 'b', type: String, position: 1, value: 'Hey now!'}),
+    new ParameterDescriptor({name: 'b', type: Object, position: 1, value: 'Hey now!'}),
     new ParameterDescriptor({name: 'c', type: Array, position: 2, value: [1, 2, 3]}),
     new ParameterDescriptor({name: 'd', type: Interface, position: 3}),
 ];
