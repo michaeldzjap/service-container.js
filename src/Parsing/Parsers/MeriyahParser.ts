@@ -1,17 +1,17 @@
 import Parser from '../../Contracts/Parsing/Parser';
-import {parse} from 'cherow';
+import {parse} from 'meriyah';
 
-class CherowParser implements Parser {
+class MeriyahParser implements Parser {
 
     /**
-     * The cherow parser options.
+     * The Meriyah parser options.
      *
      * @var {Object}
      */
     private _options: object;
 
     /**
-     * Create a new cherow parser instance.
+     * Create a new Meriyah parser instance.
      *
      * @param {Object} options
      */
@@ -31,4 +31,4 @@ class CherowParser implements Parser {
 
 }
 
-export default CherowParser;
+export default MeriyahParser;

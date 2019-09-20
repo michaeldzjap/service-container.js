@@ -61,7 +61,7 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "cherow": "^1.6.9"
+    "meriyah": "^1.7.0"
   },
   "jest": {
     "projects": [

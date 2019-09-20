@@ -4,7 +4,7 @@
  * @var {Object}
  */
 export const DRIVERS = {
-    CHEROW: 'cherow'
+    MERIYAH: 'meriyah'
 };
 
 /**
@@ -12,4 +12,4 @@ export const DRIVERS = {
  *
  * @var {string}
  */
-export const DEFAULT_DRIVER = DRIVERS.CHEROW;
+export const DEFAULT_DRIVER = DRIVERS.MERIYAH;
