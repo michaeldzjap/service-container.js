@@ -1,4 +1,4 @@
-import CherowParser from './Parsers/CherowParser';
+import MeriyahParser from './Parsers/MeriyahParser';
 import Manager from '../Support/Manager';
 import Parser from '../Contracts/Parsing/Parser';
 import {DEFAULT_DRIVER, DRIVERS} from '../constants/parser';
@@ -42,19 +42,19 @@ class ParserManager extends Manager {
      */
     protected _getDriverCreators(): DriverCreators {
         return {
-            [DRIVERS.CHEROW]: this._createCherowParser.bind(this),
+            [DRIVERS.MERIYAH]: this.createMeriyahParser.bind(this),
         };
     }
 
     /**
-     * Create an instance of the cherow parser.
+     * Create an instance of the Meriyah parser.
      *
-     * @returns {CherowParser}
+     * @returns {MeriyahParser}
      */
-    private _createCherowParser(): Parser {
+    private createMeriyahParser(): Parser {
         const options = {next: true, module: true, experimental: true};
 
-        return new CherowParser(options);
+        return new MeriyahParser(options);
     }
 
 }

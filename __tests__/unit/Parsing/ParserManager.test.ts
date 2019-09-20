@@ -1,4 +1,4 @@
-import CherowParser from '@src/Parsing/Parsers/CherowParser';
+import MeriyahParser from '@src/Parsing/Parsers/MeriyahParser';
 import ParserManager from '@src/Parsing/ParserManager';
 import {SimpleStub} from '@helpers/Stubs/ParserStubs';
 
@@ -10,8 +10,8 @@ describe('ParserManager', (): void => {
     });
 
     [
-        {type: CherowParser},
-        {driver: 'cherow', type: CherowParser},
+        {type: MeriyahParser},
+        {driver: 'meriyah', type: MeriyahParser},
     ].forEach(({driver, type}): void => {
         it(`returns the [${driver}] parser`, (): void => {
             const manager = new ParserManager;
