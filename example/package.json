@@ -15,7 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "reflect-metadata": "^0.1.13",
-    "ts-loader": "^6.2.0",
+    "ts-loader": "^6.2.1",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
