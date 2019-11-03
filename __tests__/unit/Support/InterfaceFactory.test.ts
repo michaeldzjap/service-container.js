@@ -42,7 +42,7 @@ describe('InterfaceFactory', (): void => {
             }
         };
 
-        expect(fn()).toThrow('Cannot apply @Contract decorator to the same parameter multiple times.');
+        expect(fn).toThrow('Cannot apply @Contract decorator to the same parameter multiple times.');
     });
 
     it('fails when attempting to apply the same decorator to multiple method parameters', (): void => {
@@ -58,6 +58,6 @@ describe('InterfaceFactory', (): void => {
             }
         };
 
-        expect(fn()).toThrow('Injecting the same [Contract] interface multiple times is redundant.');
+        expect(fn).toThrow('Injecting the same [Contract] interface multiple times is redundant.');
     });
 });
