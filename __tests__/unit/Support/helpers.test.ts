@@ -274,11 +274,11 @@ describe('helpers', (): void => {
         expect(name).toBe('a symbol');
     });
 
-    [
-        {target: ClassStub},
-        {target: ClassStub.prototype},
-    ].forEach(({target}): void => {
-        it('returns the name of the class', (): void => {
+    it('returns the name of the class', (): void => {
+        [
+            {target: ClassStub},
+            {target: ClassStub.prototype},
+        ].forEach(({target}): void => {
             const name = getName(target);
 
             expect(name).toBe('ClassStub');
@@ -289,13 +289,15 @@ describe('helpers', (): void => {
         expect(reverse('reverse me')).toBe('em esrever');
     });
 
-    [
-        {target: 'Hey now!'},
-        {target: (): string => 'Hey now!'},
-        {target: function (): string { return 'Hey now!'; }}, // eslint-disable-line object-shorthand
-        {target(): string { return 'Hey now!'; }},
-    ].forEach(({target}): void => {
-        expect(value(target)).toBe('Hey now!');
+    test('value', (): void => {
+        [
+            {target: 'Hey now!'},
+            {target: (): string => 'Hey now!'},
+            {target: function (): string { return 'Hey now!'; }}, // eslint-disable-line object-shorthand
+            {target(): string { return 'Hey now!'; }},
+        ].forEach(({target}): void => {
+            expect(value(target)).toBe('Hey now!');
+        });
     });
 
     test('data get', (): void => {

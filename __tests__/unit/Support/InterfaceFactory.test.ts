@@ -30,7 +30,8 @@ describe('InterfaceFactory', (): void => {
     });
 
     it('fails when attempting to decorate a method parameter multiple times', (): void => {
-        try {
+        // eslint-disable-next-line require-jsdoc
+        const fn = (): void => {
             class A {
 
                 // eslint-disable-next-line no-useless-constructor
@@ -39,14 +40,14 @@ describe('InterfaceFactory', (): void => {
                 }
 
             }
-        } catch (e) {
-            expect(e).toBeInstanceOf(Error);
-            expect(e.message).toBe('Cannot apply @Contract decorator to the same parameter multiple times.');
-        }
+        };
+
+        expect(fn()).toThrow('Cannot apply @Contract decorator to the same parameter multiple times.');
     });
 
     it('fails when attempting to apply the same decorator to multiple method parameters', (): void => {
-        try {
+        // eslint-disable-next-line require-jsdoc
+        const fn = (): void => {
             class A {
 
                 // eslint-disable-next-line no-useless-constructor
@@ -55,9 +56,8 @@ describe('InterfaceFactory', (): void => {
                 }
 
             }
-        } catch (e) {
-            expect(e).toBeInstanceOf(Error);
-            expect(e.message).toBe('Injecting the same [Contract] interface multiple times is redundant.');
-        }
+        };
+
+        expect(fn()).toThrow('Injecting the same [Contract] interface multiple times is redundant.');
     });
 });
