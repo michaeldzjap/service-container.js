@@ -13,7 +13,7 @@ interface DataItem {
 class ClassStub {}
 
 const DATA = [
-    {target: (): void => {}, name: 'arrow function'},
+    {target: (): void => {}, name: 'arrow function'}, // eslint-disable-line @typescript-eslint/no-empty-function
     {target: function (): void {}, name: 'unnamed function'}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
     {target(): void {}, name: 'named function'}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
     {target: ClassStub, name: 'class definition'},
@@ -63,7 +63,7 @@ describe('helpers', (): void => {
     });
 
     [
-        {target: (): void => {}, name: 'arrow function', expected: false},
+        {target: (): void => {}, name: 'arrow function', expected: false}, // eslint-disable-line @typescript-eslint/no-empty-function
         {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
         {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: false},
@@ -116,7 +116,7 @@ describe('helpers', (): void => {
     });
 
     [
-        {target: (): void => {}, name: 'arrow function', expected: true},
+        {target: (): void => {}, name: 'arrow function', expected: true}, // eslint-disable-line @typescript-eslint/no-empty-function
         {target: function (): void {}, name: 'unnamed function', expected: true}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
         {target(): void {}, name: 'named function', expected: true}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: {a: 1}, name: 'object instance', expected: false},
@@ -127,7 +127,7 @@ describe('helpers', (): void => {
     });
 
     [
-        {target: (): void => {}, name: 'arrow function', expected: false},
+        {target: (): void => {}, name: 'arrow function', expected: false}, // eslint-disable-line @typescript-eslint/no-empty-function
         {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
         {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: true},
@@ -145,7 +145,7 @@ describe('helpers', (): void => {
     });
 
     [
-        {target: (): void => {}, name: 'arrow function', expected: false},
+        {target: (): void => {}, name: 'arrow function', expected: false}, // eslint-disable-line @typescript-eslint/no-empty-function
         {target: function (): void {}, name: 'unnamed function', expected: false}, // eslint-disable-line object-shorthand, no-empty-function, @typescript-eslint/no-empty-function
         {target(): void {}, name: 'named function', expected: false}, // eslint-disable-line no-empty-function, @typescript-eslint/no-empty-function
         {target: ClassStub, name: 'class definition', expected: false},

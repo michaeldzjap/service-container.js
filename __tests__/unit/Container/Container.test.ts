@@ -347,11 +347,11 @@ describe('Container', (): void => {
         let rebind = false;
 
         const container = new Container;
-        container.bind('foo', (): void => {});
+        container.bind('foo', (): void => {}); // eslint-disable-line @typescript-eslint/no-empty-function
         container.rebinding('foo', (): void => {
             rebind = true;
         });
-        container.bind('foo', (): void => {});
+        container.bind('foo', (): void => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 
         expect(rebind).toBeTruthy();
     });
@@ -360,11 +360,11 @@ describe('Container', (): void => {
         let rebind = false;
 
         const container = new Container;
-        container.instance('foo', (): void => {});
+        container.instance('foo', (): void => {}); // eslint-disable-line @typescript-eslint/no-empty-function
         container.rebinding('foo', (): void => {
             rebind = true;
         });
-        container.instance('foo', (): void => {});
+        container.instance('foo', (): void => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 
         expect(rebind).toBeTruthy();
     });
@@ -376,7 +376,7 @@ describe('Container', (): void => {
         container.rebinding('foo', (): void => {
             rebind = true;
         });
-        container.instance('foo', (): void => {});
+        container.instance('foo', (): void => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 
         expect(rebind).toBeFalsy();
     });
