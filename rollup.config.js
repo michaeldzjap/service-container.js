@@ -28,7 +28,6 @@ const base = {
         typescript({
             typescript: require('typescript'),
             rollupCommonJSResolveHack: true,
-            objectHashIgnoreUnknownHack: true,
             clean: true,
         }),
         sourceMaps(),
